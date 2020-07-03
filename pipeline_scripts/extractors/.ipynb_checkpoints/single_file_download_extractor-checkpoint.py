@@ -1,0 +1,103 @@
+# Script that cleans the data from the raw data. Only facebook movement
+
+
+# Imports all the necesary functions
+
+
+# Other imports
+import os, sys
+from pathlib import Path
+# Generic file download
+# Must be a .csv
+
+import pandas as pd
+import shutil
+import extraction_functions as ext_fun
+from pathlib import Path
+
+
+
+# Reads the parameters from excecution
+location_name  = sys.argv[1] # Location name
+location_folder_name = sys.argv[2] # location folder name
+
+global_dir = Path(os.path.realpath(__file__)).parent.parent.parent
+# Location Folder
+location_folder = os.path.join(global_dir, 'data/data_stages/', location_folder_name)
+
+
+# Extracts the description
+df_description = pd.read_csv(os.path.join(location_folder, 'description.csv'), index_col = 0)
+
+
+url = df_description.loc['cases_url','value']
+
+
+ident = '         '
+
+# Constructs the export
+global_dir = Path(os.path.realpath(__file__)).parent.parent.parent
+data_dir = os.path.join(global_dir, 'data/data_stages/')
+
+# Creates the folders if the don't exist
+cases_folder = os.path.join(data_dir, location_folder_name, 'raw','cases')
+if not os.path.exists(cases_folder):
+	os.makedirs(cases_folder)
+
+cases_file_location = os.path.join(cases_folder, 'cases_raw.csv')
+
+# New Cases file and location
+new_cases_file_name = 'cases_{}_raw.csv'.format(location_folder_name)
+new_cases_location = os.path.join(ext_fun.downloads_location, new_cases_file_name)
+
+# repository folder
+print(ident + 'Extracts Cases for {}'.format(location_name))
+
+
+print(ident + '   Extracting:')
+
+# Downloads the file
+ext_fun.download_file(url, new_cases_file_name)
+
+
+print(ident + '   Checking Integrity')
+
+if os.path.exists(cases_file_location) and os.path.isfile(cases_file_location):
+
+	old_cases = pd.read_csv(cases_file_location, low_memory=False)
+	new_cases = pd.read_csv(new_cases_location, low_memory=False)
+
+
+	ok = True
+
+	if not old_cases.columns.equals(new_cases.columns):
+
+		print(ident + '      The structure of the cases file has changed:')
+
+		for col in old_cases.columns.difference(new_cases.columns):
+			print(ident + '         {}: missing'.format(col))
+
+		for col in new_cases.columns.difference(old_cases.columns):
+			print(ident + '         {}: new'.format(col))
+
+		ok = False
+else:
+	print(ident + '      No previous cases file found. Skipping integrity check.')
+	ok = True
+
+
+
+# Copies Files
+
+if ok:
+	print(ident + '      Integrity OK')
+	print(ident + '   Moving File')
+	# Moves the file
+	shutil.copy(new_cases_location, cases_file_location)
+
+	print(ident + 'Done')
+
+else:
+	print(ident + 'Integrity Failed. Will Not Move File')
+	print(ident + 'Please Check File Manually!')
+	raise ValueError('Integrity Check Failed. Check File Manually')

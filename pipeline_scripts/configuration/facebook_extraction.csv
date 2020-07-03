@@ -1,0 +1,16 @@
+location_name,fb_location_name,location_folder,type_data,excecute,dataset_id,extra_param,start_date
+Colombia,Colombia,colombia,movement,YES,760245711049044,,2020-04-02
+Indiana,Indiana,indiana_usa,movement,YES,929527014133500,,2020-04-04
+Illinois,Illinois,illinois_usa,movement,YES,624921191568705,,2020-04-05
+Kentucky,Kentucky,kentucky_usa,movement,YES,2712702045493792,,2020-04-02
+Florida,Florida,florida_usa,movement,YES,213899456725544,,2020-04-09
+Italy,Italy,italy,movement,YES,208980503584163,,2020-03-23
+Peru,Peru,peru,movement,YES,542449253076164,,2020-03-25
+Bogota,Bogota,bogota,movement,YES,592302144964359,,2020-04-12
+New South Wales,New South Wales,new_south_wales,movement,YES,529422397944028,,2020-05-03
+Vermont,Vermont,vermont_usa,movement,YES,512760616081916,,2020-04-06
+Oregon,Oregon,oregon_usa,movement,YES,533347404237840,,2020-04-28
+Germany,Germany,germany,movement,YES,1344665422407136,,2020-03-25
+Brazil,Brazil,brazil,movement,YES,2319035081732462,,2020-03-31
+Colombia,COL_gadm_2,colombia,movement_range,YES,642750926308152,extra%5Bcrisis_name%5D=COL_gadm_2,2020-02-21
+Chile,Chile,chile,movement,YES,148531153150951,,2020-03-23

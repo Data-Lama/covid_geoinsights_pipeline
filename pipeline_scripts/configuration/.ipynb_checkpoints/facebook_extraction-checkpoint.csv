@@ -1,0 +1,14 @@
+location_name,location_folder,type_data,excecute,dataset_id,start_date
+Colombia,colombia,movement,YES,760245711049044,2020-04-02
+Indiana,indiana_usa,movement,YES,929527014133500,2020-04-04
+Illinois,illinois_usa,movement,YES,624921191568705,2020-04-05
+Kentucky,kentucky_usa,movement,YES,2712702045493792,2020-04-02
+Florida,florida_usa,movement,YES,213899456725544,2020-04-09
+Italy,italy,movement,YES,208980503584163,2020-03-23
+Peru,peru,movement,YES,542449253076164,2020-03-25
+Bogota,bogota,movement,YES,592302144964359,2020-04-12
+New South Wales,new_south_wales,movement,YES,529422397944028,2020-05-03
+Vermont,vermont_usa,movement,YES,512760616081916,2020-04-06
+Oregon,oregon_usa,movement,YES,533347404237840,2020-04-28
+Germany,germany,movement,YES,1344665422407136,2020-03-25
+Brazil,brazil,movement,YES,2319035081732462,2020-03-31
