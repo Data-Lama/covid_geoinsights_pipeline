@@ -1,9 +1,17 @@
 # Specific configuration file
 global_config/config_file.csv
 
+# Rplots
+Rplots.pdf
+
+
+#Excel locks
+.~lock*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+.ipynb_checkpoints/
 
 # C extensions
 *.so

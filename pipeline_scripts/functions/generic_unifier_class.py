@@ -61,6 +61,7 @@ class GenericUnifier():
 		# Description
 		self.df_description = pd.read_csv(os.path.join(data_dir, 'data_stages', location_folder_name, 'description.csv'), index_col = 0)
 
+
 	def get(self, name):
 		'''
 		Method that gets a characteristic of the description file
