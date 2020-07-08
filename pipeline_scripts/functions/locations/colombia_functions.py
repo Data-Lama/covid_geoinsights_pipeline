@@ -105,13 +105,13 @@ class Unifier(GenericUnifier):
 		polygons_info = polygons_info[['muni_id','poly_name']].rename(columns = {'muni_id':'poly_id'})
 		polygons_final = polygons.merge(polygons_info, on = 'poly_id')
 
-		# Projects to latiude and longitud
-		#polygons_final = polygons_final.set_crs("epsg:4326")
-		polygons_final = polygons_final.to_crs('epsg:4326') 
-
 		# Extracts the center
-		polygons_final['poly_lon'] = polygons_final.geometry.centroid.x
-		polygons_final['poly_lat'] = polygons_final.geometry.centroid.y
+		polygons_final['poly_lon'] = polygons_final.geometry.centroid.to_crs('epsg:4326').x
+		polygons_final['poly_lat'] = polygons_final.geometry.centroid.to_crs('epsg:4326').y
+
+		# Adjusts geometry  to latiude and longitud
+		polygons_final = polygons_final.to_crs('epsg:4326')
+
 
 		# Converts to string
 		polygons_final['poly_id'] = polygons_final['poly_id'].astype(str)
