@@ -95,13 +95,13 @@ Florida,florida_usa,construct,constructors,1,NO,universal_daily_graphs_construct
 Florida,florida_usa,analyse,analysis,1,NO,tda_script,r,Florida florida_usa all
 Florida,florida_usa,analyse,analysis,3,NO,movement_plots_script,python,Florida florida_usa all
 NewSouthWales,new_south_wales,extract,extractors,1,NO,single_file_download_extractor,python,NewSouthWales new_south_wales
-NewSouthWales,new_south_wales,unify,unifiers,1,YES,universal_generic_unifier,python,NewSouthWales new_south_wales
+NewSouthWales,new_south_wales,unify,unifiers,1,NO,universal_generic_unifier,python,NewSouthWales new_south_wales
 NewSouthWales,new_south_wales,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,NewSouthWales new_south_wales 10
 NewSouthWales,new_south_wales,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,NewSouthWales new_south_wales
 NewSouthWales,new_south_wales,construct,constructors,1,NO,universal_daily_graphs_constructor,python,NewSouthWales new_south_wales all
 NewSouthWales,new_south_wales,analyse,analysis,1,NO,tda_script,r,NewSouthWales new_south_wales all
 NewSouthWales,new_south_wales,analyse,analysis,3,NO,movement_plots_script,python,NewSouthWales new_south_wales all
-NewSouthWales,new_south_wales,POS,analysis,1,NO,polygon_prediction_analysis,python,new_south_wales radial waverley Wav-8-y Waverley
+NewSouthWales,new_south_wales,POS,analysis,1, ,polygon_prediction_analysis,python,new_south_wales radial waverley Wav-8-y Waverley
 Vermont,vermont_usa,unify,unifiers,1,NO,usa_state_unifier,python,Vermont vermont_usa
 Vermont,vermont_usa,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Vermont vermont_usa 10
 Vermont,vermont_usa,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,Vermont vermont_usa
@@ -123,4 +123,13 @@ Colombia,colombia,POS,analysis,1,NO,polygon_prediction_analysis,python,colombia 
 Colombia,colombia,POS,analysis,1,NO,polygon_prediction_analysis,python,colombia community villavicencio 50001 Villavicencio
 Colombia,colombia,POS,analysis,1,NO,polygon_prediction_analysis,python,colombia community san_andres_tumaco 52835 SanAndresDeTumaco
 Colombia,colombia,POS,analysis,1,NO,polygon_prediction_analysis,python,colombia community medellin 5001 Medellin
+Mexico,mexico,extract,extractors,1,NO,website_crawling_extractor,python,Mexico mexico
+Mexico,mexico,unify,unifiers,1,YES,universal_generic_unifier,python,Mexico mexico
+Mexico,mexico,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Mexico mexico 10
+Mexico,mexico,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,Mexico mexico
+Mexico,mexico,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Mexico mexico all
+Mexico,mexico,analyse,analysis,1,NO,tda_script,r,Mexico mexico all
+Mexico,mexico,analyse,analysis,3,NO,movement_plots_script,python,Mexico mexico all
+Mexico,mexico,analyse,analysis,5,NO,agglomerated_units_plots_script,r,Mexico mexico all
+Mexico,mexico,analyse,analysis,5,NO,agglomerated_units_plots_script,python,Mexico mexico all
 All,,POS,POS,2,NO,copy_report_files.py,python,

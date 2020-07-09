@@ -7,6 +7,7 @@ import locations.bogota_functions as bogota
 import locations.colombia_functions as colombia
 import locations.chile_functions as chile
 import locations.peru_functions as peru
+import locations.mexico_functions as mexico
 
 agglomeration_methods = ['radial','community','geometry']
 
@@ -51,6 +52,11 @@ def get_unifier_class(location):
 	if location == "peru":
 
 		unif = peru.Unifier()
+		return(unif)
+
+	if location == "mexico":
+
+		unif = mexico.Unifier()
 		return(unif)
 
 	raise ValueError('No unifier found for: {}. Please add it'.format(location))

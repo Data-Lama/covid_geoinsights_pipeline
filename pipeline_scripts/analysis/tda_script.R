@@ -10,25 +10,21 @@ suppressMessages(library('ggmap'))
 # Loads constants
 source('pipeline_scripts/functions/constants.R')
 
-# Source code
-if(dir.exists('/home/minigonche/Documents/projects/mapperKD'))
-{
-    suppressMessages(source('/home/minigonche/Documents/projects/mapperKD/R/mapperKD_functions.R'))
-    suppressMessages(source('/home/minigonche/Documents/projects/mapperKD/R/epidemiology_module.R'))
-    suppressMessages(source('/home/minigonche/Documents/projects/mapperKD/R/general_clusters.R'))
-}
-if(dir.exists("~/Documentos/mapperKD"))
-{
-    suppressMessages(source('~/Documentos/mapperKD/R/mapperKD_functions.R'))
-    suppressMessages(source('~/Documentos/mapperKD/R/epidemiology_module.R'))
-    suppressMessages(source('~/Documentos/mapperKD/R/general_clusters.R'))
-}
-
 
 # Directories
 source("global_config/config.R")
 data_dir = get_property('data_dir')
 analysis_dir = get_property('analysis_dir')
+mapper_dir = get_property('mapper_dir')
+
+# Source code
+if(dir.exists(mapper_dir))
+{
+    suppressMessages(source(mapper_dir + '/R/mapperKD_functions.R'))
+    suppressMessages(source(mapper_dir + '/R/epidemiology_module.R'))
+    suppressMessages(source(mapper_dir + '/mapperKD/R/general_clusters.R'))
+}
+
 
 
 # Working Directory

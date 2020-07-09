@@ -1,6 +1,8 @@
 import os
+import sys
 import time
 import pandas as pd
+from os import listdir
 from pathlib import Path
 from datetime import date
 
@@ -37,19 +39,11 @@ df_description = pd.read_csv(os.path.join(location_folder, 'description.csv'), i
 # Extracts URL
 url = df_description.loc['cases_url','value']
 
-# Extracts download file name
-if 'cases_download_file_name' in df_description.index:
-    download_file_name = df_description.loc['cases_download_file_name','value']
-    tmp = download_file_name.split("$")
-    if len(tmp) == 2:
-        download_file_name = tmp[0] + date + tmp[1]
-    elif len(tmp) == 0:
-        download_file_name = tmp[0]
+# Extract file name
+if 'cases_file_name' in df_description.index:
+    cases_file_name = df_description.loc['cases_file_name','value']
 else:
-    raise Exception("Please modify descrition.csv to include the expected download file name")
-
-# Set download path
-download_path = os.path.join(cases_folder, download_file_name)
+    raise Exception("Please modify descrition.csv to include the cases file name")
 
 # Creates the folders if the don't exist
 cases_folder = os.path.join(data_dir, 'data_stages', location_folder_name, 'raw','cases')
@@ -57,7 +51,7 @@ cases_folder = os.path.join(data_dir, 'data_stages', location_folder_name, 'raw'
 if not os.path.exists(cases_folder):
 	os.makedirs(cases_folder)
 
-cases_file_location = os.path.join(cases_folder, 'cases_raw.csv')
+cases_file_location = os.path.join(cases_folder, cases_file_name)
 
 
 # repository folder
@@ -71,8 +65,7 @@ def get_data(xpath="", element_id=""):
     # Set driver options
     options = Options()
     options.set_preference("browser.download.folderList", 2)
-    #options.set_preference("browser.download.dir", cases_folder)
-    options.set_preference("browser.download.dir", "/Local/Users/andrea/Downloads")
+    options.set_preference("browser.download.dir", cases_folder)
     options.set_preference("browser.download.useDownloadDir", True)
     options.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv")
 
@@ -82,7 +75,7 @@ def get_data(xpath="", element_id=""):
     driver.implicitly_wait(5)
     if xpath != "":
         element = driver.find_element_by_xpath(xpath)
-    elif download_id != "":
+    elif element_id != "":
         element = driver.find_element_by_id(element_id)
     else:
         raise Exception("Must provide xpath or element id.")
@@ -91,20 +84,22 @@ def get_data(xpath="", element_id=""):
 
 
 def check_download():
-
     t = MAX_WAIT
-
+    files_after = os.listdir(cases_folder)
     while t:
-        if os.path.exists(download_path):
+        if len(list(set(files_after) - set(files_before))) > 0:
             retreived = True
-            break
+            return list(set(files_after) - set(files_before))[0]
         mins, secs = divmod(t, 60)
         timeformat = '{:02d}:{:02d}'.format(mins, secs)
         print(timeformat, end='\r')
         time.sleep(1)
         t -= 1
+        files_after = os.listdir(cases_folder)
     if not retreived:
         raise Exception('Timeout. Data was not retreived')
+
+files_before = os.listdir(cases_folder)
 
 # Extracts XPath or element ID for download
 if 'cases_download_xpath' in df_description.index:
@@ -116,8 +111,12 @@ elif 'cases_download_element_id' in df_description.index:
 else:
     raise Exception("Please modify descrition.csv to include either an element_id or an Xpath for download")
 
+# Get name of downloaded file
+download_file_name = check_download()
+download_path = os.path.join(cases_folder, download_file_name)
+
 print(INDENT + '   Waiting for download')
-check_download()
+
 
 print(INDENT + '   Checking Integrity')
 
@@ -146,6 +145,8 @@ if os.path.exists(cases_file_location) and os.path.isfile(cases_file_location):
 
 else:
     os.rename(download_path, cases_file_location)
+
+print(INDENT + '         Done!')
 
 
 
