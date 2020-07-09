@@ -30,7 +30,7 @@ location_folder = args[2] # Location Folder
 agglomeration_method = args[3] # Agglomeration method to build on to
 
 # For Debug
-#setwd("~/Dropbox/Projects/covid_fb_pipeline")
+#setwd("~/Dropbox/Projects/covid_fb_pipeline/covid_geoinsights_pipeline")
 #location_name = 'Colombia'
 #location_folder = 'colombia'
 
@@ -122,6 +122,14 @@ agg_poly_1 = polygons %>%
   summarise(poly_name = exctract_name_by_cases(poly_name, num_cases), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(poly_lon, poly_lat), poly_lon = extract_center_by_cases(poly_lon, poly_lat, num_cases)[1], poly_lat = extract_center_by_cases(poly_lon, poly_lat, num_cases)[2]) %>%
   ungroup()  
 
+# Creates the location to community map
+polygon_community_map = agg_poly_1 %>% 
+                        select(community_id, poly_name) %>%
+                        rename(community_name = poly_name) %>%
+                        inner_join(polygons, by = c('community_id' = 'final_id')) %>%
+                        select(poly_id, poly_name, community_id, community_name )
+          
+
 
 agg_poly = polygons %>% 
   group_by(community_id) %>%
@@ -189,6 +197,7 @@ write.csv( agg_cases, file.path(export_folder,'cases.csv'), row.names = FALSE)
 write.csv( agg_mov, file.path(export_folder,'movement.csv'), row.names = FALSE)
 write.csv(agg_poly, file.path(export_folder,'polygons.csv'), row.names = FALSE)
 write.csv(agg_pop, file.path(export_folder,'population.csv'), row.names = FALSE)
+write.csv(polygon_community_map, file.path(export_folder,'polygon_community_map.csv'), row.names = FALSE)
 
 cat(paste(ident, 'Done!','\n', sep = ""))
 

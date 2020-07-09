@@ -116,6 +116,10 @@ class Unifier(GenericUnifier):
 		# Converts to string
 		polygons_final['poly_id'] = polygons_final['poly_id'].astype(str)
 
+		# Manually adjusts adjusts Bogota
+		polygons_final.loc[polygons_final.poly_id == '11001', 'poly_lon'] = -74.0939301
+		polygons_final.loc[polygons_final.poly_id == '11001', 'poly_lat'] = 4.6576632
+
 		return(polygons_final)
 
 
