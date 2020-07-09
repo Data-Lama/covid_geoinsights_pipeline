@@ -19,7 +19,7 @@ data_folder = os.path.join(data_dir, 'data_stages')
 ident = '   '
 
 
-def extract_polygon_distance(location, agglomeration_method, polygon_id, start_day = 0, lag = 0, strech = 1, base_locations = None, verbose = False, accum = False, smooth_days = 1):
+def extract_polygon_distance(location, agglomeration_method, polygon_id, start_day = 0, lag = 0, strech = 1, base_locations = None, verbose = False, smooth_days = 1):
 	'''
 	Extracts the most similar locations to the given one
 	'''
@@ -36,10 +36,9 @@ def extract_polygon_distance(location, agglomeration_method, polygon_id, start_d
 
 	current = current[current.day >= start_day]
 	
-	if accum:
-		current_total_cases = current.num_cases.max()
-	else:
-		current_total_cases = current.num_cases.sum()
+	# Total cases
+	current_total_cases = current.num_cases.sum()
+
 
 	# Extracts end_day
 	end_day = current.day.max()
@@ -53,10 +52,14 @@ def extract_polygon_distance(location, agglomeration_method, polygon_id, start_d
 
 			if verbose:
 				print(ident + loc)
+
 			polygons_location = os.path.join(data_folder, loc, 'agglomerated',agglomeration_method, 'polygons.csv')
 			polys = pd.read_csv(polygons_location)
 
+			i = 0
 			for ind, row in polys.iterrows():
+
+				i += 1
 
 				poly = row.poly_id
 				
@@ -75,14 +78,11 @@ def extract_polygon_distance(location, agglomeration_method, polygon_id, start_d
 					distance = distance_between_timeseries(current, other)
 					
 				# Calculates total cases
-				if accum:
-					total_cases_dif = np.abs(current_total_cases - other.num_cases.max())
-				else:
-					total_cases_dif = np.abs(current_total_cases - other.num_cases.sum())
+				total_cases_dif = np.abs(current_total_cases - other.num_cases.sum())
 						
 				
 				if verbose:
-					print(ident + '   {}, {}, {}'.format(poly,other_max_day, distance ))
+					print(ident + f'   {poly} ({i} of {polys.shape[0]}). Max Day: {other_max_day}, Distance: {distance}')
 
 				res.append({'location':loc, 'polygon_id':poly, 'polygon_name':row.poly_name, 'dist': distance, 'max_day':other_max_day, 'total_cases_dif':total_cases_dif})
 			
@@ -93,7 +93,7 @@ def extract_polygon_distance(location, agglomeration_method, polygon_id, start_d
 	return(df)
 
 
-def extract_location_distance(location, agglomeration_method, start_day = 0, lag = 0, strech = 1, base_locations = None, verbose = False, accum = False, smooth_days = 1, types = ['state','country']):
+def extract_location_distance(location, agglomeration_method, start_day = 0, lag = 0, strech = 1, base_locations = None, verbose = False, smooth_days = 1, types = ['state','country']):
 	'''
 	Extracts the most similar locations to the given one
 	'''
@@ -110,10 +110,8 @@ def extract_location_distance(location, agglomeration_method, start_day = 0, lag
 
 	current = current[current.day >= start_day]
 	
-	if accum:
-		current_total_cases = current.num_cases.max()
-	else:
-		current_total_cases = current.num_cases.sum()
+	current_total_cases = current.num_cases.sum()
+
 
 	# Extracts end_day
 	end_day = current.day.max()
@@ -151,10 +149,7 @@ def extract_location_distance(location, agglomeration_method, start_day = 0, lag
 				distance = distance_between_timeseries(current, other)
 				
 				# Calculates total cases
-				if accum:
-					total_cases_dif = np.abs(current_total_cases - other.num_cases.max())
-				else:
-					total_cases_dif = np.abs(current_total_cases - other.num_cases.sum())
+				total_cases_dif = np.abs(current_total_cases - other.num_cases.sum())
 						
 				
 				if verbose:
@@ -302,7 +297,7 @@ def extract_timeseries_no_smooth(location, agglomeration_method, polygon_id, lag
 	return(df_cases)
 
 
-def get_closest_neighbors(location, agglomeration_method, polygon_id, k, start_day = 0, lag = 0, strech = 3, base_locations = None, verbose = False, accum = False, smooth_days = 1, types = ['state','country']):
+def get_closest_neighbors(location, agglomeration_method, polygon_id, k = None, start_day = 0, lag = 0, strech = 3, base_locations = None, verbose = False, smooth_days = 1, types = ['state','country']):
 	
 	if polygon_id != None:
 		df = extract_polygon_distance(location = location,
@@ -312,8 +307,7 @@ def get_closest_neighbors(location, agglomeration_method, polygon_id, k, start_d
 									  lag = lag, 
 									  strech = strech, 
 									  base_locations = base_locations, 
-									  verbose = verbose, 
-									  accum = accum,
+									  verbose = verbose, 									  
 									  smooth_days = smooth_days)
 	else:
 
@@ -325,10 +319,13 @@ def get_closest_neighbors(location, agglomeration_method, polygon_id, k, start_d
 										strech = strech, 
 										base_locations = base_locations, 
 										verbose = verbose, 
-										accum = accum, 
 										smooth_days = smooth_days, 
 										types = types)
 	
-	return(df.head(min(df.shape[0],k)))
+	# Extract only the k closest (if k is given)
+	if k != None and k > 0:
+		return(df.head(min(df.shape[0],k)))
+	else:
+		return(df)
 
 

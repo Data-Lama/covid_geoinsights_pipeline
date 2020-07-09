@@ -67,12 +67,15 @@ print(ident + '      Checks Data Structure')
 if 'geometry' not in polygons.columns or 'POLYGON' not in polygons.geometry.values[0].upper():
 	raise ValueError('To agglomerate by geometry, polygons must have a geometry column populated with POLYGON geometry')
 
+
+
 print(ident + '      Converts to GeoPandas')
 
 # Converts the datasets into geometry
 # Polygons
 polygons['geometry'] = polygons['geometry'].apply(wkt.loads)
 polygons = geopandas.GeoDataFrame(polygons, geometry = 'geometry')
+
 
 # Cases
 cases = geopandas.GeoDataFrame(cases, geometry= geopandas.points_from_xy(cases.lon, cases.lat))
@@ -123,6 +126,7 @@ print()
 print(ident + '   Saves Data:')
 
 print(ident + '      Cases')
+
 cases_date_max = agg_cases.date_time.max()
 cases_date_min = agg_cases.date_time.min()
 agg_cases.to_csv(os.path.join(agglomeration_folder, 'cases.csv'), index = False)
