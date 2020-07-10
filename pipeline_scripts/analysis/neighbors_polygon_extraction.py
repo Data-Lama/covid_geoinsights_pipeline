@@ -71,7 +71,7 @@ axis_font_size = 12
 # Extracts Neighbors
 print(ident + '   Extracts All closest neighbors')
 
-df_neighbors = get_closest_neighbors(location = location, agglomeration_method = agglomeration_method, polygon_id = polygon_id, k = k, start_day = start_day, lag = lag, strech = strech,  verbose = True, smooth_days = smooth_days)
+df_neighbors = get_closest_neighbors(location = location, agglomeration_method = agglomeration_method, polygon_id = polygon_id, k = k, start_day = start_day, lag = lag, strech = strech,  verbose = False, smooth_days = smooth_days)
 df_neighbors.to_csv(os.path.join(folder_location, 'neighbors.csv'), index = False)
 
 
