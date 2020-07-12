@@ -81,6 +81,9 @@ df_prediction = pd.read_csv(os.path.join(folder_location ,'training_data.csv'), 
 print(ident + '   Trains the model')
 df_results, summary_dict, weights = predict_location(location, polygon_id, df_prediction, alpha_options = alpha_options, iterations = iterations, verbose = False)
 
+df_results['polygon_id'] = polygon_id
+
+df_results.to_csv(os.path.join(folder_location, 'predicted_data.csv'), index = False)
 
 # Plots the prediction
 print(ident + '   Plots Prediction')

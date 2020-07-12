@@ -50,7 +50,7 @@ Germany,germany,construct,constructors,1,NO,universal_daily_graphs_constructor,p
 Germany,germany,analyse,analysis,1,NO,tda_script,r,Germany germany all
 Germany,germany,analyse,analysis,3,NO,movement_plots_script,python,Germany germany all
 Germany,germany,analyse,analysis,5,NO,agglomerated_units_plots_script,r,Germany germany all
-Germany,germany,analyse,analysis,5,NO,polygon_info_timewindow,python,germany community 5 days
+Germany,germany,analyse,analysis,5,NO,polygon_info_timewindow,python,germany community 2020-04-12 5 days
 Germany,germany,analyse,analysis,5,NO,agglomerated_units_plots_script,python,Germany germany all
 Indiana,indiana_usa,unify,unifiers,1,NO,usa_state_unifier,python,Indiana indiana_usa
 Indiana,indiana_usa,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Indiana indiana_usa 10
@@ -115,15 +115,24 @@ Oregon,oregon_usa,agglomerate,agglomerators,2,NO,universal_community_agglomerate
 Oregon,oregon_usa,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Oregon oregon_usa all
 Oregon,oregon_usa,analyse,analysis,1,NO,tda_script,r,Oregon oregon_usa all
 Oregon,oregon_usa,analyse,analysis,3,NO,movement_plots_script,python,Oregon oregon_usa all
+Mexico,mexico,extract,extractors,1,NO,website_crawling_extractor,python,Mexico mexico
+Mexico,mexico,unify,unifiers,1,NO,universal_generic_unifier,python,Mexico mexico
+Mexico,mexico,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Mexico mexico 10
+Mexico,mexico,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,Mexico mexico
+Mexico,mexico,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Mexico mexico all
+Mexico,mexico,analyse,analysis,1,NO,tda_script,r,Mexico mexico all
+Mexico,mexico,analyse,analysis,3,NO,movement_plots_script,python,Mexico mexico all
+Mexico,mexico,analyse,analysis,5,NO,agglomerated_units_plots_script,r,Mexico mexico all
+Mexico,mexico,analyse,analysis,5,NO,agglomerated_units_plots_script,python,Mexico mexico all
 Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community bogota 11001 Bogota
 Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community bogota 11001 Bogota 20
 Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community bogota 11001 Bogota
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community barranquilla 8001 Barranquilla
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community barranquilla 8001 Barranquilla 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community barranquilla 8001 Barranquilla
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community cartagena 13001 Cartagena
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community cartagena 13001 Cartagena 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community cartagena 13001 Cartagena
+Colombia,colombia,POS,analysis,1,YES,neighbors_polygon_extraction,python,colombia community barranquilla 8001 Barranquilla
+Colombia,colombia,POS,analysis,2,YES,polygon_prediction_dataset_builder,python,colombia community barranquilla 8001 Barranquilla 20
+Colombia,colombia,POS,analysis,3,YES,polygon_prediction_analysis,python,colombia community barranquilla 8001 Barranquilla
+Colombia,colombia,POS,analysis,1,YES,neighbors_polygon_extraction,python,colombia community cartagena 13001 Cartagena
+Colombia,colombia,POS,analysis,2,YES,polygon_prediction_dataset_builder,python,colombia community cartagena 13001 Cartagena 20
+Colombia,colombia,POS,analysis,3,YES,polygon_prediction_analysis,python,colombia community cartagena 13001 Cartagena
 Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community cali 76001 Cali
 Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community cali 76001 Cali 20
 Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community cali 76001 Cali
