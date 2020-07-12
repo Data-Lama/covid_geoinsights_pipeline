@@ -1,3 +1,4 @@
+import datetime
 # Module with general functions
 
 
@@ -23,3 +24,15 @@ def clean_for_publication(s):
 		s = ('-'.join(s_split[0:-1])).replace(', US',', EEUU').replace(', ','-')
 
 	return(s)
+
+def load_README(path):
+	readme = {}
+	with open(path, 'r') as f:
+		for line in f:
+			line = line.strip()
+			line = line.split(':')
+			key = "_".join(line[0].split(' '))
+			value = ":".join(line[1:]).strip()
+			readme[key] = value
+	return readme
+			

@@ -50,7 +50,7 @@ Germany,germany,construct,constructors,1,NO,universal_daily_graphs_constructor,p
 Germany,germany,analyse,analysis,1,NO,tda_script,r,Germany germany all
 Germany,germany,analyse,analysis,3,NO,movement_plots_script,python,Germany germany all
 Germany,germany,analyse,analysis,5,NO,agglomerated_units_plots_script,r,Germany germany all
-Germany,germany,analyse,analysis,5,YES,polygon_info_timewindow,python,germany community 2020-04-12 5 days
+Germany,germany,analyse,analysis,5,NO,polygon_info_timewindow,python,germany community 5 days
 Germany,germany,analyse,analysis,5,NO,agglomerated_units_plots_script,python,Germany germany all
 Indiana,indiana_usa,unify,unifiers,1,NO,usa_state_unifier,python,Indiana indiana_usa
 Indiana,indiana_usa,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Indiana indiana_usa 10
@@ -142,6 +142,8 @@ Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia 
 Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community medellin 5001 Medellin
 Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community medellin 5001 Medellin 20
 Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community medellin 5001 Medellin
+Colombia,colombia,POS,analysis,3,NO,polygon_info_timewindow,python,colombia community 5 days
+Colombia,colombia,POS,analysis,3,YES,generate_alert_file,python,colombia community 5 days
 Mexico,mexico,extract,extractors,1,NO,website_crawling_extractor,python,Mexico mexico
 Mexico,mexico,unify,unifiers,1,NO,universal_generic_unifier,python,Mexico mexico
 Mexico,mexico,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Mexico mexico 10
