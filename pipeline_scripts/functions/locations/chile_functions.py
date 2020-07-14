@@ -40,10 +40,11 @@ class Unifier(GenericUnifier):
 
 		file_name = os.path.join(self.raw_folder, 'cases', self.get('cases_file_name'))
 
-		df = pd.read_csv(file_name, parse_dates = ['Fecha'])
+		df = pd.read_csv(file_name, parse_dates = ['Fecha'], dtype={'Codigo comuna':'str'})
 		df = df.rename(columns = columns)
 
 		df_cases = df.loc[df.num_cases > 0, ['date_time','geo_id','region','comune','num_cases']].copy()
+		df_cases = df_cases.dropna(subset = ['geo_id'])
 		df_cases.geo_id = df_cases.geo_id.astype(str)
 
 

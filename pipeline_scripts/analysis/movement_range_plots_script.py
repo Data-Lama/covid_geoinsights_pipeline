@@ -9,6 +9,8 @@ import pandas as pd
 import numpy as np
 import constants as con
 
+from datetime import timedelta
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set_style("whitegrid")
@@ -41,6 +43,8 @@ suptitle_font_size = 14
 individual_plot_size = 12
 axis_font_size = 12
 max_selected = 8
+height = 3
+aspect= 5
 
 # Reads the parameters from excecution
 location_name  =  sys.argv[1] # location name
@@ -77,53 +81,132 @@ for agglomeration_method in agglomeration_methods:
 
 	# Unified folder location
 	unified_folder_location = os.path.join(data_dir, 'data_stages', location_folder, 'unified')
+	# raw
+	raw_folder_location = os.path.join(data_dir, 'data_stages', location_folder, 'raw')
 
 
 
 	print(ident + 'Excecuting Movement Analysis for {} with {} Agglomeration ({} of {}))'.format(location_name, agglomeration_method,i , len(agglomeration_methods)))
 
 	# Loads the data
-	print(ident + '   Extracts the movement for {}'.format(location_name))
+	print(ident + '   Extracts the movement and cases for {}'.format(location_name))
+
 
 	# Loads the movement range
-	df = pd.read_csv(os.path.join(unified_folder_location, 'movement_range.csv'), parse_dates = ['ds'])
-	
+	df_mov = pd.read_csv(os.path.join(unified_folder_location, 'movement_range.csv'), parse_dates = ['ds'])
+	df_mov.rename(columns = {'ds':'date_time','all_day_bing_tiles_visited_relative_change':'value'}, inplace = True)
+	df_mov = df_mov[['date_time','value', 'polygon_id']].copy()
+	df_mov['type'] = 'movement'
+
+	# Loads cases
+	df_cases_all = pd.read_csv(os.path.join(unified_folder_location, 'cases.csv'), parse_dates = ['date_time'])
+	df_cases = df_cases_all.rename(columns = {'num_cases':'value', 'geo_id': 'polygon_id'})
+	df_cases = df_cases[['date_time','value', 'polygon_id']].copy()
+	df_cases['type'] = 'cases' 
+
+	# Loads milestones
+	# Loads milestones
+	df_miles = None
+	milestones_locations = os.path.join(raw_folder_location, 'milestones/milestones.csv')
+	if  os.path.exists(milestones_locations):
+
+		df_miles = pd.read_csv(milestones_locations, parse_dates = ['date_time'], dayfirst = True)
+		df_miles.sort_values('date_time', inplace = True)
+
+		df_miles.index = [i for i in range(1,(df_miles.shape[0] + 1))]
+
+		df_miles.to_csv(os.path.join(export_folder_location,'milestones.csv'))
+
+
+
+	df = pd.concat((df_mov, df_cases), ignore_index = True)
 	# Plots movement all
 	print(ident + '   Plots movement for {} (All)'.format(location_name))
-	
+
 	# Global Movmeent Plot
 	df_plot = df
-	fig = plt.figure(figsize=fig_size)
-	ax = sns.lineplot(data = df_plot, x = 'ds', y = 'all_day_bing_tiles_visited_relative_change')
-	ax.set_title('Cambio Porcentual Movimiento {} según datos Geoinsights (Facebook)'.format(location_name), fontsize=suptitle_font_size)
-	ax.set_xlabel('Fecha', fontsize=axis_font_size)
-	ax.set_ylabel('Porcentaje Cambio', fontsize=axis_font_size)
-	fig.savefig(os.path.join(export_folder_location,'mov_range_{}.png'.format(location_folder)))
+
+	g = sns.relplot(x="date_time", y="value",row="type",
+	            height=height, aspect=aspect, facet_kws=dict(sharey=False),
+	            kind="line", data=df_plot)
+
+
+	# Axis
+	g.set_axis_labels("Fecha", "")
+	g.axes[0,0].set_ylabel('Porcentaje')
+	g.axes[1,0].set_ylabel('Número Casos')
+
+	# Titles
+	g.axes[0,0].set_title('Cambio Porcentual en el Movimiento a Nivel Nacional')
+	g.axes[1,0].set_title('Casos Promedio a Nivel Nacional')
+
+
+	#Adds milestones
+	if df_miles is not None:
+		limits = g.axes[0,0].get_ylim()
+		top_pos = limits[1] - (limits[1] - limits[0])*0.05
+
+
+		for ind, row in df_miles.iterrows():
+			g.axes[0,0].text(row.date_time - timedelta(hours = 12), top_pos, str(ind))
+			g.axes[0,0].axvline( row.date_time, color='red', linestyle='--', lw=1, ymin = 0.0,  ymax = 0.9)
+			g.axes[1,0].axvline( row.date_time, color='red', linestyle='--', lw=1, ymin = 0.0,  ymax = 1)
+
+	g.savefig(os.path.join(export_folder_location,'mov_range_{}.png'.format(location_folder)))
+
+	
 	
 	
 	if location_name == 'Colombia':
 		
-	
-		# Plots movement Selected
+
+		# Plots movement selected
 		print(ident + '   Plots movement for {} (Selected)'.format(location_name))
+
+		top = 100
+		df_index_map = pd.read_csv(os.path.join(raw_folder_location, 'geo/movement_range_polygon_id_map.csv'))
+
+		# Gets top  places
+		df_top = df_cases_all[['geo_id','location','num_cases']].groupby(['geo_id','location']).sum().reset_index().sort_values('num_cases', ascending = False)
+		df_top = df_top.head(min(top,df_top.shape[0]))
+		#filters out
+		df_index_map = df_index_map[df_index_map.poly_id.isin(df_top.geo_id)]
+
+
+
+		# Global Movmeent Plot
+		mov_index = (df['type'] == 'movement') & (df.polygon_id.isin(df_index_map.movement_range_poly_id))
+		cases_index = (df['type'] == 'cases') & (df.polygon_id.isin(df_index_map.poly_id))
+
+		df_plot = df[(mov_index) | (cases_index)]
+
+		g = sns.relplot(x="date_time", y="value",row="type",
+		            height=height, aspect=aspect, facet_kws=dict(sharey=False),
+		            kind="line", data=df_plot)
+
+		# Axis
+		g.set_axis_labels("Fecha", "")
+		g.axes[0,0].set_ylabel('Porcentaje')
+		g.axes[1,0].set_ylabel('Número Casos')
+
+		# Titles
+		g.axes[0,0].set_title('Cambio Porcentual en el Movimiento (Lugares con más Casos)')
+		g.axes[1,0].set_title('Casos Promedio (Lugares con más Casos)')
+
+		#Adds milestones
+		if df_miles is not None:
+			limits = g.axes[0,0].get_ylim()
+			top_pos = limits[1] - (limits[1] - limits[0])*0.05
+
+
+		for ind, row in df_miles.iterrows():
+			g.axes[0,0].text(row.date_time - timedelta(hours = 12), top_pos, str(ind))
+			g.axes[0,0].axvline( row.date_time, color='red', linestyle='--', lw=1, ymin = 0.0,  ymax = 0.9)
+			g.axes[1,0].axvline( row.date_time, color='red', linestyle='--', lw=1, ymin = 0.0,  ymax = 1)
 		
-		# Creates Polygons
-		# Selected places
-		selected = set(['Bogotá','Medellín', 'Cali','Villavicencio','Barranquilla', 'Cartagena', 'Santa Marta', 'Leticia'])
+		g.savefig(os.path.join(export_folder_location,'mov_range_fb_polygon_{}.png'.format(location_folder)))
 
-		poly = df.groupby(['polygon_id','polygon_name']).size().reset_index().rename(columns = {0:'total'})
-		poly['Lugar'] = poly.polygon_name.apply(clean_name)
-		poly = poly[poly.Lugar.isin(selected)]
 
-		# Selected Movement Plot
-		df_plot = df.merge(poly, on = 'polygon_id')
 
-		fig = plt.figure(figsize=fig_size)
-		ax = sns.lineplot(data = df_plot, x = 'ds', y = 'all_day_bing_tiles_visited_relative_change', hue = 'Lugar')
-		ax.set_title('Cambio Porcentual Movimiento Lugares Seleccionados según datos Geoinsights (Facebook)'.format(location_name), fontsize=suptitle_font_size)
-		ax.set_xlabel('Fecha', fontsize=axis_font_size)
-		ax.set_ylabel('Porcentaje', fontsize=axis_font_size)
-		
-		fig.savefig(os.path.join(export_folder_location,'mov_range_fb_polygon_{}.png'.format(location_folder)))
 
 print(ident + 'Done')

@@ -6,7 +6,7 @@ from general_functions import *
 
 # Other imports
 import os, sys
-
+from datetime import timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -88,6 +88,7 @@ for agglomeration_method in agglomeration_methods:
     if len(dfs) == 0:
         raise ValueError(f'No predictions precomputed polygon predictions found for location: {location_name}, please excecute the script: polygon_prediction_analysis.py for selected polygons before this one.')
 
+
     # Concatenates all data frames
     df_results = pd.concat(dfs)
 
@@ -109,13 +110,25 @@ for agglomeration_method in agglomeration_methods:
     df1.rename(columns = {'target_num_cases': 'cases', 'target_num_cases_accum': 'cases_accum'}, inplace = True)
     df1['Tipo'] = 'Real' 
 
-    df2 = df_results[['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
+    # Histroic Predict
+    df2 = df_results.loc[ ~df_results.target_num_cases.isna(), ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
     #Groups
     df2 = df2.groupby('target_date').sum().reset_index()
     df2.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
-    df2['Tipo'] = 'Predecido' 
+    df2['Tipo'] = 'Predecido Histórico' 
 
-    df_plot = pd.concat((df1,df2), ignore_index = True)
+    # Future Prediction
+    # Future Prediction
+    start_date = df_results[df_results.target_num_cases.isna()].target_date.min() - timedelta(days = 5)
+    df3 = df_results.loc[ df_results.target_date >= start_date, ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
+    #Groups
+    df3 = df3.groupby('target_date').sum().reset_index()
+    df3.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
+    df3['Tipo'] = 'Proyección' 
+
+    # Unifies
+    df_plot = pd.concat((df1,df2, df3), ignore_index = True)
+
 
     df_plot['cases'] = df_plot.cases.astype(float)
     df_plot['cases_accum'] = df_plot.cases_accum.astype(float)

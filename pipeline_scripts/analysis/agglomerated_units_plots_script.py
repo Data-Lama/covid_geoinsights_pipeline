@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 import numpy as np
-
+from datetime import timedelta
 import constants as con
 
 import matplotlib.pyplot as plt
@@ -97,6 +97,7 @@ for agglomeration_method in agglomeration_methods:
 
 	fig = plt.figure(figsize=fig_size)
 	df_plot = df_movement.loc[df_movement.start_poly_id == df_movement.end_poly_id, ['date_time','start_poly_name', 'movement']].groupby(['date_time','start_poly_name']).mean().reset_index()
+	df_plot = df_plot[df_plot.date_time <= (df_plot.date_time.max() - timedelta(days = 1))]
 
 	df_plot = df_plot.groupby('start_poly_name').apply(lambda df: get_percentage_difference(df, 5)).dropna()
 
