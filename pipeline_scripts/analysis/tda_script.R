@@ -22,7 +22,7 @@ if(dir.exists(mapper_dir))
 {
     suppressMessages(source(mapper_dir + '/R/mapperKD_functions.R'))
     suppressMessages(source(mapper_dir + '/R/epidemiology_module.R'))
-    suppressMessages(source(mapper_dir + '/mapperKD/R/general_clusters.R'))
+    suppressMessages(source(mapper_dir + '/R/general_clusters.R'))
 }
 
 
