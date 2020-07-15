@@ -137,7 +137,7 @@ for agglomeration_method in agglomeration_methods:
     fig, ax = plt.subplots(2,1, figsize=(15,8))
 
 
-    fig.suptitle('Predicción para {} ({}% de los Cases)'.format(location_name, np.round(100*coverage,1)), fontsize=suptitle_font_size)
+    fig.suptitle('Predicción para {} ({}% de los Casos)'.format(location_name, np.round(100*coverage,1)), fontsize=suptitle_font_size)
 
     # Plot individual Lines
     sns.lineplot(x = 'target_date', y = 'cases', hue = 'Tipo', data = df_plot, ax = ax[0])

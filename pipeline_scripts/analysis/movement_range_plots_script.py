@@ -139,7 +139,7 @@ for agglomeration_method in agglomeration_methods:
 
 	# Titles
 	g.axes[0,0].set_title('Cambio Porcentual en el Movimiento a Nivel Nacional')
-	g.axes[1,0].set_title('Casos Promedio a Nivel Nacional')
+	g.axes[1,0].set_title('Casos Diarios a Nivel Nacional')
 
 
 	#Adds milestones
@@ -197,7 +197,7 @@ for agglomeration_method in agglomeration_methods:
 
 		# Titles
 		g.axes[0,0].set_title('Cambio Porcentual en el Movimiento (Lugares con más Casos)')
-		g.axes[1,0].set_title('Casos Promedio (Lugares con más Casos)')
+		g.axes[1,0].set_title('Casos Diarios (Lugares con más Casos)')
 
 		#Adds milestones
 		if df_miles is not None:

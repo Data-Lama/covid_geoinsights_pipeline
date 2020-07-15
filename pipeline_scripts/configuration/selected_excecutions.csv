@@ -2,10 +2,10 @@ location_name,locations_folder,stage,folder_location,position,excecute,script_na
 All,,PRE,PRE,1,NO,download_facebook,python,
 USA,usa,PRE,extractors,2,NO,usa_extractor,python,
 Colombia,colombia,extract,extractors,1,NO,single_file_download_extractor,python,Colombia colombia
-Colombia,colombia,unify,unifiers,1,NO,universal_generic_unifier,python,Colombia colombia
-Colombia,colombia,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Colombia colombia 10
-Colombia,colombia,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,Colombia colombia
-Colombia,colombia,agglomerate,agglomerators,1,NO,universal_geometry_agglomerate,python,Colombia colombia
+Colombia,colombia,unify,unifiers,1,YES,universal_generic_unifier,python,Colombia colombia
+Colombia,colombia,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Colombia colombia 10
+Colombia,colombia,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Colombia colombia
+Colombia,colombia,agglomerate,agglomerators,1,YES,universal_geometry_agglomerate,python,Colombia colombia
 Colombia,colombia,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Colombia colombia all
 Colombia,colombia,analyse,analysis,1,NO,tda_script,r,Colombia colombia all
 Colombia,colombia,analyse,analysis,3,NO,movement_plots_script,python,Colombia colombia all
@@ -80,15 +80,15 @@ Italy,italy,analyse,analysis,3,NO,movement_plots_script,python,Italy italy all
 Italy,italy,analyse,analysis,5,NO,agglomerated_units_plots_script,r,Italy italy all
 Italy,italy,analyse,analysis,5,NO,agglomerated_units_plots_script,python,Italy italy all
 Italy,italy,POS,analysis,1,NO,polygon_prediction_analysis,python,italy radial milano 15 Milan
-Bogota,bogota,unify,unifiers,1,YES,universal_generic_unifier,python,Bogota bogota
-Bogota,bogota,agglomerate,agglomerators,1,YES,universal_geometry_agglomerate,python,Bogota bogota
-Bogota,bogota,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Bogota bogota
-Bogota,bogota,construct,constructors,1,YES,universal_daily_graphs_constructor,python,Bogota bogota all
-Bogota,bogota,analyse,analysis,3,YES,movement_plots_script,python,Bogota bogota all
-Bogota,bogota,analyse,analysis,4,YES,movement_plots_script,r,Bogota bogota all 0.8 150
-Bogota,bogota,analyse,analysis,5,YES,tda_script,r,Bogota bogota all
-Bogota,bogota,analyse,analysis,5,YES,agglomerated_units_plots_script,r,Bogota bogota all
-Bogota,bogota,analyse,analysis,5,YES,agglomerated_units_plots_script,python,Bogota bogota all
+Bogota,bogota,unify,unifiers,1,NO,universal_generic_unifier,python,Bogota bogota
+Bogota,bogota,agglomerate,agglomerators,1,NO,universal_geometry_agglomerate,python,Bogota bogota
+Bogota,bogota,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,Bogota bogota
+Bogota,bogota,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Bogota bogota all
+Bogota,bogota,analyse,analysis,3,NO,movement_plots_script,python,Bogota bogota all
+Bogota,bogota,analyse,analysis,4,NO,movement_plots_script,r,Bogota bogota all 0.8 150
+Bogota,bogota,analyse,analysis,5,NO,tda_script,r,Bogota bogota all
+Bogota,bogota,analyse,analysis,5,NO,agglomerated_units_plots_script,r,Bogota bogota all
+Bogota,bogota,analyse,analysis,5,NO,agglomerated_units_plots_script,python,Bogota bogota all
 Florida,florida_usa,unify,unifiers,1,NO,usa_state_unifier,python,Florida florida_usa
 Florida,florida_usa,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Florida florida_usa 10
 Florida,florida_usa,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,Florida florida_usa

@@ -73,13 +73,14 @@ class Unifier(GenericUnifier):
 		# Selects columns
 		df = df[['date_time', 'geo_id','num_cases','num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house']].copy()
 		df = df.groupby(['date_time', 'geo_id']).sum().reset_index()
-		df
 
 		# Adds lat and lon from the polyfons of the shapefile
 		polygons_final = self.build_polygons()
 		polygons_final = polygons_final[['poly_id', 'poly_lon', 'poly_lat', 'poly_name']].rename(columns = {'poly_id':'geo_id', 'poly_lon':'lon', 'poly_lat':'lat', 'poly_name':'location'})
 
-		df = df.merge(polygons_final, on = 'geo_id')
+		df = df.merge(polygons_final, on = 'geo_id', how = 'right')
+		df.loc[df.date_time.isna(), 'date_time'] = df.date_time.min()
+		df.fillna(0, inplace = True)
 		df = df[['date_time','geo_id','location','lon','lat', 'num_cases', 'num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house']]
 
 		return(df)	
