@@ -36,6 +36,7 @@ agglomeration_method_parameter = sys.argv[3] # Aglomeration name
 # Constructs the export
 data_folder = os.path.join(data_dir, 'data_stages')
 
+
 # Checks which aglomeration is received
 if agglomeration_method_parameter.upper() == 'ALL':
 	agglomeration_methods = con.agglomeration_methods

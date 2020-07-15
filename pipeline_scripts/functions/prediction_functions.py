@@ -166,7 +166,7 @@ def predict_location(location, poly_id, df_prediction, alpha_options = [80,100,1
 	
 	# Extracts the polygon set (or location)
 	if poly_id is not None:
-		df_poly_all = df_prediction[(df_prediction.location == location) & (df_prediction.poly_id == poly_id)].copy()
+		df_poly_all = df_prediction[(df_prediction.location == location) & (df_prediction.poly_id.astype(str) == str(poly_id))].copy()
 	else:
 		df_poly_all = df_prediction[(df_prediction.location == location)].copy()
 

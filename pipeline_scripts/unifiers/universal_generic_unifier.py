@@ -3,6 +3,7 @@
 
 # Imports all the necesary functions
 import fb_functions as fb
+import general_functions as gf
 
 
 # Other imports
@@ -15,12 +16,15 @@ import constants as con
 from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
+key_string = config.get_property('key_string') 
 
 
 # Unifies Facebook data
 location_name  = sys.argv[1] # Location name
 location_folder_name = sys.argv[2] # location folder name
 
+# Checks if its encrypted
+encrypted = gf.is_encrypted(location_folder_name)
 
 # Loads the unifier class
 unifier = con.get_unifier_class(location_folder_name)
@@ -52,7 +56,10 @@ df_cases = unifier.build_cases_geo()
 cases_date = df_cases.date_time.max()
 
 # Saves
-df_cases.to_csv(os.path.join(unified_dir, 'cases.csv'), index = False)
+if not encrypted:
+    df_cases.to_csv(os.path.join(unified_dir, 'cases.csv'), index = False)
+else:
+    gf.encrypt_df(df_cases, os.path.join(unified_dir, 'cases.csv'), key_string)
 
 
 # -------------------

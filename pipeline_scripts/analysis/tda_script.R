@@ -20,9 +20,9 @@ mapper_dir = get_property('mapper_dir')
 # Source code
 if(dir.exists(mapper_dir))
 {
-    suppressMessages(source(mapper_dir + '/R/mapperKD_functions.R'))
-    suppressMessages(source(mapper_dir + '/R/epidemiology_module.R'))
-    suppressMessages(source(mapper_dir + '/R/general_clusters.R'))
+    suppressMessages(source(paste0(mapper_dir , '/R/mapperKD_functions.R')))
+    suppressMessages(source(paste0(mapper_dir , '/R/epidemiology_module.R')))
+    suppressMessages(source(paste0(mapper_dir , '/R/general_clusters.R')))
 }
 
 

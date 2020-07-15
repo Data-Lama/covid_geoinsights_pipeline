@@ -3,7 +3,7 @@
 
 # Imports all the necesary functions
 import agglomeration_functions as agg
-
+import general_functions as gf
 
 # Other imports
 import os, sys
@@ -13,6 +13,7 @@ import pandas as pd
 
 from global_config import config
 data_dir = config.get_property('data_dir')
+key_string = config.get_property('key_string') 
 
 
 # Method Name
@@ -25,6 +26,9 @@ radius  = int(sys.argv[3]) # radius
 
 # Sets the location
 location_folder = os.path.join(data_dir, 'data_stages', location_folder_name)
+
+# Checks if its encrypted
+encrypted = gf.is_encrypted(location_folder_name)
 
 # Creates the folders if the don't exist
 # constructed
@@ -50,7 +54,12 @@ print(ident + '      Polygons')
 polygons = pd.read_csv(os.path.join(location_folder, 'unified/polygons.csv'))
 
 print(ident + '      Cases')
-cases = pd.read_csv(os.path.join(location_folder, 'unified/cases.csv'))
+
+if not encrypted:
+	cases = pd.read_csv(os.path.join(location_folder, 'unified/cases.csv'))
+else:
+	cases = gf.decrypt_df(os.path.join(location_folder, 'unified/cases.csv'), key_string)
+
 
 print(ident + '      Movement')
 movement = pd.read_csv(os.path.join(location_folder,  'unified/movement.csv'))

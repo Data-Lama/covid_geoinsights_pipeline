@@ -23,6 +23,7 @@ df_files = pd.read_csv(export_file)
 
 print(ident + 'Copying {} files:'.format(df_files.shape[0]))
 
+not_found = 0
 for ind, row in df_files.iterrows():
 
 
@@ -42,7 +43,16 @@ for ind, row in df_files.iterrows():
 
 
 	print(ident + '   {}'.format(source))
-	shutil.copy(source, destination)
+
+
+	try:
+		shutil.copy(source, destination)
+
+	except FileNotFoundError:
+		# File NOt found
+		not_found += 1
+		print(f'File Not Found \n: {source}')
+		print("")
 
 
 print(ident + 'Write TimeStamp')
@@ -51,5 +61,8 @@ print(ident + 'Write TimeStamp')
 with open(os.path.join(report_dir, 'README.txt'), 'w') as file:
 
 	file.write('Last Updated: {}'.format(datetime.now()) + '\n')
+
+if not_found > 0:
+	raise ValueError(f"{not_found} files where not found.")
 
 print(ident + 'Done')

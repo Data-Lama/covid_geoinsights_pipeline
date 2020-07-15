@@ -7,6 +7,7 @@ from general_functions import *
 
 # Other imports
 import os, sys
+from datetime import timedelta
 
 from pathlib import Path
 
@@ -87,15 +88,25 @@ df_results.to_csv(os.path.join(folder_location, 'predicted_data.csv'), index = F
 
 # Plots the prediction
 print(ident + '   Plots Prediction')
+
+# Actual
 df1 = df_results[['target_date','target_num_cases','target_num_cases_accum']].copy()
 df1.rename(columns = {'target_num_cases': 'cases', 'target_num_cases_accum': 'cases_accum'}, inplace = True)
 df1['Tipo'] = 'Real' 
 
-df2 = df_results[['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
+# Histroic Prediction
+df2 = df_results.loc[ ~df_results.target_num_cases.isna(), ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
 df2.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
-df2['Tipo'] = 'Predecido' 
+df2['Tipo'] = 'Predecido Histórico' 
 
-df_plot = pd.concat((df1,df2), ignore_index = True)
+# Future Prediction
+start_date = df_results[df_results.target_num_cases.isna()].target_date.min() - timedelta(days = 5)
+df3 = df_results.loc[ df_results.target_date >= start_date, ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
+df3.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
+df3['Tipo'] = 'Poyección' 
+
+
+df_plot = pd.concat((df1,df2,df3), ignore_index = True)
 
 df_plot['cases'] = df_plot.cases.astype(float)
 df_plot['cases_accum'] = df_plot.cases_accum.astype(float)
