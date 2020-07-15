@@ -26,6 +26,7 @@ EXTERNAL_MOV_THRESHOLD = 0.5
 # Get file names
 time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window')
 polygons_file = os.path.join(data_dir, 'data_stages', location_name, 'constructed', location_folder, 'daily_graphs', 'node_locations.csv')
+community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', 'community', 'polygon_community_map.csv')
 alert_report_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window','polygon_info_window_{}{}_alert_report.csv'.format(window_size_parameter, time_unit))
 
 
@@ -48,6 +49,12 @@ try:
     df_polygons = pd.read_csv(polygons_file, low_memory=False, )
 except:
     df_polygons = pd.read_csv(polygons_file, low_memory=False, encoding = 'latin-1')
+
+#Load community map database
+try:  
+    df_community = pd.read_csv(community_file, low_memory=False, )
+except:
+    df_community = pd.read_csv(community_file, low_memory=False, encoding = 'latin-1')
 
 # Internal alerts
 alert_backward_num_cases = df_backward_window[(df_backward_window['delta_num_cases'] >= NUM_CASES_THRESHOLD)].replace([np.inf, -np.inf], np.nan).dropna(axis='rows')
@@ -83,26 +90,34 @@ yellow_alert_external_num_cases = set(alert_total_external_cases['node_id'])
 red_alert_external_mov = set(alert_total_external_mov['node_id']).intersection(alert_forward_external_mov['node_id'])
 yellow_alert_external_mov = set(alert_total_external_mov['node_id'])
 
-print(red_alert_external_mov)
-print(red_alert_external_num_cases)
-# Alert for external threat:
-# RED: if both external movement and external cases are red
-# YELLOW: if either external movement or external cases are red, or if both are yellow
-# GREEN: otherwise
-
-red_alert_external_threat = red_alert_external_mov.intersection(red_alert_external_num_cases)
-yellow_alert_external_threat = red_alert_external_mov.difference(red_alert_external_threat)\
-    .union(red_alert_external_num_cases.difference(red_alert_external_threat))\
-    .union(yellow_alert_external_num_cases.intersection(yellow_alert_external_mov))
-
-
 def set_alert(node_id, red_alert, yellow_alert):
-    if node_id in red_alert: return 'RED'
-    elif node_id in yellow_alert: return 'YELLOW'
-    else: return 'GREEN'
+    if node_id in red_alert: return 'ROJO'
+    elif node_id in yellow_alert: return 'AMARILLO'
+    else: return 'VERDE'
 
-df_polygons['internal_alert_num_cases'] = df_polygons.apply(lambda x: set_alert(x.node_id, red_alert_num_cases, yellow_alert_num_cases), axis=1)
-df_polygons['internal_alert_movement'] = df_polygons.apply(lambda x: set_alert(x.node_id, red_alert_inner_mov, yellow_alert_inner_mov), axis=1)
-df_polygons['external_threat_alert'] = df_polygons.apply(lambda x: set_alert(x.node_id, red_alert_external_threat, yellow_alert_external_threat), axis=1)
+df_polygons['internal_num_cases_alert'] = df_polygons.apply(lambda x: set_alert(x.node_id, red_alert_num_cases, yellow_alert_num_cases), axis=1)
+df_polygons['internal_movement_alert'] = df_polygons.apply(lambda x: set_alert(x.node_id, red_alert_inner_mov, yellow_alert_inner_mov), axis=1)
+df_polygons['external_movement_alert'] = df_polygons.apply(lambda x: set_alert(x.node_id, red_alert_external_mov, yellow_alert_external_mov), axis=1)
+df_polygons['external_num_cases_alert'] = df_polygons.apply(lambda x: set_alert(x.node_id, red_alert_external_num_cases, yellow_alert_external_num_cases), axis=1)
 
-df_polygons.to_csv(alert_report_path, index=False)
+
+alerts = df_polygons.loc[(df_polygons['internal_num_cases_alert'] == 'ROJO') | (df_polygons['internal_movement_alert'] == 'ROJO') \
+     | (df_polygons['external_movement_alert'] == 'ROJO')]
+
+alerts.sort_values(by=['node_name'], inplace=True)
+alerts = pd.merge(alerts, df_community.drop(columns=['community_id', 'poly_name'], axis=1), left_on='node_id', right_on='poly_id')
+alerts.rename(columns={'internal_num_cases_alert':'Alerta numero de casos',
+                        'internal_movement_alert':'Alerta flujo dentro del municipio',
+                        'external_num_cases_alert':'Alerta numero de casos en municipios vecinos',
+                        'external_movement_alert':'Alerta flujo hacia el municipio',
+                        'node_name':'Municipio',
+                        'community_name': 'Unidad funcional'}, inplace=True)
+
+alerts.drop(columns=['lat', 'lon', 'poly_id', 'node_id'], inplace=True)
+
+alerts.to_csv(alert_report_path, columns=['Municipio', 
+                                        'Unidad funcional', 
+                                        'Alerta numero de casos',
+                                        'Alerta flujo dentro del municipio',
+                                        'Alerta numero de casos en municipios vecinos',
+                                        'Alerta flujo hacia el municipio'], index=False)

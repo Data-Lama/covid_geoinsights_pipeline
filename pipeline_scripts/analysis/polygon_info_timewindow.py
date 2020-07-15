@@ -180,25 +180,6 @@ df_cases_avg_middle = df_middle_window.groupby(['node_id']).mean().drop(['day', 
 df_cases_avg_forward = df_forward_window.groupby(['node_id']).mean().drop(['day', 'population'], axis=1).reset_index()
 df_cases_avg_total = df_total_window.groupby(['node_id']).mean().drop(['day', 'population'], axis=1).reset_index()
 
-# # Calculate num cases per node for min_time and max_time and time_zero
-# df_min = df_nodes.loc[df_nodes['date_time'] == min_time].drop(['day', 'population'], axis=1)
-# df_time_zero = df_nodes.loc[df_nodes['date_time'] == date_zero].drop(['day', 'population'], axis=1)
-# df_max = df_nodes.loc[df_nodes['date_time'] == max_time].drop(['day', 'population'], axis=1)
-
-# # Calculate external movement and neighbor cases for min and max time and time_zero
-# df_min['external_movement'] = df_min.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time), axis=1).fillna(0)
-# df_min['external_num_cases'] = df_min.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time), axis=1).fillna(0)
-
-# df_max['external_movement'] = df_max.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time), axis=1).fillna(0)
-# df_max['external_num_cases'] = df_max.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time), axis=1).fillna(0)
-
-# df_time_zero['external_movement'] = df_time_zero.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time), axis=1).fillna(0)
-# df_time_zero['external_num_cases'] = df_time_zero.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time), axis=1).fillna(0)
-
-# df_min = df_min.set_index(df_min['node_id']).drop(['node_id'], axis=1)
-# df_max = df_max.set_index(df_max['node_id']).drop(['node_id'], axis=1)
-# df_time_zero = df_time_zero.set_index(df_time_zero['node_id']).drop(['node_id'], axis=1)
-
 # Add neighbor_cases_average backward window
 df_backward_window_info = pd.DataFrame()
 df_backward_window_info['node_id'] = df_backward_window['node_id']
