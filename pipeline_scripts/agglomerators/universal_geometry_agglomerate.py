@@ -9,11 +9,13 @@ from pathlib import Path
 import pandas as pd
 from shapely import wkt
 import geopandas as geopandas
+import general_functions as gf
 
 # Direcotries
 from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
+key_string = config.get_property('key_string') 
 
 
 # Method Name
@@ -21,7 +23,10 @@ method_name = 'geometry'
 
 # Reads the parameters from excecution
 location_name  = sys.argv[1] # location namme
-location_folder_name  = sys.argv[2] # location folder namme
+location_folder_name  = sys.argv[2] # location folder name
+
+# Checks if its encrypted
+encrypted = gf.is_encrypted(location_folder_name)
 
 
 # Sets the location
@@ -51,7 +56,11 @@ print(ident + '      Polygons')
 polygons = pd.read_csv(os.path.join(location_folder, 'unified/polygons.csv'))
 
 print(ident + '      Cases')
-cases = pd.read_csv(os.path.join(location_folder, 'unified/cases.csv'))
+
+if not encrypted:
+	cases = pd.read_csv(os.path.join(location_folder, 'unified/cases.csv'))
+else:
+	cases = gf.decrypt_df(os.path.join(location_folder, 'unified/cases.csv'), key_string)
 
 print(ident + '      Movement')
 movement = pd.read_csv(os.path.join(location_folder,  'unified/movement.csv'))

@@ -12,7 +12,10 @@ import time
 
 # Generic Unifier
 from generic_unifier_class import GenericUnifier
+import general_functions as gf
 
+#Directories
+from global_config import config
 
 
 
@@ -31,7 +34,10 @@ class Unifier(GenericUnifier):
 
 		
 		# Reads cases
-		cases = pd.read_excel(os.path.join(self.raw_folder,'cases', self.get('cases_file_name')), parse_dates = ['Fecha de Inicio de Síntomas'], date_parser = lambda x: pd.to_datetime(x, errors="coerce"))
+		cases = gf.decrypt_df(os.path.join(self.raw_folder,'cases', self.get('cases_file_name')), config.get_property('key_string') )
+		cases['Fecha de Inicio de Síntomas'] = cases['Fecha de Inicio de Síntomas'].apply(lambda x: pd.to_datetime(x, errors="coerce"))
+
+		#cases = pd.read_excel(os.path.join(self.raw_folder,'cases', self.get('cases_file_name')), parse_dates = ['Fecha de Inicio de Síntomas'], date_parser = lambda x: pd.to_datetime(x, errors="coerce"))
 		cases = cases[['Fecha de Inicio de Síntomas','Recuperado','UPZ_Geo', 'NOMUPZ', 'X','Y', 'Ubicación']].rename(columns = {'Fecha de Inicio de Síntomas':'date_time', 'UPZ_Geo':'geo_id','NOMUPZ':'location','X':'lon','Y':'lat'})
 
 		# Cleans the state
@@ -86,9 +92,13 @@ class Unifier(GenericUnifier):
 		# Selects columns and renames
 		polygons = polygons[['SECC','poly_name', 'TOTAL','Shape_Area','geometry']].rename(columns = {'SECC':'poly_id','TOTAL':'attr_population','Shape_Area':'attr_area'})
 
+
 		# Extracts the center
-		polygons['poly_lon'] = polygons.geometry.centroid.x
-		polygons['poly_lat'] = polygons.geometry.centroid.y
+		polygons['poly_lon'] = polygons.geometry.centroid.to_crs('epsg:4326').x
+		polygons['poly_lat'] = polygons.geometry.centroid.to_crs('epsg:4326').y
+
+		# Adjusts geometry  to latiude and longitud
+		polygons = polygons.to_crs('epsg:4326')
 		
 		return(polygons)
 

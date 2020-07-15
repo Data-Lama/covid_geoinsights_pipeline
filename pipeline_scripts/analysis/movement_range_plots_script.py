@@ -43,8 +43,9 @@ suptitle_font_size = 14
 individual_plot_size = 12
 axis_font_size = 12
 max_selected = 8
-height = 3
+height = 2.5
 aspect= 5
+num_ticks = 6
 
 # Reads the parameters from excecution
 location_name  =  sys.argv[1] # location name
@@ -99,12 +100,12 @@ for agglomeration_method in agglomeration_methods:
 	df_mov['type'] = 'movement'
 
 	# Loads cases
-	df_cases_all = pd.read_csv(os.path.join(unified_folder_location, 'cases.csv'), parse_dates = ['date_time'])
-	df_cases = df_cases_all.rename(columns = {'num_cases':'value', 'geo_id': 'polygon_id'})
-	df_cases = df_cases[['date_time','value', 'polygon_id']].copy()
+	df_cases_raw = pd.read_csv(os.path.join(unified_folder_location, 'cases.csv'), parse_dates = ['date_time'])
+	df_cases_all = df_cases_raw.rename(columns = {'num_cases':'value', 'geo_id': 'polygon_id'})
+	df_cases_all = df_cases_all[['date_time','value', 'polygon_id']].copy()
+	df_cases = df_cases_all[['date_time','value']].groupby('date_time').sum().reset_index()
 	df_cases['type'] = 'cases' 
 
-	# Loads milestones
 	# Loads milestones
 	df_miles = None
 	milestones_locations = os.path.join(raw_folder_location, 'milestones/milestones.csv')
@@ -152,6 +153,8 @@ for agglomeration_method in agglomeration_methods:
 			g.axes[0,0].axvline( row.date_time, color='red', linestyle='--', lw=1, ymin = 0.0,  ymax = 0.9)
 			g.axes[1,0].axvline( row.date_time, color='red', linestyle='--', lw=1, ymin = 0.0,  ymax = 1)
 
+	min_dat, max_date = g.axes[0,0].get_xlim()
+	g.axes[1,0].xaxis.set_ticks(np.arange(min_dat,max_date,(max_date - min_dat)/num_ticks).tolist()[1:])
 	g.savefig(os.path.join(export_folder_location,'mov_range_{}.png'.format(location_folder)))
 
 	
@@ -167,18 +170,21 @@ for agglomeration_method in agglomeration_methods:
 		df_index_map = pd.read_csv(os.path.join(raw_folder_location, 'geo/movement_range_polygon_id_map.csv'))
 
 		# Gets top  places
-		df_top = df_cases_all[['geo_id','location','num_cases']].groupby(['geo_id','location']).sum().reset_index().sort_values('num_cases', ascending = False)
+		df_top = df_cases_raw[['geo_id','location','num_cases']].groupby(['geo_id','location']).sum().reset_index().sort_values('num_cases', ascending = False)
 		df_top = df_top.head(min(top,df_top.shape[0]))
+		
 		#filters out
 		df_index_map = df_index_map[df_index_map.poly_id.isin(df_top.geo_id)]
 
+		# Selected dataframes
+		df_mov_sel = df_mov[(df_mov.polygon_id.isin(df_index_map.movement_range_poly_id))]
+
+		#Caes
+		df_cases = df_cases_all.loc[df_cases_all.polygon_id.isin(df_index_map.poly_id), ['date_time','value']].groupby('date_time').sum().reset_index()
+		df_cases['type'] = 'cases' 
 
 
-		# Global Movmeent Plot
-		mov_index = (df['type'] == 'movement') & (df.polygon_id.isin(df_index_map.movement_range_poly_id))
-		cases_index = (df['type'] == 'cases') & (df.polygon_id.isin(df_index_map.poly_id))
-
-		df_plot = df[(mov_index) | (cases_index)]
+		df = pd.concat((df_mov, df_cases), ignore_index = True)
 
 		g = sns.relplot(x="date_time", y="value",row="type",
 		            height=height, aspect=aspect, facet_kws=dict(sharey=False),
@@ -204,6 +210,9 @@ for agglomeration_method in agglomeration_methods:
 			g.axes[0,0].axvline( row.date_time, color='red', linestyle='--', lw=1, ymin = 0.0,  ymax = 0.9)
 			g.axes[1,0].axvline( row.date_time, color='red', linestyle='--', lw=1, ymin = 0.0,  ymax = 1)
 		
+
+		min_dat, max_date = g.axes[0,0].get_xlim()
+		g.axes[1,0].xaxis.set_ticks(np.arange(min_dat,max_date,(max_date - min_dat)/num_ticks).tolist()[1:])
 		g.savefig(os.path.join(export_folder_location,'mov_range_fb_polygon_{}.png'.format(location_folder)))
 
 
