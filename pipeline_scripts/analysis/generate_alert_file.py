@@ -2,11 +2,16 @@ import os
 import sys
 import numpy as np
 import pandas as pd
-
+import geopandas as gpd
+import contextily as ctx
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 # Direcotries
 from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
+report_dir = config.get_property('report_dir')
+
 
 # Reads the parameters from excecution
 location_name  =  sys.argv[1] # location name
@@ -28,7 +33,11 @@ time_window_file_path = os.path.join(analysis_dir, location_name, location_folde
 polygons_file = os.path.join(data_dir, 'data_stages', location_name, 'constructed', location_folder, 'daily_graphs', 'node_locations.csv')
 community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', 'community', 'polygon_community_map.csv')
 alert_report_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window','polygon_info_window_{}{}_alert_report.csv'.format(window_size_parameter, time_unit))
+shape_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'geo', 'Municpios_Dane_2017.shp')
+output_file_path = os.path.join(report_dir) 
 
+# Import shapefile
+geo_df = gpd.read_file(shape_file_path)
 
 files = [i for i in os.listdir(time_window_file_path) if os.path.isfile(os.path.join(time_window_file_path,i)) and 'polygon_info' in i]
 if len(files) == 0:
@@ -112,7 +121,17 @@ alerts.rename(columns={'internal_num_cases_alert':'Alerta numero de casos',
                         'external_movement_alert':'Alerta flujo hacia el municipio',
                         'node_name':'Municipio',
                         'community_name': 'Unidad funcional'}, inplace=True)
-
+# Map alerts
+df_polygons = geo_df.merge(df_polygons, left_on='Codigo_Dan', right_on='node_id')
+cmap = ListedColormap([(1,0.8,0), (0.8, 0, 0), (0,0.6,0)], name='alerts')
+df_polygons.to_crs(epsg=3857, inplace=True)
+ax = df_polygons.fillna(0).plot(column='internal_num_cases_alert', figsize=(15,9),
+                                legend=True, linewidth=0.5, cmap=cmap)
+ax.set_axis_off()
+ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
+plt.title('Alerta numero de casos')
+# plt.savefig(os.path.join(output_file_path, 'alert_map_.png'.format(location_name)), bbox_inches="tight")
+plt.show()
 alerts.drop(columns=['lat', 'lon', 'poly_id', 'node_id'], inplace=True)
 
 alerts.to_csv(alert_report_path, columns=['Municipio', 
