@@ -14,6 +14,8 @@ exctract_name = function(location, num_cases)
   
 }
 
+
+
 # Function that create the geometry (colection of points)
 extract_geometry = function(lon, lat)
 {
@@ -54,3 +56,15 @@ exctract_id_by_cases = function(poly_id, num_cases)
 {
   return(poly_id[num_cases == max(num_cases)][1])
 }
+
+exctract_name_by_population = function(poly_name, population)
+{
+  return(poly_name[population == max(population)][1])
+  
+}
+
+exctract_id_by_population = function(poly_id, population)
+{
+  return(poly_id[population == max(population)][1])
+}
+

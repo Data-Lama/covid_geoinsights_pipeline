@@ -30,9 +30,9 @@ location_folder = args[2] # Location Folder
 agglomeration_method = args[3] # Agglomeration method to build on to
 
 # For Debug
-#setwd("~/Dropbox/Projects/covid_fb_pipeline/covid_geoinsights_pipeline")
-#location_name = 'Colombia'
-#location_folder = 'colombia'
+setwd("~/Dropbox/Projects/covid_fb_pipeline/covid_geoinsights_pipeline")
+location_name = 'Colombia'
+location_folder = 'colombia'
 
 
 if(is.na(agglomeration_method))
@@ -104,11 +104,24 @@ cat(paste(ident, '   Agglomerates Cases','\n', sep = ""))
 cat(paste(ident, '   Agglomerates Polygons','\n', sep = ""))
 
 # Final_comunity
-final_community = polygons %>%
-                  select(poly_id, community_id, num_cases) %>%
-                  group_by(community_id) %>%
-                  summarise(final_id = exctract_id_by_cases(poly_id, num_cases)) %>%
-                  ungroup()  
+# I fpopulation is found it will be used for the id
+# if not, the number of cases will be used
+if('attr_population' %in% colnames(polygons))
+{
+  final_community = polygons %>%
+                    select(poly_id, community_id, attr_population) %>%
+                    group_by(community_id) %>%
+                    summarise(final_id = exctract_id_by_population(poly_id, attr_population)) %>%
+                    ungroup()  
+}else
+{
+    final_community = polygons %>%
+                    select(poly_id, community_id, num_cases) %>%
+                    group_by(community_id) %>%
+                    summarise(final_id = exctract_id_by_cases(poly_id, num_cases)) %>%
+                    ungroup()  
+}
+
 
 polygons = polygons %>%
            inner_join(final_community, by = c('community_id' = 'community_id')) %>%
@@ -116,11 +129,22 @@ polygons = polygons %>%
 
 
 
-# Creates the community name (the one with highest frequency) for aglomeration
-agg_poly_1 = polygons %>% 
+# Creates the community name:
+# If population exists it uses it if not, number of cases
+if('attr_population' %in% colnames(polygons))
+{
+    agg_poly_1 = polygons %>% 
+    group_by(community_id) %>%
+    summarise(poly_name = exctract_name_by_population(poly_name, attr_population), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(poly_lon, poly_lat), poly_lon = extract_center_by_cases(poly_lon, poly_lat, num_cases)[1], poly_lat = extract_center_by_cases(poly_lon, poly_lat, num_cases)[2]) %>%
+    ungroup()  
+  
+}else
+{
+  agg_poly_1 = polygons %>% 
   group_by(community_id) %>%
   summarise(poly_name = exctract_name_by_cases(poly_name, num_cases), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(poly_lon, poly_lat), poly_lon = extract_center_by_cases(poly_lon, poly_lat, num_cases)[1], poly_lat = extract_center_by_cases(poly_lon, poly_lat, num_cases)[2]) %>%
   ungroup()  
+}
 
 # Creates the location to community map
 polygon_community_map = agg_poly_1 %>% 

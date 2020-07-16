@@ -4,6 +4,8 @@ from cryptography.fernet import Fernet
 import uuid
 import pandas as pd
 import os
+import unidecode
+
 
 # Module with general functions
 from global_config import config
@@ -21,6 +23,9 @@ def clean_for_publication(s):
 	subs['colombia'] = 'Colombia'
 	subs['italy'] = 'Italia'
 
+	subs['Bogotá D.C.-Bogotá d C.'] = 'Bogotá'
+	subs['-'] = ' - '
+
 	for k in subs:
 		s = s.replace(k, subs[k])
 
@@ -31,6 +36,29 @@ def clean_for_publication(s):
 		s = ('-'.join(s_split[0:-1])).replace(', US',', EEUU').replace(', ','-')
 
 	return(s)
+
+def create_folder_name(s):
+	'''
+	given a string, return a valid file name
+	'''
+	s = unidecode.unidecode(s)
+
+	s = s.lower()
+	s = s.replace('.','')
+
+	splitting_strings = ['-',':','_']
+	for sp in splitting_strings:
+		s = s.split(sp)[0]
+
+	# Strips
+	s = s.strip()
+	s = s.replace('   ',' ')
+	s = s.replace('  ',' ')
+
+	s = s.replace(' ','_')
+
+	return(s)
+
 
 def load_README(path):
 	readme = {}

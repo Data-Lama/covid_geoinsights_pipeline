@@ -4,6 +4,8 @@
 # Imports
 from general_functions import *
 
+from sklearn.metrics import mean_squared_error
+
 # Other imports
 import os, sys
 from datetime import timedelta
@@ -160,12 +162,18 @@ for agglomeration_method in agglomeration_methods:
 
     print(ident + '   Exports Statistics')
 
+    # Computes RMSE
+    y1 = df1.sort_values('target_date').cases.values
+    y2 = df2.sort_values('target_date').cases.values
+
+    rmse = mean_squared_error(y1, y2, squared = False)
+
     with open(os.path.join(folder_location, 'statistics.txt'), 'w') as file:
         
         file.write('Agglomeration Method Used: {}'.format(agglomeration_method) + '\n')
-        file.write('Coverage: {}%'.format(np.round(100*coverage,2)))
-        file.write("   From: {}".format(' '.join([str(p) for p in included_polygons])))
-
+        file.write('Coverage: {}% \n'.format(np.round(100*coverage,2)))
+        file.write("   From: {} \n".format(' '.join([str(p) for p in included_polygons])))
+        file.write('RMSE: {} \n'.format(np.round(rmse,2)))
 
 
     print(ident + 'Done!')

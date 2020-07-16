@@ -2,17 +2,17 @@ location_name,locations_folder,stage,folder_location,position,excecute,script_na
 All,,PRE,PRE,1,NO,download_facebook,python,
 USA,usa,PRE,extractors,2,NO,usa_extractor,python,
 Colombia,colombia,extract,extractors,1,NO,single_file_download_extractor,python,Colombia colombia
-Colombia,colombia,unify,unifiers,1,YES,universal_generic_unifier,python,Colombia colombia
-Colombia,colombia,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Colombia colombia 10
-Colombia,colombia,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Colombia colombia
-Colombia,colombia,agglomerate,agglomerators,1,YES,universal_geometry_agglomerate,python,Colombia colombia
+Colombia,colombia,unify,unifiers,1,NO,universal_generic_unifier,python,Colombia colombia
+Colombia,colombia,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Colombia colombia 10
+Colombia,colombia,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,Colombia colombia
+Colombia,colombia,agglomerate,agglomerators,1,NO,universal_geometry_agglomerate,python,Colombia colombia
 Colombia,colombia,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Colombia colombia all
-Colombia,colombia,analyse,analysis,1,NO,tda_script,r,Colombia colombia all
-Colombia,colombia,analyse,analysis,3,NO,movement_plots_script,python,Colombia colombia all
-Colombia,colombia,analyse,analysis,4,NO,movement_plots_script,r,Colombia colombia all 0.3 25
-Colombia,colombia,analyse,analysis,5,NO,movement_range_plots_script,python,Colombia colombia all
-Colombia,colombia,analyse,analysis,6,NO,agglomerated_units_plots_script,r,Colombia colombia all
-Colombia,colombia,analyse,analysis,7,NO,agglomerated_units_plots_script,python,Colombia colombia all
+Colombia,colombia,analyse,analysis,1,NO,tda_script,r,Colombia colombia community
+Colombia,colombia,analyse,analysis,3,NO,movement_plots_script,python,Colombia colombia community
+Colombia,colombia,analyse,analysis,4,NO,movement_plots_script,r,Colombia colombia community 0.3 25
+Colombia,colombia,analyse,analysis,5,NO,movement_range_plots_script,python,Colombia colombia community
+Colombia,colombia,analyse,analysis,6,NO,agglomerated_units_plots_script,r,Colombia colombia community
+Colombia,colombia,analyse,analysis,7,NO,agglomerated_units_plots_script,python,Colombia colombia community
 Colombia,colombia,analyse,analysis,8,NO,neighbors_location_extraction,python,Colombia colombia community
 Peru,peru,extract,extractors,1,NO,single_file_download_extractor,python,Peru peru
 Peru,peru,unify,unifiers,1,NO,universal_generic_unifier,python,Peru peru
@@ -124,33 +124,7 @@ Mexico,mexico,analyse,analysis,1,NO,tda_script,r,Mexico mexico all
 Mexico,mexico,analyse,analysis,3,NO,movement_plots_script,python,Mexico mexico all
 Mexico,mexico,analyse,analysis,5,NO,agglomerated_units_plots_script,r,Mexico mexico all
 Mexico,mexico,analyse,analysis,5,NO,agglomerated_units_plots_script,python,Mexico mexico all
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community bogota 11001 Bogota
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community bogota 11001 Bogota 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community bogota 11001 Bogota
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community barranquilla 8001 Barranquilla
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community barranquilla 8001 Barranquilla 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community barranquilla 8001 Barranquilla
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community cartagena 13001 Cartagena
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community cartagena 13001 Cartagena 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community cartagena 13001 Cartagena
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community cali 76001 Cali
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community cali 76001 Cali 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community cali 76001 Cali
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community leticia 91001 Leticia
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community leticia 91001 Leticia 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community leticia 91001 Leticia
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community soledad 8758 Soledad
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community soledad 8758 Soledad 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community soledad 8758 Soledad
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community villavicencio 50001 Villavicencio
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community villavicencio 50001 Villavicencio 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community villavicencio 50001 Villavicencio
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community san_andres_tumaco 52835 SanAndresDeTumaco
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community san_andres_tumaco 52835 SanAndresDeTumaco 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community san_andres_tumaco 52835 SanAndresDeTumaco
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community medellin 5001 Medellin
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community medellin 5001 Medellin 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community medellin 5001 Medellin
+Colombia,colombia,POS,analysis,1,NO,location_selected_polygon_prediction_analysis,python,Colombia colombia community 0.8 20
 Colombia,colombia,POS,analysis,4,NO,location_prediction_by_polygon_union,python,Colombia colombia community
 Colombia,colombia,POS,analysis,3,NO,polygon_info_timewindow,python,colombia community 5 days
 Colombia,colombia,POS,analysis,3,NO,generate_alert_file,python,colombia community 5 days

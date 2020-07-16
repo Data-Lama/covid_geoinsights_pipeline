@@ -6,6 +6,7 @@ import glob
 import numpy as np
 import os
 from datetime import datetime
+import re
 
 #Directories
 from global_config import config
@@ -30,6 +31,7 @@ for ind, row in df_files.iterrows():
 	source = os.path.join(analysis_dir,row.source)
 	destination = os.path.join( report_dir, row.destination)
 
+	# Last
 	if '*' in source:
 		start = source.split('*')[0]
 		end = source.split('*')[1]
@@ -40,6 +42,29 @@ for ind, row in df_files.iterrows():
 			if num > max_num:
 				max_num = num
 				source = file
+
+	# At position
+	elif "[" in source:
+
+		start = source.split('[')[0]
+		end = source.split(']')[1]
+		number =  int(re.search('\[(.*)\]', source).group(1))
+
+		options = glob.glob(start + '*' + end)
+
+		max_num = -1
+		min_num = np.inf
+
+		for file in options:
+			num = int(file.replace(start,'').replace(end,''))
+			max_num = max(max_num, num)
+			min_num = min(min_num, num)
+
+
+		if number >= 0:
+			source = start + str(min_num + number) + end
+		else:
+			source = start + str(max_num + number) + end
 
 
 	print(ident + '   {}'.format(source))
