@@ -269,7 +269,9 @@ def build_prediction_dataset_for_nodes(node_ids, nodes, edges, days_back, days_a
 		in_cases = passed_edges[['date_time', 'num_cases']].groupby('date_time').sum().reset_index().sort_values('date_time').num_cases.values
 		
 		# Calculates the passed internal movement and internal degree
+
 		history = passed_nodes.loc[passed_nodes.node_id.isin(node_ids),['date_time','inner_movement','num_cases']]
+
 		history['degree'] = history.inner_movement*history.num_cases
 		
 		internal_degree = history[['date_time', 'degree']].groupby('date_time').sum().reset_index().sort_values('date_time').degree.values

@@ -52,6 +52,11 @@ location_name  =  sys.argv[1] # location name
 location_folder =  sys.argv[2] # locatio folder name
 agglomeration_method_parameter = sys.argv[3] # Aglomeration name
 
+miles_stones_color = 'lightblue'
+miles_stones_width = 1
+
+cut_line_color = 'red'
+cut_stones_width = 1
 
 
 # Checks which aglomeration is received
@@ -116,7 +121,12 @@ for agglomeration_method in agglomeration_methods:
 
 		df_miles.index = [i for i in range(1,(df_miles.shape[0] + 1))]
 
-		df_miles.to_csv(os.path.join(export_folder_location,'milestones.csv'))
+		# Adjusts columns
+
+		df_miles_exp = df_miles.rename(columns = {'measure':'Medidas adoptadas COVID-19','date_time':'Fecha','soport_document':'Documento Soporte'})
+		df_miles_exp['Num.'] = df_miles.index.values
+		df_miles_exp = df_miles_exp[['Num.','Medidas adoptadas COVID-19','Fecha','Documento Soporte']]
+		df_miles_exp.to_csv(os.path.join(export_folder_location,'milestones.csv'), index = False)
 
 
 
@@ -139,7 +149,7 @@ for agglomeration_method in agglomeration_methods:
 
 	# Titles
 	g.axes[0,0].set_title('Cambio Porcentual en el Movimiento a Nivel Nacional')
-	g.axes[1,0].set_title('Casos Promedio a Nivel Nacional')
+	g.axes[1,0].set_title('Casos Diarios a Nivel Nacional')
 
 
 	#Adds milestones
@@ -150,11 +160,25 @@ for agglomeration_method in agglomeration_methods:
 
 		for ind, row in df_miles.iterrows():
 			g.axes[0,0].text(row.date_time - timedelta(hours = 12), top_pos, str(ind))
-			g.axes[0,0].axvline( row.date_time, color='red', linestyle='--', lw=1, ymin = 0.0,  ymax = 0.9)
-			g.axes[1,0].axvline( row.date_time, color='red', linestyle='--', lw=1, ymin = 0.0,  ymax = 1)
+			g.axes[0,0].axvline( row.date_time, color=miles_stones_color, linestyle='--', lw=miles_stones_width, ymin = 0.0,  ymax = 0.9)
+			g.axes[1,0].axvline( row.date_time, color=miles_stones_color, linestyle='--', lw=miles_stones_width, ymin = 0.0,  ymax = 1)
+
+
+	# Adds the horizontal line
+	g.axes[0,0].axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
 
 	min_dat, max_date = g.axes[0,0].get_xlim()
-	g.axes[1,0].xaxis.set_ticks(np.arange(min_dat,max_date,(max_date - min_dat)/num_ticks).tolist()[1:])
+
+	tick = np.round(min_dat) + 4
+	ticks = []
+	jump = 15
+	while tick  < max_date:
+		ticks.append(tick)
+		tick += jump
+
+
+
+	g.axes[1,0].xaxis.set_ticks(ticks)
 	g.savefig(os.path.join(export_folder_location,'mov_range_{}.png'.format(location_folder)))
 
 	
@@ -197,7 +221,7 @@ for agglomeration_method in agglomeration_methods:
 
 		# Titles
 		g.axes[0,0].set_title('Cambio Porcentual en el Movimiento (Lugares con más Casos)')
-		g.axes[1,0].set_title('Casos Promedio (Lugares con más Casos)')
+		g.axes[1,0].set_title('Casos Diarios (Lugares con más Casos)')
 
 		#Adds milestones
 		if df_miles is not None:
@@ -207,9 +231,12 @@ for agglomeration_method in agglomeration_methods:
 
 		for ind, row in df_miles.iterrows():
 			g.axes[0,0].text(row.date_time - timedelta(hours = 12), top_pos, str(ind))
-			g.axes[0,0].axvline( row.date_time, color='red', linestyle='--', lw=1, ymin = 0.0,  ymax = 0.9)
-			g.axes[1,0].axvline( row.date_time, color='red', linestyle='--', lw=1, ymin = 0.0,  ymax = 1)
+			g.axes[0,0].axvline( row.date_time, color=miles_stones_color, linestyle='--', lw=miles_stones_width, ymin = 0.0,  ymax = 0.9)
+			g.axes[1,0].axvline( row.date_time, color=miles_stones_color, linestyle='--', lw=miles_stones_width, ymin = 0.0,  ymax = 1)
 		
+		
+		# Adds the horizontal line
+		g.axes[0,0].axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
 
 		min_dat, max_date = g.axes[0,0].get_xlim()
 		g.axes[1,0].xaxis.set_ticks(np.arange(min_dat,max_date,(max_date - min_dat)/num_ticks).tolist()[1:])

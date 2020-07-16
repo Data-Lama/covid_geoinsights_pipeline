@@ -32,8 +32,7 @@ location_folder = sys.argv[2] # location folder
 agglomeration_method_parameter = sys.argv[3] # Aglomeration name
 
 
-
-# Constructs the export
+# Global location folder
 data_folder = os.path.join(data_dir, 'data_stages')
 
 

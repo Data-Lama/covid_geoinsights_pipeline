@@ -11,7 +11,8 @@ import locations.mexico_functions as mexico
 
 agglomeration_methods = ['radial','community','geometry']
 
-
+figure_folder_name = 'report_figure_folder'
+table_folder_name = 'report_table_folder'
 
 def get_unifier_class(location):
 
