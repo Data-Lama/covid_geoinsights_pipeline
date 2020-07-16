@@ -7,6 +7,7 @@ import numpy as np
 import os
 from datetime import datetime
 import re
+import constants as con
 
 #Directories
 from global_config import config
@@ -27,10 +28,16 @@ print(ident + 'Copying {} files:'.format(df_files.shape[0]))
 not_found = 0
 for ind, row in df_files.iterrows():
 
-
 	source = os.path.join(analysis_dir,row.source)
-	destination = os.path.join( report_dir, row.destination)
 
+	if row['type'] == 'figure':		
+		destination = os.path.join( report_dir, con.figure_folder_name, row.destination)
+
+	elif row['type'] == 'table':		
+		destination = os.path.join( report_dir, con.table_folder_name, row.destination)		
+
+	else:
+		raise ValueError('No support for type: {} of file'.format(row['type']))
 	# Last
 	if '*' in source:
 		start = source.split('*')[0]

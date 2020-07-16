@@ -123,9 +123,9 @@ for agglomeration_method in agglomeration_methods:
 
 		# Adjusts columns
 
-		df_miles_exp = df_miles.rename(columns = {'measure':'Medida','date_time':'Fecha','soport_document':'Documento Soporte'})
-		df_miles_exp['#'] = df_miles.index.values
-		df_miles_exp = df_miles_exp[['#','Medida','Fecha','Documento Soporte']]
+		df_miles_exp = df_miles.rename(columns = {'measure':'Medidas adoptadas COVID-19','date_time':'Fecha','soport_document':'Documento Soporte'})
+		df_miles_exp['Num.'] = df_miles.index.values
+		df_miles_exp = df_miles_exp[['Num.','Medidas adoptadas COVID-19','Fecha','Documento Soporte']]
 		df_miles_exp.to_csv(os.path.join(export_folder_location,'milestones.csv'), index = False)
 
 
