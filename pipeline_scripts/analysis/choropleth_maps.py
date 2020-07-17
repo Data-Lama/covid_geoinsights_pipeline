@@ -1,6 +1,7 @@
 import os
 import sys
 import datetime
+import mapclassify
 import numpy as np
 import pandas as pd
 import geopandas as gpd
@@ -26,11 +27,18 @@ location_name  =  sys.argv[1] # location name
 # Get name of files
 deltas_file_path = os.path.join(analysis_dir, location_name, 'geometry', 'polygon_info_window', 'polygon_info_total_window_5days.csv')
 march_file_path = os.path.join(analysis_dir, location_name, 'geometry', 'polygon_info_window', 'polygon_info_total_window_5days-2020-04-07.csv')
+community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', 'community', 'polygon_community_map.csv')
 shape_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'geo', 'Municpios_Dane_2017.shp')
+river_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'geo', 'river_lines', 'River_lines.shp')
 output_file_path = os.path.join(report_dir)
+
 
 # Import shapefile
 geo_df = gpd.read_file(shape_file_path)
+rivers_df = gpd.read_file(river_file_path)
+
+# Get functional units
+df_functional_units = pd.read_csv(community_file)
 
 def calculate_delta(t_0, t_1):
     t_1.set_index('node_id', inplace=True)
@@ -60,23 +68,71 @@ df_municipalites_t0 = df_municipalites_t0.merge(deltas.reset_index(), right_on='
 # Get choropleth map 15-day window 
 choropleth_map_recent = geo_df.merge(df_municipalites, left_on='Codigo_Dan', right_on='node_id')
 choropleth_map_recent.to_crs(epsg=3857, inplace=True)
+scheme = [0, 0.49, 1, 2, 5, 10]
 ax = choropleth_map_recent.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(15,9),
-                                    scheme='EqualInterval', k=6, legend=True, linewidth=0.5)
+                                    scheme='user_defined', classification_kwds={'bins':scheme}, legend=True, linewidth=0.5)
+
 ax.set_axis_off()
+rivers_df.to_crs(epsg=3857, inplace=True)
+rivers_df.plot(ax=ax, alpha=0.1)
 ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
 plt.suptitle('Incremento Porcentual de Movimiento Incidente por Municipio')
-plt.title('Ventana 15 dias atrás')
-plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_15-day-window.png'.format(location_name)), bbox_inches="tight")
+plt.title('Comparativo entre el día del reporte y 15 días atrás')
+plt.savefig(os.path.join(output_file_path, 'report_figure_folder', 'choropleth_map_{}_15-day-window.png'.format(location_name)), bbox_inches="tight")
 
 # Get choropleth map historic
 choropleth_map_historic = geo_df.merge(df_municipalites_t0, left_on='Codigo_Dan', right_on='node_id')
 choropleth_map_historic.replace([np.inf, -np.inf], np.nan, inplace=True)
 choropleth_map_historic.to_crs(epsg=3857, inplace=True)
 ax = choropleth_map_historic.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(15,9),
-                                    scheme='natural_breaks', k=6, legend=True, linewidth=0.5)
+                                    scheme='user_defined', classification_kwds={'bins':scheme}, k=6, legend=True, linewidth=0.5)
 ax.set_axis_off()
 
 ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
+rivers_df.to_crs(epsg=3857, inplace=True)
+rivers_df.plot(ax=ax, alpha=0.1)
 plt.suptitle('Incremento Porcentual de Movimiento Incidente por Municipio')
-plt.title('Comparativo a Marzo 2020')
-plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_historic.png'.format(location_name)), bbox_inches="tight")
+plt.title('Comparativo entre el día del reporte y los primeros 15 días de Abril')
+plt.savefig(os.path.join(output_file_path, 'report_figure_folder','choropleth_map_{}_historic.png'.format(location_name)), bbox_inches="tight")
+
+translate = {'delta_num_cases':'Incremento numero de casos',
+            'delta_inner_movement':'Incremento flujo dentro del municipio',
+            'delta_external_num_cases':'Incremento numero de casos en municipios vecinos',
+            'delta_external_movement':'Incremento flujo hacia el municipio',
+            'community_name':'Unidad funcional'}
+
+
+
+# Get darker names in table
+df_highlights_recent = choropleth_map_recent[choropleth_map_recent['delta_external_movement'] > 1].fillna(0)
+df_highlights_historic = choropleth_map_historic[choropleth_map_historic['delta_external_movement'] > 5].fillna(0)
+
+# Merge with functional_units
+df_highlights_recent = df_highlights_recent.merge(df_functional_units, left_on='node_id', right_on='poly_id', how='left')
+df_highlights_historic = df_highlights_historic.merge(df_functional_units, left_on='node_id', right_on='poly_id', how='left')
+
+df_highlights_recent.drop(columns=['OBJECTID', 'POBT_2018', 'POBH_2018', 'POBM_2018', 'VIVT_2018',
+       'Departamen', 'Pob_Urbana', 'Pob_Rural', 'Total_2018',
+       'Codigo_Dan', 'No_Bog', 'SabanaBOG', 'Km2', 'Ha', 'Bog', 'Shape_Leng',
+       'Shape_Area', 'geometry', 'node_id', 'external_movement',
+       'external_num_cases', 'num_cases', 'inner_movement', 'community_id', 'poly_name', 'poly_id'], inplace=True)
+df_highlights_recent.rename(columns=translate, inplace=True)
+
+df_highlights_historic.drop(columns=['OBJECTID', 'POBT_2018', 'POBH_2018', 'POBM_2018', 'VIVT_2018',
+       'Departamen', 'Pob_Urbana', 'Pob_Rural', 'Total_2018',
+       'Codigo_Dan', 'No_Bog', 'SabanaBOG', 'Km2', 'Ha', 'Bog', 'Shape_Leng',
+       'Shape_Area', 'geometry', 'node_id', 'external_movement',
+       'external_num_cases', 'num_cases', 'inner_movement', 'community_id', 'poly_name', 'poly_id'], inplace=True)
+
+df_highlights_historic.rename(columns=translate, inplace=True)
+
+# Arrange columns
+df_highlights_historic = df_highlights_historic[['Unidad funcional', 'Municipio', 
+                                        'Incremento numero de casos', 'Incremento flujo dentro del municipio',
+                                        'Incremento numero de casos en municipios vecinos']]
+df_highlights_recent = df_highlights_recent[['Unidad funcional', 'Municipio', 
+                                        'Incremento numero de casos', 'Incremento flujo dentro del municipio',
+                                        'Incremento numero de casos en municipios vecinos']]
+
+df_highlights_recent.to_csv(os.path.join(output_file_path, 'report_table_folder', 'detail_choropleth_recent.csv'), float_format="%.3f", index=False)
+df_highlights_historic.to_csv(os.path.join(output_file_path, 'report_table_folder', 'detail_choropleth_historic.csv'), float_format="%.3f", index=False)

@@ -126,6 +126,7 @@ Mexico,mexico,analyse,analysis,5,NO,agglomerated_units_plots_script,r,Mexico mex
 Mexico,mexico,analyse,analysis,5,NO,agglomerated_units_plots_script,python,Mexico mexico all
 Colombia,colombia,POS,analysis,1,NO,location_selected_polygon_prediction_analysis,python,Colombia colombia community 0.8 20
 Colombia,colombia,POS,analysis,4,NO,location_prediction_by_polygon_union,python,Colombia colombia community
-Colombia,colombia,POS,analysis,3,NO,polygon_info_timewindow,python,colombia community 5 days
-Colombia,colombia,POS,analysis,3,NO,generate_alert_file,python,colombia community 5 days
-All,,POS,POS,5,YES,copy_report_files.py,python,
+Colombia,colombia,POS,analysis,3,NO,polygon_info_timewindow,python,colombia geometry 5 days
+Colombia,colombia,POS,analysis,3,NO,generate_alert_file,python,colombia geometry 5 days
+Colombia,colombia,POS,analysis,3,YES,choropleth_maps,python,colombia
+All,,POS,POS,5,NO,copy_report_files.py,python,

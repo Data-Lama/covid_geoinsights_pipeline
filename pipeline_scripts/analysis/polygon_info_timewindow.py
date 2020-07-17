@@ -254,9 +254,9 @@ def get_window_information(date_zero, min_time, max_time):
                                                             'num_cases': 'delta_num_cases'})
 
     # Add deltas
-    df_final_forward = df_final_forward.merge(df_delta_forward, left_index=True, right_index=True, how='outer')
-    df_final_backward = df_final_backward.merge(df_delta_backward, left_index=True, right_index=True, how='outer')
-    df_final_total = df_final_total.merge(df_delta_total, left_index=True, right_index=True, how='outer')
+    df_final_forward = df_final_forward.merge(df_delta_forward, left_index=True, right_index=True, how='outer').replace([np.inf, -np.inf], np.nan)
+    df_final_backward = df_final_backward.merge(df_delta_backward, left_index=True, right_index=True, how='outer').replace([np.inf, -np.inf], np.nan)
+    df_final_total = df_final_total.merge(df_delta_total, left_index=True, right_index=True, how='outer').replace([np.inf, -np.inf], np.nan)
 
     return [df_final_backward, df_final_backward, df_final_total]
 
