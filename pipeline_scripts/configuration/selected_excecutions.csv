@@ -125,6 +125,12 @@ Mexico,mexico,analyse,analysis,3,NO,movement_plots_script,python,Mexico mexico a
 Mexico,mexico,analyse,analysis,5,NO,agglomerated_units_plots_script,r,Mexico mexico all
 Mexico,mexico,analyse,analysis,5,NO,agglomerated_units_plots_script,python,Mexico mexico all
 Colombia,colombia,POS,analysis,1,NO,location_selected_polygon_prediction_analysis,python,Colombia colombia community 0.8 20
+Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community ibague 73001 Ibagué-Tolima
+Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community ibague 73001 Ibagué-Tolima 20
+Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community ibague 73001 Ibagué-Tolima
+Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community popayan 19001 Popayán-Cauca
+Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community popayan 19001 Popayán-Cauca 20
+Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community popayan 19001 Popayán-Cauca
 Colombia,colombia,POS,analysis,4,NO,location_prediction_by_polygon_union,python,Colombia colombia community
 Colombia,colombia,POS,analysis,3,NO,polygon_info_timewindow,python,colombia geometry 5 days
 Colombia,colombia,POS,analysis,3,NO,generate_alert_file,python,colombia geometry 5 days

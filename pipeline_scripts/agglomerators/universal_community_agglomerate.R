@@ -30,9 +30,14 @@ location_folder = args[2] # Location Folder
 agglomeration_method = args[3] # Agglomeration method to build on to
 
 # For Debug
-setwd("~/Dropbox/Projects/covid_fb_pipeline/covid_geoinsights_pipeline")
-location_name = 'Colombia'
-location_folder = 'colombia'
+debug = FALSE
+if(debug)
+{   
+  cat("\n\n\n\n\n\n\n\n\n\n\n¡¡¡¡¡DEBUG IS ON!!!!\n\n\n\n\n\n\n\n\n")
+  setwd("~/Dropbox/Projects/covid_fb_pipeline/covid_geoinsights_pipeline")
+  location_name = 'Colombia'
+  location_folder = 'colombia'
+}
 
 
 if(is.na(agglomeration_method))
