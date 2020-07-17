@@ -43,11 +43,11 @@ df_locations = pd.read_csv('pipeline_scripts/configuration/selected_excecutions.
 
 # Exctracts PRE
 df_pre = df_locations[df_locations.stage == 'PRE']
-df_pre = df_pre[df_pre.excecute == 'YES'].copy()
+df_pre = df_pre[df_pre.excecute == 'YES'].sort_values('position')
 
 # Extracts POS
 df_pos = df_locations[df_locations.stage == 'POS']
-df_pos = df_pos[df_pos.excecute == 'YES'].copy()
+df_pos = df_pos[df_pos.excecute == 'YES'].sort_values('position')
 
 # Filters out
 df_locations = df_locations[df_locations.excecute == 'YES']

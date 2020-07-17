@@ -6,6 +6,7 @@ options(warn=-1)
 suppressMessages(library('igraph'))
 suppressMessages(library('ggplot2'))
 suppressMessages(library('ggmap'))
+suppressMessages(library("dplyr"))
 
 # Loads constants
 source('pipeline_scripts/functions/constants.R')
@@ -36,10 +37,19 @@ location_name = args[1]
 location_folder = args[2]
 agglomeration_method_parameter = args[3]# Aglomeration Method
 
-#setwd("~/Dropbox/Projects/covid_fb")
-#location_name = 'Colombia'
-#location_folder = 'colombia'
-#agglomeration_method_parameter = 'community'
+
+window = 4
+
+debug = FALSE
+if(debug)
+{   
+    cat("\n\n\n\n\n\n\n\n\n\n\n¡¡¡¡¡DEBUG IS ON!!!!\n\n\n\n\n\n\n\n\n")
+    setwd("~/Dropbox/Projects/covid_fb_pipeline/covid_geoinsights_pipeline")
+    location_name = 'Colombia'
+    location_folder = 'colombia'
+    agglomeration_method_parameter = 'community'
+}
+
 
 ident = '         '
 
@@ -278,10 +288,27 @@ for(agglomeration_method in agglomeration_methods)
     # First for non cumulative scenarios (only cases of the day)
     for(day in start_day:end_day)
     {
+        curr_date = nodes[nodes$day == day,]$date_time
         cat(paste(day,' ',sep =""))
-        current_graph = nodes[nodes$day == day,]
-        current_edges = edges[edges$day == day,]
+        current_graph = nodes[nodes$day <= day + window/2,]
+        current_graph = current_graph[current_graph$day >= day - window/2,]
         
+        current_graph = current_graph %>% 
+            group_by(lon, lat) %>% 
+            summarise(inner_movement = mean(inner_movement), num_cases = mean(num_cases)) %>%
+            ungroup()
+        
+        
+        current_edges = edges[edges$day <= day + window/2,]
+        current_edges = current_edges[current_edges$day >= day + window/2,]
+        
+        current_edges = current_edges %>% 
+            group_by(lon.x, lat.x, lon.y, lat.y) %>% 
+            summarise(movement = mean(movement)) %>%
+            ungroup()
+        
+        # Only plots the one with at least one case
+        current_graph = current_graph[current_graph$num_cases > 0, ]
     
         p =  ggmap(map)
         p = p + geom_point(data = current_graph, aes(x = lon, y = lat, size = inner_movement, color = num_cases))
@@ -290,7 +317,7 @@ for(agglomeration_method in agglomeration_methods)
         p = p + scale_size(limits=c(internal_min, internal_max))
         p = p + scale_alpha(limits=c(external_min, external_max))
         p = p + labs(color = "Casos", alpha = "Mov. Externo", size = "Mov. Interno")
-        p = p + ggtitle(paste('COVID-19 Dinámicas en el Día:', day))
+        p = p + ggtitle(paste0('COVID-19 Dinámicas Promedio en el Día: ', day,' (',curr_date,')'))
     
         ggsave(file.path( export_folder, "maps_on_day", paste0("map_on_",day,".jpeg")), plot = p, width = width, height = height, device = 'jpeg')
     
@@ -317,13 +344,33 @@ for(agglomeration_method in agglomeration_methods)
     cat(paste(ident, '   Generating Maps by day', '\n', sep = ""))
     cat(paste(ident, '   ', sep = ""))
     for(day in start_day:end_day)
-    {
+    {   
+        curr_date = nodes[nodes$day == day,]$date_time
+        
         cat(paste(day,' ',sep =""))
-        current_graph = nodes[nodes$day == day,]
-        current_edges = edges[edges$day == day,]
-    
+       
+        current_graph = nodes[nodes$day <= day + window/2,]
+        current_graph = current_graph[current_graph$day >= day - window/2,]
+        
+        current_graph = current_graph %>% 
+            group_by(lon, lat) %>% 
+            summarise(inner_movement = mean(inner_movement), num_cases = mean(num_cases)) %>%
+            ungroup()
+        
         # Adds the cases
         current_graph$num_cases = current_graph$num_cases + cases
+        
+        
+        current_edges = edges[edges$day <= day + window/2,]
+        current_edges = current_edges[current_edges$day >= day + window/2,]
+        
+        current_edges = current_edges %>% 
+            group_by(lon.x, lat.x, lon.y, lat.y) %>% 
+            summarise(movement = mean(movement)) %>%
+            ungroup()
+        
+        # Only plots the one with at least one case
+        current_graph = current_graph[current_graph$num_cases > 0, ]
     
         p =  ggmap(map)
         p = p + geom_point(data = current_graph, aes(x = lon, y = lat, size = inner_movement, color = num_cases))
@@ -332,11 +379,11 @@ for(agglomeration_method in agglomeration_methods)
         p = p + scale_size(limits=c(internal_min, internal_max))
         p = p + scale_alpha(limits=c(external_min, external_max))
         p = p + labs(color = "Casos", alpha = "Mov. Externo", size = "Mov. Interno")
-        p = p + ggtitle(paste('COVID-19 Dinámicas al Día:', day, '(Casos Acumulados)'))
+        p = p + ggtitle(paste0('COVID-19 Dinámicas Promedio al Día: ', day,' (',curr_date,')',' (Casos Acumulados)'))
         
         ggsave(file.path( export_folder, "maps_by_day", paste0("map_by_",day,".jpeg")), plot = p, width = width, height = height, device = 'jpeg')
     
-        cases = current_graph$num_cases
+        cases = nodes[nodes$day == day,]$num_cases
     }
     
     cat('\n')

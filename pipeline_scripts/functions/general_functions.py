@@ -22,6 +22,8 @@ def clean_for_publication(s):
 	subs['11001'] = 'Bogotá'
 	subs['colombia'] = 'Colombia'
 	subs['italy'] = 'Italia'
+	subs['brazil'] = 'Brasil'
+	subs['peru'] = 'Perú'
 
 	subs['Bogotá D.C.-Bogotá d C.'] = 'Bogotá'
 	subs['-'] = ' - '

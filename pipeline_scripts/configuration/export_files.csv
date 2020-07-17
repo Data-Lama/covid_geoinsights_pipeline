@@ -28,6 +28,10 @@ Neighbor Series soledad,figure,colombia/community/neighbors/soledad/neighbor_tim
 Prediction soledad,figure,colombia/community/prediction/soledad/prediction_soledad.png,prediction_soledad.png
 Neighbor Series Bogota,figure,colombia/community/neighbors/bogota_dc/neighbor_timeseries_bogota_dc.png,neighbor_timeseries_bogota.png
 Prediction Bogota,figure,colombia/community/prediction/bogota_dc/prediction_bogota_dc.png,prediction_bogota.png
+Neighbor Series soledad,figure,colombia/community/neighbors/popayan/neighbor_timeseries_popayan.png,neighbor_timeseries_popayan.png
+Prediction popayan,figure,colombia/community/prediction/popayan/prediction_popayan.png,prediction_popayan.png
+Neighbor Series Ibague,figure,colombia/community/neighbors/ibague/neighbor_timeseries_ibague.png,neighbor_timeseries_ibague.png
+Prediction Ibague,figure,colombia/community/prediction/ibague/prediction_ibague.png,prediction_ibague.png
 Neighbor Series Colombia,figure,colombia/community/neighbors/entire_location/neighbor_timeseries_colombia.png,neighbor_timeseries_colombia.png
 Prediction Colombia,figure,colombia/community/prediction/entire_location/prediction_colombia.png,prediction_colombia.png
 Tabla Hitos,table,colombia/community/movement_plots/milestones.csv,milestones.csv
