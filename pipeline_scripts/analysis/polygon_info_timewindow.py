@@ -23,6 +23,7 @@ The script calculates for each node of the given agglomeration.
 import os
 import sys
 import datetime
+import numpy as np
 import pandas as pd
 from datetime import date
 

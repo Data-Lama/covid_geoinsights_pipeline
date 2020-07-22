@@ -10,7 +10,6 @@ from matplotlib.colors import ListedColormap
 from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
-report_dir = config.get_property('report_dir')
 
 
 # Reads the parameters from excecution
@@ -21,6 +20,7 @@ time_unit = sys.argv[4] # time unit for window [days, hours]
 
 # Constants
 ident = '         '
+ident_1 = '             '
 
 NUM_CASES_THRESHOLD = 0.5
 INNER_MOV_THRESHOLD = 0.5
@@ -37,15 +37,18 @@ COLORS_ = {'#b30000':'RED',
 '#ffcc00':'YELLOW',
 '#006600':'GREEN'}
 
+print(ident+'Generating alert files for {} {}'.format(location_name, location_folder))
 
+print(ident + ' Using the following thresholds:\n{}internal_num_cases: \
+{}\n{}internal movement: {}\n{}external_num_cases: {}\n{}external_movement: {}'.format(ident_1, 
+NUM_CASES_THRESHOLD, ident_1, INNER_MOV_THRESHOLD, ident_1, NUM_EXT_CASES_THRESHOLD, ident_1, EXTERNAL_MOV_THRESHOLD))
 
 # Get file names
 time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window')
 polygons_file = os.path.join(data_dir, 'data_stages', location_name, 'constructed', location_folder, 'daily_graphs', 'node_locations.csv')
 community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', 'community', 'polygon_community_map.csv')
-# alert_report_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window','polygon_info_window_{}{}_alert_report.csv'.format(window_size_parameter, time_unit))
+output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window')
 shape_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'geo', 'Municpios_Dane_2017.shp')
-output_file_path = os.path.join(report_dir) 
 
 # Import shapefile
 geo_df = gpd.read_file(shape_file_path)
@@ -104,9 +107,6 @@ yellow_alert_external_num_cases = set(alert_forward_external_cases['node_id'])
 red_alert_external_mov = set(alert_total_external_mov['node_id']).intersection(alert_forward_external_mov['node_id'])
 yellow_alert_external_mov = set(alert_forward_external_mov['node_id'])
 
-print(set(alert_total_external_mov['node_id']))
-print(set(alert_forward_external_mov['node_id']))
-
 def set_alert(node_id, red_alert, yellow_alert):
     if node_id in red_alert: return 'ROJO'
     elif node_id in yellow_alert: return 'AMARILLO'
@@ -143,7 +143,7 @@ alerts.rename(columns=translate, inplace=True)
 alerts.drop(columns=['lat', 'lon', 'poly_id', 'node_id'], inplace=True)
 alerts.sort_values(by=['Unidad funcional'], inplace=True)
 
-alerts.to_csv(os.path.join(output_file_path, 'report_table_folder', 'alerts.csv'), columns=['Unidad funcional',
+alerts.to_csv(os.path.join(output_file_path, 'alerts.csv'), columns=['Unidad funcional',
                                         'Municipio',                                          
                                         'Alerta numero de casos',
                                         'Alerta flujo dentro del municipio',
@@ -156,18 +156,19 @@ df_polygons = geo_df.merge(df_polygons, left_on='Codigo_Dan', right_on='node_id'
 cmap = ListedColormap([(1,0.8,0), (0.8, 0, 0), (0,0.4,0)], name='alerts')
 df_polygons.to_crs(epsg=3857, inplace=True)
 
+print(ident+ "  Drawing alert maps.")
 # Draw maps
 for i in ['internal_num_cases_alert', 'internal_movement_alert', 'external_num_cases_alert', 'external_movement_alert']:
+    print(ident + '     Drawing {}_map'.format(i))
     color_key = i.replace('alert', 'color')
     ax = df_polygons.plot(figsize=(15,9), linewidth=0.5, color=df_polygons[color_key], missing_kwds={'color': 'lightgrey'})
     colors = [COLORS_[x] for x in df_polygons[color_key].unique()]
 
-    print(colors)
     ax.legend(labels=colors, loc='upper right')
     ax.set_axis_off()
     ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
     plt.title(translate[i])
     # plt.show()
-    plt.savefig(os.path.join(output_file_path, 'report_figure_folder','alert_map_{}.png'.format(i)), bbox_inches="tight")
+    plt.savefig(os.path.join(output_file_path, 'map_{}.png'.format(i)), bbox_inches="tight")
 
 
