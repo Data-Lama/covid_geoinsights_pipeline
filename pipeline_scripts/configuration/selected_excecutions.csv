@@ -121,6 +121,7 @@ Mexico,mexico,analyse,analysis,1,NO,tda_script,r,Mexico mexico all
 Mexico,mexico,analyse,analysis,3,NO,movement_plots_script,python,Mexico mexico all
 Mexico,mexico,analyse,analysis,5,NO,agglomerated_units_plots_script,r,Mexico mexico all
 Mexico,mexico,analyse,analysis,5,NO,agglomerated_units_plots_script,python,Mexico mexico all
+<<<<<<< HEAD
 Colombia,colombia,POS,analysis,1,YES,location_selected_polygon_prediction_analysis,python,Colombia colombia community 0.8 20
 Colombia,colombia,POS,analysis,1,YES,neighbors_polygon_extraction,python,colombia community ibague 73001 Ibagué-Tolima
 Colombia,colombia,POS,analysis,2,YES,polygon_prediction_dataset_builder,python,colombia community ibague 73001 Ibagué-Tolima 20
@@ -133,3 +134,12 @@ Colombia,colombia,POS,analysis,3,YES,polygon_info_timewindow,python,colombia geo
 Colombia,colombia,POS,analysis,3,YES,generate_alert_file,python,colombia geometry 5 days
 Colombia,colombia,POS,analysis,3,YES,choropleth_maps,python,colombia
 All,,POS,POS,5,YES,copy_report_files.py,python,
+=======
+Colombia,colombia,POS,analysis,1,NO,location_selected_polygon_prediction_analysis,python,Colombia colombia community 0.8 20
+Colombia,colombia,POS,analysis,4,NO,location_prediction_by_polygon_union,python,Colombia colombia community
+Colombia,colombia,POS,analysis,3,NO,polygon_info_timewindow,python,colombia geometry 5 days
+Colombia,colombia,POS,analysis,3,NO,generate_alert_file,python,colombia geometry 5 days
+Colombia,colombia,POS,analysis,3,NO,choropleth_maps,python,colombia geometry
+Colombia,colombia,POS,analysis,3,YES,general_statistics,python,colombia community
+All,,POS,POS,5,NO,copy_report_files.py,python,
+>>>>>>> 13b16996c7fbd2e0b8941a72dc33f6dff479f93e
