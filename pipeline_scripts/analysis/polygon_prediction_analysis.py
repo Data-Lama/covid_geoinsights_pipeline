@@ -8,6 +8,7 @@ from general_functions import *
 # Other imports
 import os, sys
 from datetime import timedelta
+from sklearn.metrics import mean_squared_error
 
 from pathlib import Path
 
@@ -68,6 +69,7 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 	suptitle_font_size = 14
 	individual_plot_size = 12
 	axis_font_size = 12
+	alpha = 0.2
 
 	# Extracts Neighbors
 	print(ident + '   Extracts the Trainig Dataset')
@@ -87,7 +89,7 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 	print(ident + '   Plots Prediction')
 
 	# Actual
-	df1 = df_results[['target_date','target_num_cases','target_num_cases_accum']].copy()
+	df1 = df_results[['target_date','target_num_cases','target_num_cases_accum']].dropna()
 	df1.rename(columns = {'target_num_cases': 'cases', 'target_num_cases_accum': 'cases_accum'}, inplace = True)
 	df1['Tipo'] = 'Real' 
 
@@ -101,6 +103,28 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 	df3 = df_results.loc[ df_results.target_date >= start_date, ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
 	df3.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
 	df3['Tipo'] = 'Poyección' 
+
+	# Errors
+	# Computes RMSE
+	y1 = df1.sort_values('target_date').cases.values
+	y2 = df2.sort_values('target_date').cases.values
+
+	rmse = mean_squared_error(y1, y2, squared = False)
+	mpe = 100*np.mean(np.abs(y1 - y2)/(y1 +1))
+
+	df_grouped = df_results.groupby('target_date').sum().reset_index()
+
+	x_values = df3.target_date.values
+
+	# Non cumulative
+	y_values = df3.cases.values
+	lower_bound = [ y_values[i] - rmse for i in range(len(y_values))]
+	upper_bound = [ y_values[i] + rmse for i in range(len(y_values))]
+
+	# Cumulative
+	y_values = df3.cases_accum.values
+	lower_bound_accum = [ y_values[i] - rmse*(i+1) for i in range(len(y_values))]
+	upper_bound_accum = [ y_values[i] + rmse*(i+1) for i in range(len(y_values))]
 
 
 	df_plot = pd.concat((df1,df2,df3), ignore_index = True)
@@ -116,6 +140,10 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 	# Plot individual Lines
 	sns.lineplot(x = 'target_date', y = 'cases', hue = 'Tipo', data = df_plot, ax = ax[0])
 	sns.lineplot(x = 'target_date', y = 'cases_accum', hue = 'Tipo', data = df_plot, ax = ax[1])
+
+	# Adds confidence intervals
+	ax[0].fill_between(x_values, lower_bound, upper_bound, alpha=alpha)
+	ax[1].fill_between(x_values, lower_bound_accum, upper_bound_accum, alpha=alpha)	
 
 	# Plot titles
 	ax[0].set_title('Flujo Casos', fontsize=individual_plot_size)

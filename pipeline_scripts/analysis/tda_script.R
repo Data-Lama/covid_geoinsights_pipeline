@@ -2,15 +2,12 @@
 
 options(warn=-1)
 
-# TDA Over daily graphs of the COVID Pandemic
-suppressMessages(library('igraph'))
-suppressMessages(library('ggplot2'))
-suppressMessages(library('ggmap'))
 suppressMessages(library("dplyr"))
+suppressMessages(library('igraph'))
+suppressMessages(library('proxy'))
+suppressMessages(library('ramify'))
 
-# Loads constants
 source('pipeline_scripts/functions/constants.R')
-
 
 # Directories
 source("global_config/config.R")
@@ -26,10 +23,12 @@ if(dir.exists(mapper_dir))
     suppressMessages(source(paste0(mapper_dir , '/R/general_clusters.R')))
 }
 
+# If they are placed before TDA something fails (No idea what)
+suppressMessages(library('ggplot2'))
+suppressMessages(library('ggmap'))
 
 
 # Working Directory
-
 
 # Location Folder from args
 args = commandArgs(trailingOnly=TRUE)
@@ -38,7 +37,7 @@ location_folder = args[2]
 agglomeration_method_parameter = args[3]# Aglomeration Method
 
 
-window = 4
+window = 14
 
 debug = FALSE
 if(debug)
@@ -290,17 +289,20 @@ for(agglomeration_method in agglomeration_methods)
     {
         curr_date = nodes[nodes$day == day,]$date_time
         cat(paste(day,' ',sep =""))
-        current_graph = nodes[nodes$day <= day + window/2,]
-        current_graph = current_graph[current_graph$day >= day - window/2,]
+        
+        #Sliding
+        plus = max(window/2, window - (day - start_day))
+        minus = max(window/2, window - (end_day - day))
+        current_graph = nodes[nodes$day <= day + plus,]
+        current_graph = current_graph[current_graph$day >= day - minus,]
         
         current_graph = current_graph %>% 
             group_by(lon, lat) %>% 
             summarise(inner_movement = mean(inner_movement), num_cases = mean(num_cases)) %>%
             ungroup()
-        
-        
-        current_edges = edges[edges$day <= day + window/2,]
-        current_edges = current_edges[current_edges$day >= day + window/2,]
+
+        current_edges = edges[edges$day <= day + plus,]
+        current_edges = current_edges[current_edges$day >= day - minus,]
         
         current_edges = current_edges %>% 
             group_by(lon.x, lat.x, lon.y, lat.y) %>% 
@@ -333,9 +335,16 @@ for(agglomeration_method in agglomeration_methods)
     
     # Recalculates the cases_max
     cases_max = -1
+    nodes = nodes[order(nodes$lon, nodes$lat),]
     cases = rep(0, nrow(locations))
     for(day in start_day:end_day)
-        cases = cases + nodes[nodes$day == day, 'num_cases']
+    {
+        temp_nodes = nodes[nodes$day == day,]
+        temp_nodes = temp_nodes[order(temp_nodes$lon, temp_nodes$lat),]
+        cases = cases + temp_nodes$num_cases
+        
+    }
+
     
     cases_max = max(cases)
     
@@ -349,8 +358,10 @@ for(agglomeration_method in agglomeration_methods)
         
         cat(paste(day,' ',sep =""))
        
-        current_graph = nodes[nodes$day <= day + window/2,]
-        current_graph = current_graph[current_graph$day >= day - window/2,]
+        plus = max(window/2, window - (day - start_day))
+        minus = max(window/2, window - (end_day - day))
+        current_graph = nodes[nodes$day <= day + plus,]
+        current_graph = current_graph[current_graph$day >= day - minus,]
         
         current_graph = current_graph %>% 
             group_by(lon, lat) %>% 
@@ -358,11 +369,14 @@ for(agglomeration_method in agglomeration_methods)
             ungroup()
         
         # Adds the cases
+        current_graph = current_graph[order(current_graph$lon, current_graph$lat),]
         current_graph$num_cases = current_graph$num_cases + cases
+        #Adjusts to max
+        current_graph$num_cases =  sapply( current_graph$num_cases, function(s){min(s, cases_max)})
         
         
-        current_edges = edges[edges$day <= day + window/2,]
-        current_edges = current_edges[current_edges$day >= day + window/2,]
+        current_edges = edges[edges$day <= day + plus,]
+        current_edges = current_edges[current_edges$day >= day - minus,]
         
         current_edges = current_edges %>% 
             group_by(lon.x, lat.x, lon.y, lat.y) %>% 
@@ -383,7 +397,7 @@ for(agglomeration_method in agglomeration_methods)
         
         ggsave(file.path( export_folder, "maps_by_day", paste0("map_by_",day,".jpeg")), plot = p, width = width, height = height, device = 'jpeg')
     
-        cases = nodes[nodes$day == day,]$num_cases
+        cases = cases + nodes[nodes$day == day,]$num_cases
     }
     
     cat('\n')
