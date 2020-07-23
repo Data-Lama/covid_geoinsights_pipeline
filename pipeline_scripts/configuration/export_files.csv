@@ -43,3 +43,5 @@ Mapa Alertas Casos Externos,figure,colombia/geometry/polygon_info_window/map_ext
 Mapa Alertas Movimiento Externo,figure,colombia/geometry/polygon_info_window/map_external_movement_alert.png,map_external_movement_alert.png
 Detalles Mapa Cloroplético Reciente,table,colombia/geometry/polygon_info_window/detail_choropleth_recent.csv,detail_choropleth_recent.csv
 Alertas Rojas,table,colombia/geometry/polygon_info_window/alerts.csv,alerts.csv
+Estadisticas Municipio,table,colombia/geometry/stats/general_stats.csv,general_stats_geometry.csv
+Estadisticas Unidad Funcional,table,colombia/community/stats/general_stats.csv,general_stats_community.csv
