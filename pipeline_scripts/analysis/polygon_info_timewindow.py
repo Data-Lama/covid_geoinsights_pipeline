@@ -22,10 +22,12 @@ The script calculates for each node of the given agglomeration.
 
 import os
 import sys
+import random
 import datetime
 import numpy as np
 import pandas as pd
 from datetime import date
+import matplotlib.pyplot as plt
 
 from pipeline_scripts.functions.general_functions import load_README
 
@@ -87,6 +89,17 @@ if not os.path.isdir(output_file_path):
 # Get nodes and edges
 df_nodes = pd.read_csv(nodes, parse_dates=['date_time'])
 df_edges = pd.read_csv(edges, parse_dates=['date_time'])
+
+# # Visualize node trends
+# nodes = df_nodes['node_id'].unique()
+# print(len(nodes))
+# node_int = random.randint(1,1101)
+# print(node_int)
+# node = nodes[node_int]
+# df_rand_node = df_nodes[df_nodes['node_id'] == node]
+# print(df_rand_node.head())
+# plt.scatter(x=df_rand_node['date_time'], y=df_rand_node['inner_movement'])
+# plt.show()
 
 # Get nodes within time window. Date zero will be counted with backward window.
 margin = margins[time_unit] 

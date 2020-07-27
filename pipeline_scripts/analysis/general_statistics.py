@@ -9,6 +9,9 @@ from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
+# Constants
+WINDOW = 15
+
 # Reads the parameters from excecution
 location_name  =  sys.argv[1] # location name
 location_folder =  sys.argv[2] # polygon name
@@ -79,6 +82,22 @@ def max_min_day_by_node(df):
 
     return df_max.merge(df_min, on='node_id', how='outer')
 
+def get_polygons_no_new_cases(df, window_size):
+    today = datetime.datetime.today()
+    x_days_ago = today - datetime.timedelta(days = window_size)
+    df_window_for = df[df['date_time'] > x_days_ago]
+    df_window_for_sum = df_window_for.groupby('node_id').sum()
+    df_no_cases = df_window_for_sum[df_window_for_sum['num_cases'] == 0]
+    df_no_cases.reset_index(inplace=True)
+    set_no_new_cases = set(df_no_cases['node_id'])
+    
+    df_window_back = df[df['date_time'] < x_days_ago]
+    df_window_back_sum = df_window_back.groupby('node_id').sum()
+    df_prev_cases = df_window_back_sum[df_window_back_sum['num_cases'] > 0]
+    df_prev_cases.reset_index(inplace=True)
+    set_previous_cases = set(df_prev_cases['node_id'])
+    
+    return set_previous_cases.intersection(set_no_new_cases)
 
 # Get the information of the max and min historical points 
 max_inner_mov = get_max_min('inner_movement', df_nodes)[0]
@@ -92,24 +111,21 @@ min_inner_mov_day = get_day_max_min('inner_movement', df_nodes)[1]
 max_num_cases_day = get_day_max_min('num_cases', df_nodes)[0]
 min_num_cases_day = get_day_max_min('num_cases', df_nodes)[1]
 
-# print(max_inner_mov)
-# print(min_inner_mov_day)
-# print(max_num_cases_day)
-# print(min_num_cases_day)
-
 # Get the number of polygons that reported having their first case in the last 5 days
 today = datetime.datetime.today()
-five_days_ago = today - datetime.timedelta(days = 5)
-historic = df_nodes[df_nodes['date_time'] < five_days_ago]
+x_days_ago = today - datetime.timedelta(days = WINDOW)
+historic = df_nodes[df_nodes['date_time'] < x_days_ago]
 historic_set = get_nodes_with_cases(historic)
 current_set = get_nodes_with_cases(df_nodes)
 intersection = current_set.intersection(historic_set)
 
 new_case_polygon = current_set - intersection
+no_new_case_polygon = get_polygons_no_new_cases(df_nodes, WINDOW)
 stats_by_node = max_min_day_by_node(df_nodes)
 
 stats = {
     'num_first_case':len(new_case_polygon),
+    'no_case_polygons_last_days':len(no_new_case_polygon),
     'day_max_mov': max_inner_mov_day['date'],
     'day_min_mov': min_inner_mov_day['date'],
     'day_max_cases': max_num_cases_day['date'],

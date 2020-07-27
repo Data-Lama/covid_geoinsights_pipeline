@@ -37,6 +37,15 @@ COLORS_ = {'#b30000':'RED',
 '#ffcc00':'YELLOW',
 '#006600':'GREEN'}
 
+# Colors for map esp
+COLORS_SP = {'ROJO':'#b30000',
+'AMARILLO':'#ffcc00',
+'VERDE':'#006600'}
+
+COLORS_SP_ = {'#b30000':'ROJO',
+'#ffcc00':'AMARILLO',
+'#006600':'VERDE'}
+
 print(ident+'Generating alert files for {} {}'.format(location_name, location_folder))
 
 print(ident + ' Using the following thresholds:\n{}internal_num_cases: \
@@ -117,17 +126,28 @@ def set_color(node_id, red_alert, yellow_alert):
     elif node_id in yellow_alert: return COLORS['YELLOW']
     else: return COLORS['GREEN']
 
+def join_alert(mov_alert, num_cases_alert):
+    if mov_alert == 'ROJO':
+        return 'ROJO'
+    if mov_alert == 'AMARILLO' and num_cases_alert == 'ROJO':
+        return 'ROJO'
+    if num_cases_alert == 'ROJO' or num_cases_alert == 'AMARILLO':
+        return 'AMARILLO'
+    return 'VERDE'
+
 df_polygons['internal_num_cases_alert'] = df_polygons.apply(lambda x: set_alert(x.node_id, red_alert_num_cases, yellow_alert_num_cases), axis=1)
 df_polygons['internal_movement_alert'] = df_polygons.apply(lambda x: set_alert(x.node_id, red_alert_inner_mov, yellow_alert_inner_mov), axis=1)
 df_polygons['external_movement_alert'] = df_polygons.apply(lambda x: set_alert(x.node_id, red_alert_external_mov, yellow_alert_external_mov), axis=1)
 df_polygons['external_num_cases_alert'] = df_polygons.apply(lambda x: set_alert(x.node_id, red_alert_external_num_cases, yellow_alert_external_num_cases), axis=1)
+df_polygons['external_joint_alert'] = df_polygons.apply(lambda x: join_alert(x.external_movement_alert, x.external_num_cases_alert), axis=1)
+df_polygons['internal_joint_alert'] = df_polygons.apply(lambda x: join_alert(x.internal_movement_alert, x.internal_num_cases_alert), axis=1)
 
 df_polygons['internal_num_cases_color'] = df_polygons.apply(lambda x: set_color(x.node_id, red_alert_num_cases, yellow_alert_num_cases), axis=1)
 df_polygons['internal_movement_color'] = df_polygons.apply(lambda x: set_color(x.node_id, red_alert_inner_mov, yellow_alert_inner_mov), axis=1)
 df_polygons['external_movement_color'] = df_polygons.apply(lambda x: set_color(x.node_id, red_alert_external_mov, yellow_alert_external_mov), axis=1)
 df_polygons['external_num_cases_color'] = df_polygons.apply(lambda x: set_color(x.node_id, red_alert_external_num_cases, yellow_alert_external_num_cases), axis=1)
-
-
+df_polygons['external_joint_color'] = df_polygons.apply(lambda x: COLORS_SP[x.external_joint_alert], axis=1)
+df_polygons['internal_joint_color'] = df_polygons.apply(lambda x: COLORS_SP[x.internal_joint_alert], axis=1)
 
 alerts = df_polygons.loc[(df_polygons['internal_num_cases_alert'] == 'ROJO') | (df_polygons['internal_movement_alert'] == 'ROJO') \
      | (df_polygons['external_movement_alert'] == 'ROJO')]
@@ -137,6 +157,8 @@ translate = {'internal_num_cases_alert':'Alerta numero de casos',
                         'internal_movement_alert':'Alerta flujo dentro del municipio',
                         'external_num_cases_alert':'Alerta numero de casos en municipios vecinos',
                         'external_movement_alert':'Alerta flujo hacia el municipio',
+                        'internal_joint_alert': 'Alerta interna compuesta',
+                        'external_joint_alert': 'Alerta externa compuesta',
                         'node_name':'Municipio',
                         'community_name': 'Unidad funcional'}
 alerts.rename(columns=translate, inplace=True)
@@ -158,7 +180,9 @@ df_polygons.to_crs(epsg=3857, inplace=True)
 
 print(ident+ "  Drawing alert maps.")
 # Draw maps
-for i in ['internal_num_cases_alert', 'internal_movement_alert', 'external_num_cases_alert', 'external_movement_alert']:
+for i in ['internal_num_cases_alert', 'internal_movement_alert', 
+            'external_num_cases_alert', 'external_movement_alert', 
+            'internal_joint_alert', 'external_joint_alert']:
     print(ident + '     Drawing {}_map'.format(i))
     color_key = i.replace('alert', 'color')
     ax = df_polygons.plot(figsize=(15,9), linewidth=0.5, color=df_polygons[color_key], missing_kwds={'color': 'lightgrey'})

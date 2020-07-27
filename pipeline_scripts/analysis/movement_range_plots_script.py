@@ -144,7 +144,7 @@ for agglomeration_method in agglomeration_methods:
 
 	# Axis
 	g.set_axis_labels("Fecha", "")
-	g.axes[0,0].set_ylabel('Porcentaje')
+	g.axes[0,0].set_ylabel('Proporción (0-1)')
 	g.axes[1,0].set_ylabel('Número Casos')
 
 	# Titles
