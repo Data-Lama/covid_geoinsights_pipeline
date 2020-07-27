@@ -32,6 +32,7 @@ class Unifier(GenericUnifier):
 
 		'''
 		Loads the cases downloaded from: https://www.datos.gov.co/
+		https://www.datos.gov.co/api/views/gt2j-8ykr/rows.csv?accessType=DOWNLOAD
 		'''
 		
 		file_name = os.path.join(self.raw_folder, 'cases', self.get('cases_file_name'))
@@ -55,7 +56,7 @@ class Unifier(GenericUnifier):
 		cols['Fecha recuperado'] = 'date_recovered'
 		cols['Fecha reporte web'] = 'date_reported_web'
 
-		df = pd.read_csv(file_name, parse_dates = ['Fecha diagnostico'], date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
+		df = pd.read_csv(file_name, parse_dates = ['Fecha diagnostico','FIS','Fecha de muerte','Fecha recuperado','Fecha reporte web'], date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
 		df = df.rename(columns=cols)
 
 		df.dropna(subset = ['date_time', 'attention'], inplace = True)
@@ -82,6 +83,9 @@ class Unifier(GenericUnifier):
 		df.loc[df.date_time.isna(), 'date_time'] = df.date_time.min()
 		df.fillna(0, inplace = True)
 		df = df[['date_time','geo_id','location','lon','lat', 'num_cases', 'num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house']]
+
+		# Removes last day (usually is incomplete)
+		df = df[df['date_time'] < df['date_time'].max()].copy()
 
 		return(df)	
 

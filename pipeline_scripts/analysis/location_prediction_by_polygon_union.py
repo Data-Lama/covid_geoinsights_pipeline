@@ -6,6 +6,7 @@ from general_functions import *
 
 from sklearn.metrics import mean_squared_error
 
+
 # Other imports
 import os, sys
 from datetime import timedelta
@@ -40,6 +41,7 @@ fig_size = (15,8)
 suptitle_font_size = 14
 individual_plot_size = 12
 axis_font_size = 12
+alpha = 0.2
 
 folder_name = 'entire_location'
 
@@ -68,6 +70,8 @@ for agglomeration_method in agglomeration_methods:
 
     # Loads the polygons
     polygons = pd.read_csv(os.path.join(agglomerated_folder_location, 'polygons.csv'))
+    # Loads cases
+    cases = pd.read_csv(os.path.join(agglomerated_folder_location, 'cases.csv'), parse_dates = ['date_time'])
 
     predictions_folder_location =  os.path.join(analysis_dir, location_folder, agglomeration_method, 'prediction')
     folder_location = os.path.join(predictions_folder_location, folder_name)
@@ -100,16 +104,21 @@ for agglomeration_method in agglomeration_methods:
     # Extracts coverage
     coverage = polygons[polygons.poly_id.isin(included_polygons)].num_cases.sum()/polygons.num_cases.sum()
 
+    # Extracts the real cases
+    df_real_cases = cases.loc[cases['date_time'].isin(df_results['target_date']), ['date_time','num_cases']].rename(columns = {'num_cases':'cases','date_time':'target_date'})
+    df_real_cases = df_real_cases.groupby('target_date').sum().reset_index()
+    df_real_cases['cases_accum'] = df_real_cases['cases'].rolling(min_periods=1, window=df_real_cases.shape[0]).sum()
+
+
+
+
     # Removes polygon_id
     df_results.drop('polygon_id', axis = 1, inplace = True)
-    
+    df_results.sort_values('target_date', inplace = True)
 
     # Plots the prediction
     print(ident + '   Plots Prediction')
-    df1 = df_results[['target_date','target_num_cases','target_num_cases_accum']].copy()
-    #Groups
-    df1 = df1.dropna().groupby('target_date').sum().reset_index()
-    df1.rename(columns = {'target_num_cases': 'cases', 'target_num_cases_accum': 'cases_accum'}, inplace = True)
+    df1 = df_real_cases.copy()
     df1['Tipo'] = 'Real' 
 
     # Histroic Predict
@@ -117,16 +126,47 @@ for agglomeration_method in agglomeration_methods:
     #Groups
     df2 = df2.groupby('target_date').sum().reset_index()
     df2.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
-    df2['Tipo'] = 'Predecido Histórico' 
+    df2['Tipo'] = 'Predecido Histórico'
+
+    # Adjusts
+    df2['cases'] = df2['cases']/coverage
+    df2['cases_accum'] = df2['cases_accum']/coverage
 
     # Future Prediction
     # Future Prediction
-    start_date = df_results[df_results.target_num_cases.isna()].target_date.min() - timedelta(days = 5)
+    days_back = 3
+    start_date = df_results[df_results.target_num_cases.isna()].target_date.min() - timedelta(days = days_back)
     df3 = df_results.loc[ df_results.target_date >= start_date, ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
     #Groups
     df3 = df3.groupby('target_date').sum().reset_index()
     df3.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
     df3['Tipo'] = 'Proyección' 
+
+    # Adjusts
+    df3['cases'] = df3['cases']/coverage
+    df3['cases_accum'] = df3['cases_accum']/coverage
+
+    # Errors
+    # Computes RMSE
+    y1 = df1.sort_values('target_date').cases.values
+    y2 = df2.sort_values('target_date').cases.values
+
+    rmse = mean_squared_error(y1, y2, squared = False)
+    mpe = 100*np.mean(np.abs(y1 - y2)/(y1 +1))
+
+    df_grouped = df_results.groupby('target_date').sum().reset_index()
+
+    x_values = df3.target_date.values
+
+    # Non cumulative
+    y_values = df3.cases.values
+    lower_bound = [ y_values[i] - rmse for i in range(len(y_values))]
+    upper_bound = [ y_values[i] + rmse for i in range(len(y_values))]
+
+    # Cumulative
+    y_values = df3.cases_accum.values
+    lower_bound_accum = [ y_values[i] - rmse*(i+1) for i in range(len(y_values))]
+    upper_bound_accum = [ y_values[i] + rmse*(i+1) for i in range(len(y_values))]
 
     # Unifies
     df_plot = pd.concat((df1,df2, df3), ignore_index = True)
@@ -139,11 +179,15 @@ for agglomeration_method in agglomeration_methods:
     fig, ax = plt.subplots(2,1, figsize=(15,8))
 
 
-    fig.suptitle('Predicción para {} ({}% de los Casos)'.format(location_name, np.round(100*coverage,1)), fontsize=suptitle_font_size)
+    fig.suptitle('Predicción para {}'.format(location_name), fontsize=suptitle_font_size)
 
     # Plot individual Lines
     sns.lineplot(x = 'target_date', y = 'cases', hue = 'Tipo', data = df_plot, ax = ax[0])
     sns.lineplot(x = 'target_date', y = 'cases_accum', hue = 'Tipo', data = df_plot, ax = ax[1])
+
+    # Adds confidence intervals
+    ax[0].fill_between(x_values, lower_bound, upper_bound, alpha=alpha)
+    ax[1].fill_between(x_values, lower_bound_accum, upper_bound_accum, alpha=alpha)
 
     # Plot titles
     ax[0].set_title('Flujo Casos', fontsize=individual_plot_size)
@@ -162,11 +206,6 @@ for agglomeration_method in agglomeration_methods:
 
     print(ident + '   Exports Statistics')
 
-    # Computes RMSE
-    y1 = df1.sort_values('target_date').cases.values
-    y2 = df2.sort_values('target_date').cases.values
-
-    rmse = mean_squared_error(y1, y2, squared = False)
 
     with open(os.path.join(folder_location, 'statistics.txt'), 'w') as file:
         
@@ -174,6 +213,7 @@ for agglomeration_method in agglomeration_methods:
         file.write('Coverage: {}% \n'.format(np.round(100*coverage,2)))
         file.write("   From: {} \n".format(' '.join([str(p) for p in included_polygons])))
         file.write('RMSE: {} \n'.format(np.round(rmse,2)))
+        file.write('MPE: {}% \n'.format(np.round(mpe,2)))
 
 
     print(ident + 'Done!')

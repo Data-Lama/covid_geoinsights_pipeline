@@ -29,6 +29,8 @@ import pandas as pd
 from datetime import date
 import matplotlib.pyplot as plt
 
+import numpy as np
+
 from pipeline_scripts.functions.general_functions import load_README
 
 # Direcotries
