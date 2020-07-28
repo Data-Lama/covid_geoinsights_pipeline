@@ -115,19 +115,8 @@ min_inner_mov_day = get_day_max_min('inner_movement', df_nodes)[1]
 max_num_cases_day = get_day_max_min('num_cases', df_nodes)[0]
 min_num_cases_day = get_day_max_min('num_cases', df_nodes)[1]
 
-<<<<<<< HEAD
-# print(max_inner_mov)
-# print(min_inner_mov_day)
-# print(max_num_cases_day)
-# print(min_num_cases_day)
 
 # Get the number of polygons that reported having their first case in the last n days
-num_days_first_case = 7
-today = datetime.datetime.today()
-num_days_ago = today - datetime.timedelta(days = num_days_first_case)
-historic = df_nodes[df_nodes['date_time'] < num_days_ago]
-=======
-# Get the number of polygons that reported having their first case in the last 5 days
 today = datetime.datetime.today()
 x_days_ago = today - datetime.timedelta(days = WINDOW)
 historic = df_nodes[df_nodes['date_time'] < x_days_ago]
@@ -141,7 +130,7 @@ no_new_case_polygon = get_polygons_no_new_cases(df_nodes, WINDOW)
 stats_by_node = max_min_day_by_node(df_nodes)
 
 
-# Extraxts number of oplygons without new cases
+# Extracts number of oplygons without new cases
 days_back = 15
 last_days = df_nodes[df_nodes.date_time >= df_nodes.date_time.max() - datetime.timedelta(days = days_back)]
 total_last_days = last_days[['node_id','num_cases']].groupby('node_id').sum().reset_index()
@@ -151,19 +140,11 @@ no_case_polygons_last_days = int((total_last_days.num_cases == 0).sum())
 
 stats = {
     'num_first_case':len(new_case_polygon),
-<<<<<<< HEAD
     'no_case_polygons_last_days' : no_case_polygons_last_days,
     'day_max_mov': max_inner_mov_day['date'].strftime(date_format),
     'day_min_mov': min_inner_mov_day['date'].strftime(date_format),
     'day_max_cases': max_num_cases_day['date'].strftime(date_format),
     'day_min_cases': min_num_cases_day['date'].strftime(date_format),
-=======
-    'no_case_polygons_last_days':len(no_new_case_polygon),
-    'day_max_mov': max_inner_mov_day['date'],
-    'day_min_mov': min_inner_mov_day['date'],
-    'day_max_cases': max_num_cases_day['date'],
-    'day_min_cases': min_num_cases_day['date'],
->>>>>>> 2b2adfddf45bd1c66830e9c7d81cc14b31788a88
     'max_move_in_day': max_inner_mov_day['inner_movement'],
     'min_move_in_day': min_inner_mov_day['inner_movement'],
     'max_cases_in_day': max_num_cases_day['num_cases'],
