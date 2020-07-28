@@ -100,14 +100,16 @@ for agglomeration_method in agglomeration_methods:
 	df_plot = df_plot[df_plot.date_time <= (df_plot.date_time.max() - timedelta(days = 1))]
 
 	df_plot = df_plot.groupby('start_poly_name').apply(lambda df: get_percentage_difference(df, 5)).dropna()
-
+	
+	# Adjust from percentage to rate
+	df_plot['movement_change'] = df_plot['movement_change'].divide(100)
 
 	ax = sns.lineplot(data = df_plot, x = 'date_time', y = 'movement_change', hue = 'start_poly_name')
 	ax.set_title('Cambio Porcentual Movimiento Interno en Unidades de Control para {}'.format(location_name), fontsize=suptitle_font_size)
 	ax.set_xlabel('Fecha', fontsize=axis_font_size)
-	ax.set_ylabel('Porcentaje', fontsize=axis_font_size)
+	ax.set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
 	ax.legend().texts[0].set_text("Unidad de Control")
-
+	
 	fig.savefig(os.path.join(export_folder_location,'internal_movement_selected_polygons_{}.png'.format(location_folder)))
 
 
@@ -120,14 +122,13 @@ for agglomeration_method in agglomeration_methods:
 	df_plot.loc[df_plot.start_poly_name == 'Otros (Promedio)', 'start_poly_name'] = df_plot.loc[df_plot.start_poly_name == 'Otros (Promedio)', 'end_poly_name'] 
 	
 	df_plot = df_plot[['date_time','start_poly_name', 'movement']].groupby(['date_time','start_poly_name']).mean().reset_index()
-
 	
 	df_plot = df_plot.groupby('start_poly_name').apply(lambda df: get_percentage_difference(df, 5)).dropna()
-
+	
 	ax = sns.lineplot(data = df_plot, x = 'date_time', y = 'movement_change', hue = 'start_poly_name')
 	ax.set_title('Cambio Porcentual  Movimiento Externo en Unidades de Control para {}'.format(location_name), fontsize=suptitle_font_size)
 	ax.set_xlabel('Fecha', fontsize=axis_font_size)
-	ax.set_ylabel('Porcentaje', fontsize=axis_font_size)
+	ax.set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
 	ax.legend().texts[0].set_text("Unidad de Control")
 
 	fig.savefig(os.path.join(export_folder_location,'external_movement_selected_polygons_{}.png'.format(location_folder)))

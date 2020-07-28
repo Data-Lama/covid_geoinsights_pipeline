@@ -3,6 +3,7 @@
 
 
 # Necesary imports
+import geopandas as gpd
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -100,3 +101,15 @@ def extract_lat(poly, pos = 1):
 	resp = poly.split(' ')[1]
 	
 	return(float(resp))
+
+# ----------------------------------------
+# --- Movement Range to Movement Tile ----
+# ----------------------------------------
+
+def get_polygon(GALM_id, df_GALM=None):
+	if df_GALM == None:
+		path = os.path.join(data_dir, 'data_stages', 'colombia', 'raw', 'geo', 'gadm36_COL_shp', 'gadm36_COL_2.shp')
+		df_GALM = gpd.read_file(path)
+
+	polygon = df_GALM[df_GALM['GID_2'] == GALM_id]['geometry']
+	return polygon
