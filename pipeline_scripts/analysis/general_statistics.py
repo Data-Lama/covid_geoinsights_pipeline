@@ -13,6 +13,10 @@ analysis_dir = config.get_property('analysis_dir')
 location_name  =  sys.argv[1] # location name
 location_folder =  sys.argv[2] # polygon name
 
+
+# Format
+date_format = "%d/%m/%Y"
+
 # Get files
 constructed_file_path = os.path.join(data_dir, 'data_stages', location_name, 'constructed', location_folder, 'daily_graphs')
 output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'stats')
@@ -97,10 +101,11 @@ min_num_cases_day = get_day_max_min('num_cases', df_nodes)[1]
 # print(max_num_cases_day)
 # print(min_num_cases_day)
 
-# Get the number of polygons that reported having their first case in the last 5 days
+# Get the number of polygons that reported having their first case in the last n days
+num_days_first_case = 7
 today = datetime.datetime.today()
-five_days_ago = today - datetime.timedelta(days = 5)
-historic = df_nodes[df_nodes['date_time'] < five_days_ago]
+num_days_ago = today - datetime.timedelta(days = num_days_first_case)
+historic = df_nodes[df_nodes['date_time'] < num_days_ago]
 historic_set = get_nodes_with_cases(historic)
 current_set = get_nodes_with_cases(df_nodes)
 intersection = current_set.intersection(historic_set)
@@ -108,12 +113,22 @@ intersection = current_set.intersection(historic_set)
 new_case_polygon = current_set - intersection
 stats_by_node = max_min_day_by_node(df_nodes)
 
+
+# Extraxts number of oplygons without new cases
+days_back = 15
+last_days = df_nodes[df_nodes.date_time >= df_nodes.date_time.max() - datetime.timedelta(days = days_back)]
+total_last_days = last_days[['node_id','num_cases']].groupby('node_id').sum().reset_index()
+
+no_case_polygons_last_days = int((total_last_days.num_cases == 0).sum())
+
+
 stats = {
     'num_first_case':len(new_case_polygon),
-    'day_max_mov': max_inner_mov_day['date'],
-    'day_min_mov': min_inner_mov_day['date'],
-    'day_max_cases': max_num_cases_day['date'],
-    'day_min_cases': min_num_cases_day['date'],
+    'no_case_polygons_last_days' : no_case_polygons_last_days,
+    'day_max_mov': max_inner_mov_day['date'].strftime(date_format),
+    'day_min_mov': min_inner_mov_day['date'].strftime(date_format),
+    'day_max_cases': max_num_cases_day['date'].strftime(date_format),
+    'day_min_cases': min_num_cases_day['date'].strftime(date_format),
     'max_move_in_day': max_inner_mov_day['inner_movement'],
     'min_move_in_day': min_inner_mov_day['inner_movement'],
     'max_cases_in_day': max_num_cases_day['num_cases'],

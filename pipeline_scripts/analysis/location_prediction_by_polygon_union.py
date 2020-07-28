@@ -207,13 +207,15 @@ for agglomeration_method in agglomeration_methods:
     print(ident + '   Exports Statistics')
 
 
-    with open(os.path.join(folder_location, 'statistics.txt'), 'w') as file:
+    with open(os.path.join(folder_location, 'statistics.csv'), 'w') as file:
         
-        file.write('Agglomeration Method Used: {}'.format(agglomeration_method) + '\n')
-        file.write('Coverage: {}% \n'.format(np.round(100*coverage,2)))
-        file.write("   From: {} \n".format(' '.join([str(p) for p in included_polygons])))
-        file.write('RMSE: {} \n'.format(np.round(rmse,2)))
-        file.write('MPE: {}% \n'.format(np.round(mpe,2)))
+        file.write('attribute_name,attribute_value\n')
+        file.write('agglomeration_method,{}\n'.format(agglomeration_method))
+        file.write('coverage,{}\n'.format(np.round(100*coverage,2)))
+        file.write("polygons_included,{}\n".format(' '.join([str(p) for p in included_polygons])))
+        file.write('rmse,{}\n'.format(int(np.round(rmse))))
+        file.write('mpe,{}\n'.format(np.round(mpe,2)))
+
 
 
     print(ident + 'Done!')
