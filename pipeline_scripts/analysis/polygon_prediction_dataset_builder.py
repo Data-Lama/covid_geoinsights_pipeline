@@ -59,6 +59,10 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
     days_ahead = 8
     smooth_days = 2
 
+
+    # Mobility Range
+    mobility_range = [0.5, 0.75, 1, 1.25, 1.5]
+
     # Extracts Neighbors
     print(ident + '   Extracts the {} closest neighbors'.format(k))
 
@@ -76,6 +80,19 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
     df_current_prediction = extract_prediction_data(agglomeration_method, [location], [polygon_id], days_back, days_ahead, max_day = None, smooth_days = smooth_days)
 
 
+    # Constructs the data with mobility ratio
+
+    dfs_mobility = []
+    for ratio in mobility_range:
+        print(ident + f'      For Ratio: {ratio}')
+        df_temp = extract_prediction_data(agglomeration_method, [location], [polygon_id], days_back, days_ahead, max_day = None, smooth_days = smooth_days, mobility_ratio = ratio)
+        df_temp['mobility_ratio'] = ratio
+
+        dfs_mobility.append(df_temp)
+
+    df_mobility = pd.concat(dfs_mobility, ignore_index = True)
+
+
     locations = df_neighbors.location.values.tolist()
     polygons_ids = df_neighbors.polygon_id.values.tolist()
 
@@ -83,6 +100,7 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
     max_day = df_current_prediction.elapsed_days.max()
 
     # Gets current for neighbors (Drops NANs)
+    print(ident + '   Constructs Prediction Data for Neighbors')
     df_neighbor_prediction = extract_prediction_data(agglomeration_method, locations, polygons_ids, days_back, days_ahead, max_day = max_day, smooth_days = smooth_days).dropna()
 
     df_prediction = pd.concat((df_current_prediction,df_neighbor_prediction), ignore_index = True)
@@ -91,6 +109,8 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
     # Saves
     print(ident + '   Saves')
     df_prediction.to_csv(os.path.join(folder_location ,'training_data.csv'), index = False)
+
+    df_mobility.to_csv(os.path.join(folder_location ,'mobility_ratio_data.csv'), index = False)
 
     print(ident + '   Exports Statistics')
 

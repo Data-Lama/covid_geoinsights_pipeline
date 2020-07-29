@@ -244,15 +244,22 @@ def read_single_file(file_name, dropna = False, parse_dates = False):
 	Reads a single file and returns it as a pandas data frame.
 	This method is designed for te facebook files
 	'''
-	if parse_dates:
-		df = pd.read_csv(file_name, parse_dates=["date_time"], date_parser=lambda x: pd.to_datetime(x, format="%Y-%m-%d %H%M"), na_values = ['\\N'])
-	else: 
-		df = pd.read_csv(file_name, na_values = ['\\N'])
 
-	if dropna:
-		df.dropna(inplace = True)
+	try:
+		if parse_dates:
+			df = pd.read_csv(file_name, parse_dates=["date_time"], date_parser=lambda x: pd.to_datetime(x, format="%Y-%m-%d %H%M"), na_values = ['\\N'])
+		else: 
+			df = pd.read_csv(file_name, na_values = ['\\N'])
 
-	return(df)
+		if dropna:
+			df.dropna(inplace = True)
+
+		return(df)
+
+	except pd.errors.EmptyDataError:
+		raise ValueError(f'File {file_name} is empty, please download it again.')
+
+
 
 
 

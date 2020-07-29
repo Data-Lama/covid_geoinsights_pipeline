@@ -120,7 +120,6 @@ min_num_cases_day = get_day_max_min('num_cases', df_nodes)[1]
 today = datetime.datetime.today()
 x_days_ago = today - datetime.timedelta(days = WINDOW)
 historic = df_nodes[df_nodes['date_time'] < x_days_ago]
->>>>>>> 2b2adfddf45bd1c66830e9c7d81cc14b31788a88
 historic_set = get_nodes_with_cases(historic)
 current_set = get_nodes_with_cases(df_nodes)
 intersection = current_set.intersection(historic_set)

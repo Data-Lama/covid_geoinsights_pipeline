@@ -18,12 +18,18 @@ def clean_for_publication(s):
 	Mostly converts to spansh
 	'''
 
+	s = ' '.join([sub.title() for sub in s.split('_')])
+
+
 	subs = {}
 	subs['11001'] = 'Bogotá'
 	subs['colombia'] = 'Colombia'
 	subs['italy'] = 'Italia'
 	subs['brazil'] = 'Brasil'
 	subs['peru'] = 'Perú'
+	subs[' Usa'] = ' EEUU'
+	subs[' Us'] = ' EEUU'
+
 
 	subs['Bogotá D.C.-Bogotá d C.'] = 'Bogotá'
 	subs['-'] = ' - '
@@ -31,11 +37,6 @@ def clean_for_publication(s):
 	for k in subs:
 		s = s.replace(k, subs[k])
 
-
-	# Checks for the us
-	s_split = s.split('-')
-	if '_' in s_split[-1]:
-		s = ('-'.join(s_split[0:-1])).replace(', US',', EEUU').replace(', ','-')
 
 	return(s)
 

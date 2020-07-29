@@ -47,7 +47,7 @@ def get_graphs(agglomeration_method, location):
 
 
 
-def extract_prediction_data(agglomeration_method, locations, polygons_ids, days_back, days_ahead, max_day = None, smooth_days = 1):
+def extract_prediction_data(agglomeration_method, locations, polygons_ids, days_back, days_ahead, max_day = None, smooth_days = 1, mobility_ratio = 1):
 	
 	dfs = []
 	
@@ -57,7 +57,13 @@ def extract_prediction_data(agglomeration_method, locations, polygons_ids, days_
 		poly_id = polygons_ids[i]
 		
 		nodes, edges, node_locations = get_graphs(agglomeration_method,loc)
-				
+
+		# Asjusted mobility
+		nodes.inner_movement = nodes.inner_movement*mobility_ratio
+		edges.movement = edges.movement*mobility_ratio
+		
+		#print(loc)
+		#print(poly_id)				
 		df_temp = constr.build_prediction_dataset_for_nodes(node_ids = [poly_id], nodes = nodes, edges = edges, days_back = days_back, days_ahead = days_ahead, max_day = max_day, smooth_days = smooth_days)
 		df_temp['location'] = loc
 		df_temp['poly_id'] = poly_id
@@ -70,7 +76,7 @@ def extract_prediction_data(agglomeration_method, locations, polygons_ids, days_
 	return(df_polys_predict)
 	
 
-def extract_prediction_data_for_location(agglomeration_method, locations, days_back, days_ahead, max_day = None):
+def extract_prediction_data_for_location(agglomeration_method, locations, days_back, days_ahead, max_day = None, mobility_ratio = 1):
 	
 	dfs = []
 	
@@ -79,7 +85,11 @@ def extract_prediction_data_for_location(agglomeration_method, locations, days_b
 		loc = locations[i]
 		
 		nodes, edges, node_locations = get_graphs(agglomeration_method, loc)
-				
+
+		# Reduces mobility
+		nodes.inner_movement = nodes.inner_movement*mobility_ratio
+		edges.movement = edges.movement*mobility_ratio
+
 		df_temp = constr.build_prediction_dataset_for_graphs(nodes = nodes, edges = edges, days_back = days_back, days_ahead = days_ahead, max_day = max_day)
 		df_temp['location'] = loc
 
@@ -157,10 +167,13 @@ def get_best_ridge_alpha(X, y, alpha_options, iterations, verbose = True, local_
 
 
 
-def predict_location(location, poly_id, df_prediction, alpha_options = [80,100,120,160,180], iterations = 50, verbose = False, col_shift = 5):
+def predict_location(location, poly_id, df_prediction, alpha_options = [80,100,120,160,180], iterations = 50, verbose = False, col_shift = 5, days_movent_reduction_back = 15):
 	'''
 	Predicts for a specific location
 	'''
+
+	# In percentage
+	reductions = [10,30,50]
 
 	response = {}
 	
@@ -213,6 +226,7 @@ def predict_location(location, poly_id, df_prediction, alpha_options = [80,100,1
 	# Predicted Values
 	df_poly_all['predicted_num_cases'] = final_clf.predict(scaler.transform(df_poly_all[df_poly_all.columns[0:(-1*col_shift)]].values))
 	
+
 	# Constructs the plotting data
 	
 	# Actual
@@ -229,6 +243,6 @@ def predict_location(location, poly_id, df_prediction, alpha_options = [80,100,1
 					'local_r2': local_r2, 'local_rmse': local_rmse}
 	
 	
-	return(df_plot, summary_dict, coef_w)
+	return(df_plot, summary_dict, final_clf, scaler, coef_w)
 	
 	

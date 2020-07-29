@@ -48,4 +48,6 @@ Alertas Rojas,analysis,table,colombia/geometry/polygon_info_window/alerts.csv,al
 Estadisticas Municipio,analysis,table,colombia/geometry/stats/general_stats.csv,geometry_statistics.csv
 Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/general_stats.csv,community_statistics.csv
 Estadisticas Prediccion,analysis,table,colombia/community/prediction/entire_location/statistics.csv,prediction_statistics.csv
+Incidence Map,analysis,figure,colombia/geometry/incidence_maps/incidence_map.jpeg,incidence_map_geometry.jpeg
+Incidence Table,analysis,table,colombia/geometry/incidence_maps/incidences.csv,incidences_geometry.csv
 Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv

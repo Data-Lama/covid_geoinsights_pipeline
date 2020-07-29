@@ -79,7 +79,7 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 
     all_series = []
 
-    time_series = extract_timeseries(location, agglomeration_method, polygon_id, lag = lag, accum = False, smooth_days = smooth_days)
+    time_series = extract_timeseries_cases(location, agglomeration_method, polygon_id, lag = lag, accum = False, smooth_days = smooth_days)
     time_series.to_csv('temp1.csv', index = False)
     time_series['location'] = polygon_display_name
     all_series.append(time_series)
@@ -87,7 +87,7 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
     for ind, row in df_neighbors_plot.iterrows():
         
         if row.polygon_id != polygon_id:
-            time_series = extract_timeseries(row.location, agglomeration_method, row.polygon_id, accum = False, smooth_days = smooth_days)
+            time_series = extract_timeseries_cases(row.location, agglomeration_method, row.polygon_id, accum = False, smooth_days = smooth_days)
             time_series['location'] = str(row.polygon_name) + '-' + row.location
             all_series.append(time_series)
         
@@ -100,14 +100,14 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 
     all_series = []
 
-    time_series = extract_timeseries(location, agglomeration_method, polygon_id, lag = lag, accum = True, smooth_days = smooth_days)
+    time_series = extract_timeseries_cases(location, agglomeration_method, polygon_id, lag = lag, accum = True, smooth_days = smooth_days)
     time_series['location'] = polygon_display_name
     all_series.append(time_series)
 
     for ind, row in df_neighbors_plot.iterrows():
         
         if row.polygon_id != polygon_id:
-            time_series = extract_timeseries(row.location, agglomeration_method, row.polygon_id, accum = True, smooth_days = smooth_days)
+            time_series = extract_timeseries_cases(row.location, agglomeration_method, row.polygon_id, accum = True, smooth_days = smooth_days)
             time_series['location'] = str(row.polygon_name) + '-' + row.location
             all_series.append(time_series)
         
@@ -125,8 +125,8 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
     # Global title
     fig.suptitle('Flujos Similares a {}'.format(polygon_display_name), fontsize=suptitle_font_size)
 
-    sns.lineplot(x = 'day', y = 'num_cases', hue = 'location', data = df_plot, ax = ax[0])
-    sns.lineplot(x = 'day', y = 'num_cases', hue = 'location', data = df_plot_accum, ax = ax[1])
+    sns.lineplot(x = 'day', y = 'value', hue = 'location', data = df_plot, ax = ax[0])
+    sns.lineplot(x = 'day', y = 'value', hue = 'location', data = df_plot_accum, ax = ax[1])
 
 
     # Plot titles
