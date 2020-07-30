@@ -133,7 +133,6 @@ df_highlights_historic = choropleth_map_historic[choropleth_map_historic['delta_
 
 # Get polygons on river
 choropleth_map_on_river = choropleth_map_recent[choropleth_map_recent['delta_external_movement'] > 0].fillna(0)
-choropleth_map_on_river.to_csv('~/Desktop/tmp/highlights.csv')
 choropleth_map_on_river['river'] = choropleth_map_on_river.apply(lambda x: is_polygon_on_river(x.node_id), axis=1)
 choropleth_map_on_river.to_csv(os.path.join(output_file_path, 'detail_choropleth_recent_rivers.csv'), encoding = 'latin-1', 
        index=False, float_format="%.3f", columns=['Departamen', 'Municipio', 'river', 'delta_external_movement'])

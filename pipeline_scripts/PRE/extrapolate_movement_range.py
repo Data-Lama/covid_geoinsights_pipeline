@@ -77,17 +77,15 @@ def convert_movement_range(f, gdf_polygons):
         # This dict stores for each node_id, the GADM nodes that intersect and the area of intersection
         # intersections_dict = {}
         with open(output_file_name, 'w') as out:
+            out.write("{},{}\n".format('poly_id', 'extrapolated_relative_movement'))
             for poly_id in gdf_polygons['poly_id'].unique():
                 polygon = gdf_polygons.loc[gdf_polygons['poly_id'] == poly_id, 'geometry']
                 polygon = polygon.to_numpy()[0]
                 intersections = get_intersection_areas(polygon, gdf_movement_range)
-                # if len(intersections) > 0:
-                #     intersections_dict[np.int64(poly_id).item()] = intersections
                 extrapolated_movement = calculate_movement(intersections, df_movement_range)
                 out.write("{},{}\n".format(poly_id, extrapolated_movement))
 
     
-    return NotImplemented
 
 # Load dfs and gdfs
 # polygon geodataset has crs: {epsg:4326}
@@ -101,4 +99,3 @@ for f in movement_range_files:
     f = f.strip()
     print('{}{}Transforming {}.'.format(indent, indent, f))
     convert_movement_range(f, gdf_polygons)
-    break
