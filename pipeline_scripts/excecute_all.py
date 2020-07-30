@@ -3,7 +3,27 @@
 # Usual imports
 import pandas as pd
 import os
+from datetime import datetime
 
+progress_file = 'excecution_progress.csv'
+
+
+def reset_progress():
+	'''
+	Resets progress
+	'''
+
+	with open(progress_file, 'w') as f:
+		f.write('time,script_name,parameters,result\n')
+
+
+def add_progress(script_name, parameters, result):
+	'''
+	Resets progress
+	'''
+
+	with open(progress_file, 'a') as f:
+		f.write(f'{datetime.now()},{script_name},{parameters},{result}\n')
 
 
 def excecute_script(script_location, name, code_type, parameters):
@@ -18,7 +38,7 @@ def excecute_script(script_location, name, code_type, parameters):
 			name = name + '.py'
 
 		final_path = os.path.join(script_location, name)
-		os.system('{} {} {}'.format('python', final_path, parameters))
+		resp = os.system('{} {} {}'.format('python', final_path, parameters))
 
 	elif code_type.upper() == 'R':
 		#R
@@ -26,12 +46,18 @@ def excecute_script(script_location, name, code_type, parameters):
 			name = name + '.R'
 
 		final_path = os.path.join(script_location, name)
-		os.system('{} {} {}'.format('Rscript --vanilla', final_path, parameters))
+		resp = os.system('{} {} {}'.format('Rscript --vanilla', final_path, parameters))
 
 	else:
 		raise ValueError('No support for scripts in: {}'.format(code_type))
 
 
+	add_progress(name, parameters, resp)
+
+
+
+# Resets Progress
+reset_progress()
 
 # Stages variables
 stages = ['EXTRACT','UNIFY', 'AGGLOMERATE', 'CONSTRUCT', 'ANALYSE']

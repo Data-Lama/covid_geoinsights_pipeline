@@ -138,8 +138,6 @@ choropleth_map_on_river['river'] = choropleth_map_on_river.apply(lambda x: is_po
 choropleth_map_on_river.to_csv(os.path.join(output_file_path, 'detail_choropleth_recent_rivers.csv'), encoding = 'latin-1', 
        index=False, float_format="%.3f", columns=['Departamen', 'Municipio', 'river', 'delta_external_movement'])
 
-# choropleth_map_recent_onrivers
-# print(rivers_df[rivers_df['NOMBRE_GEO'] == 'RIO SINU'])
 
 # Merge with functional_units
 df_highlights_recent = df_highlights_recent.merge(df_functional_units, left_on='node_id', right_on='poly_id', how='left')

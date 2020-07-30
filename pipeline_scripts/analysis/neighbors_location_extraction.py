@@ -100,12 +100,13 @@ for agglomeration_method in agglomeration_methods:
 
     all_series = []
 
-    time_series = extract_timeseries(location, agglomeration_method, polygon_id = None, lag = lag, accum = False, smooth_days = smooth_days)
+    time_series = extract_timeseries_cases(location, agglomeration_method, polygon_id = None, lag = lag, accum = False, smooth_days = smooth_days)
     all_series.append(time_series)
+
 
     for ind, row in df_neighbors_plot.iterrows():
 
-        time_series = extract_timeseries(row.location, agglomeration_method, polygon_id = None, accum = False, smooth_days = smooth_days)
+        time_series = extract_timeseries_cases(row.location, agglomeration_method, polygon_id = None, accum = False, smooth_days = smooth_days)
         all_series.append(time_series)
         
 
@@ -117,12 +118,12 @@ for agglomeration_method in agglomeration_methods:
 
     all_series = []
 
-    time_series = extract_timeseries(location, agglomeration_method, polygon_id = None, lag = lag, accum = True, smooth_days = smooth_days)
+    time_series = extract_timeseries_cases(location, agglomeration_method, polygon_id = None, lag = lag, accum = True, smooth_days = smooth_days)
     all_series.append(time_series)
 
     for ind, row in df_neighbors_plot.iterrows():
         
-        time_series = extract_timeseries(row.location, agglomeration_method, polygon_id = None, accum = True, smooth_days = smooth_days)
+        time_series = extract_timeseries_cases(row.location, agglomeration_method, polygon_id = None, accum = True, smooth_days = smooth_days)
         all_series.append(time_series)
         
 
@@ -130,8 +131,8 @@ for agglomeration_method in agglomeration_methods:
 
 
     # Cleans for publication
-    df_plot.location = df_plot.location.apply(clean_for_publication)
-    df_plot_accum.location = df_plot_accum.location.apply(clean_for_publication)
+    df_plot.location_id = df_plot.location_id.apply(clean_for_publication)
+    df_plot_accum.location_id = df_plot_accum.location_id.apply(clean_for_publication)
 
     # Plots Figures
     fig, ax = plt.subplots(2,1, figsize=fig_size)
@@ -139,8 +140,8 @@ for agglomeration_method in agglomeration_methods:
     # Global title
     fig.suptitle('Flujos Similares a {}'.format(location_display_name), fontsize=suptitle_font_size)
 
-    sns.lineplot(x = 'day', y = 'num_cases', hue = 'location', data = df_plot, ax = ax[0])
-    sns.lineplot(x = 'day', y = 'num_cases', hue = 'location', data = df_plot_accum, ax = ax[1])
+    sns.lineplot(x = 'day', y = 'value', hue = 'location_id', data = df_plot, ax = ax[0])
+    sns.lineplot(x = 'day', y = 'value', hue = 'location_id', data = df_plot_accum, ax = ax[1])
 
 
     # Plot titles

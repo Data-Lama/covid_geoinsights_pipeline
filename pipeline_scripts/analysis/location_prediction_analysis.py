@@ -200,7 +200,7 @@ for agglomeration_method in agglomeration_methods:
 
 	# Trains the model
 	print(ident + '   Trains the model')
-	df_results, summary_dict, weights = predict_location(location_folder, poly_id = None, df_prediction = df_prediction, alpha_options = alpha_options, iterations = iterations, verbose = False, col_shift = 4)
+	df_results, summary_dict, final_clf, scaler, weights = predict_location(location_folder, poly_id = None, df_prediction = df_prediction, alpha_options = alpha_options, iterations = iterations, verbose = False, col_shift = 4)
 
 	# Plots the prediction
 	print(ident + '   Plots Prediction')
@@ -240,6 +240,8 @@ for agglomeration_method in agglomeration_methods:
 	fig.tight_layout(pad=3.0)
 
 	fig.savefig(os.path.join(folder_location, 'prediction_{}.png'.format(location)))
+
+	weights.to_csv(os.path.join(folder_location, 'weights.csv'), index = False)
 
 	print(ident + '   Exports Statistics')
 

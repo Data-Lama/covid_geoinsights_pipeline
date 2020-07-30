@@ -82,14 +82,20 @@ for agglomeration_method in agglomeration_methods:
 
     # Extract the prediction results for all polygon
     dfs = []
+    dfs_mobility = []
 
     for folder in os.listdir(predictions_folder_location):        
         if os.path.isdir(os.path.join(predictions_folder_location, folder)) and folder != folder_name:
             data_set_location = os.path.join(predictions_folder_location, folder, 'predicted_data.csv')
+            data_set_location_mobility = os.path.join(predictions_folder_location, folder, 'predicted_data_mobility_ratio..csv')
             # If exists it imports it
             if os.path.exists(data_set_location):
                 data_set = pd.read_csv(data_set_location, parse_dates = ['target_date'])
                 dfs.append(data_set)
+
+                data_set_mob = pd.read_csv(data_set_location_mobility, parse_dates = ['target_date'])
+                dfs_mobility.append(data_set_mob)
+                
 
     if len(dfs) == 0:
         raise ValueError(f'No predictions precomputed polygon predictions found for location: {location_name}, please excecute the script: polygon_prediction_analysis.py for selected polygons before this one.')
@@ -97,6 +103,7 @@ for agglomeration_method in agglomeration_methods:
 
     # Concatenates all data frames
     df_results = pd.concat(dfs)
+    df_prediction_mobility = pd.concat(dfs_mobility)
 
     # Extract the selected Polygons
     included_polygons = df_results.polygon_id.unique()
@@ -108,8 +115,6 @@ for agglomeration_method in agglomeration_methods:
     df_real_cases = cases.loc[cases['date_time'].isin(df_results['target_date']), ['date_time','num_cases']].rename(columns = {'num_cases':'cases','date_time':'target_date'})
     df_real_cases = df_real_cases.groupby('target_date').sum().reset_index()
     df_real_cases['cases_accum'] = df_real_cases['cases'].rolling(min_periods=1, window=df_real_cases.shape[0]).sum()
-
-
 
 
     # Removes polygon_id
@@ -134,9 +139,10 @@ for agglomeration_method in agglomeration_methods:
 
     # Future Prediction
     # Future Prediction
-    days_back = 3
-    start_date = df_results[df_results.target_num_cases.isna()].target_date.min() - timedelta(days = days_back)
-    df3 = df_results.loc[ df_results.target_date >= start_date, ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
+    days_back = 1
+    start_date = df_results[df_results.target_num_cases.isna()].target_date.min()
+    start_date_delayed =  start_date - timedelta(days = days_back)
+    df3 = df_results.loc[ df_results.target_date >= start_date_delayed, ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
     #Groups
     df3 = df3.groupby('target_date').sum().reset_index()
     df3.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
@@ -145,6 +151,29 @@ for agglomeration_method in agglomeration_methods:
     # Adjusts
     df3['cases'] = df3['cases']/coverage
     df3['cases_accum'] = df3['cases_accum']/coverage
+
+
+    # Future Prediction reduction 25%
+    df4 = df_prediction_mobility.loc[ (df_prediction_mobility.ratio == 0.75) & (df_prediction_mobility.target_date >= start_date), ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
+    #df4 = df_prediction_mobility.loc[ (df_prediction_mobility.ratio == 0.75), ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
+    df4 = df4.groupby('target_date').sum().reset_index() 
+    df4.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
+    df4['Tipo'] = 'Poyección Reduccion 25% Movilidad ' 
+
+    # Adjusts
+    df4['cases'] = df4['cases']/coverage
+    df4['cases_accum'] = df4['cases_accum']/coverage
+
+    df5 = df_prediction_mobility.loc[ (df_prediction_mobility.ratio == 1.25) & (df_prediction_mobility.target_date >= start_date), ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
+    #df5 = df_prediction_mobility.loc[ (df_prediction_mobility.ratio == 1.25), ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
+    df5 = df5.groupby('target_date').sum().reset_index() 
+    df5.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
+    df5['Tipo'] = 'Poyección Aumento 25% Movilidad ' 
+
+    # Adjusts
+    df5['cases'] = df5['cases']/coverage
+    df5['cases_accum'] = df5['cases_accum']/coverage
+
 
     # Errors
     # Computes RMSE
@@ -207,13 +236,15 @@ for agglomeration_method in agglomeration_methods:
     print(ident + '   Exports Statistics')
 
 
-    with open(os.path.join(folder_location, 'statistics.txt'), 'w') as file:
+    with open(os.path.join(folder_location, 'statistics.csv'), 'w') as file:
         
-        file.write('Agglomeration Method Used: {}'.format(agglomeration_method) + '\n')
-        file.write('Coverage: {}% \n'.format(np.round(100*coverage,2)))
-        file.write("   From: {} \n".format(' '.join([str(p) for p in included_polygons])))
-        file.write('RMSE: {} \n'.format(np.round(rmse,2)))
-        file.write('MPE: {}% \n'.format(np.round(mpe,2)))
+        file.write('attribute_name,attribute_value\n')
+        file.write('agglomeration_method,{}\n'.format(agglomeration_method))
+        file.write('coverage,{}\n'.format(np.round(100*coverage,2)))
+        file.write("polygons_included,{}\n".format(' '.join([str(p) for p in included_polygons])))
+        file.write('rmse,{}\n'.format(int(np.round(rmse))))
+        file.write('mpe,{}\n'.format(np.round(mpe,2)))
+
 
 
     print(ident + 'Done!')

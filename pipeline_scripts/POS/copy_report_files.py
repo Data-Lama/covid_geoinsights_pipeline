@@ -28,7 +28,17 @@ print(ident + 'Copying {} files:'.format(df_files.shape[0]))
 not_found = 0
 for ind, row in df_files.iterrows():
 
-	source = os.path.join(analysis_dir,row.source)
+
+	
+	if row['folder'] == 'analysis':		
+		source = os.path.join(analysis_dir,row.source)
+
+	elif row['folder'] == 'data':		
+		source = os.path.join(data_dir,row.source)
+
+	else:
+		raise ValueError('No support for folder: {} of source of file'.format(row['folder']))
+
 
 	if row['type'] == 'figure':		
 		destination = os.path.join( report_dir, con.figure_folder_name, row.destination)

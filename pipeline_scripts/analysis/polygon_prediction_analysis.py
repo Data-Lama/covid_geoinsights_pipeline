@@ -76,14 +76,42 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 
 	df_prediction = pd.read_csv(os.path.join(folder_location ,'training_data.csv'), parse_dates = ['current_date','target_date'])
 
+	df_training_mobility = pd.read_csv(os.path.join(folder_location ,'mobility_ratio_data.csv'), parse_dates = ['current_date','target_date'])
+
 
 	# Trains the model
 	print(ident + '   Trains the model')
-	df_results, summary_dict, weights = predict_location(location, polygon_id, df_prediction, alpha_options = alpha_options, iterations = iterations, verbose = False)
+	df_results, summary_dict, final_clf, scaler, weights = predict_location(location, polygon_id, df_prediction, alpha_options = alpha_options, iterations = iterations, verbose = False)
 
 	df_results['polygon_id'] = polygon_id
 
 	df_results.to_csv(os.path.join(folder_location, 'predicted_data.csv'), index = False)
+
+
+	# Reduces Movement and predicts
+	# Extracts the 
+	num_cols = weights.shape[0]
+	mobility_dfs = []
+
+	for ratio in df_training_mobility.mobility_ratio.unique():
+
+		df_temp = df_training_mobility[df_training_mobility.mobility_ratio == ratio]
+		X_temp = df_temp[df_temp.columns.values[0:num_cols]]
+
+		pred = final_clf.predict( scaler.transform(X_temp))
+		df_mob_temp = pd.DataFrame({'target_date':df_temp['target_date'], 'predicted_num_cases': pred, 'ratio': ratio})
+
+		# Cases Accum
+		df_mob_temp['predicted_num_cases_accum'] = df_mob_temp['predicted_num_cases'].rolling(min_periods=1, window=df_mob_temp.shape[0]).sum()
+
+		# Adds it
+		mobility_dfs.append(df_mob_temp)
+
+
+	df_prediction_mobility = pd.concat(mobility_dfs, ignore_index = True) 
+
+	df_prediction_mobility.to_csv(os.path.join(folder_location, 'predicted_data_mobility_ratio.csv'), index = False)
+
 
 	# Plots the prediction
 	print(ident + '   Plots Prediction')
@@ -99,10 +127,24 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 	df2['Tipo'] = 'Predecido Histórico' 
 
 	# Future Prediction
-	start_date = df_results[df_results.target_num_cases.isna()].target_date.min() - timedelta(days = 5)
-	df3 = df_results.loc[ df_results.target_date >= start_date, ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
+	start_date = df_results[df_results.target_num_cases.isna()].target_date.min()
+	start_date_delayed =  start_date - timedelta(days = 1)
+	df3 = df_results.loc[ df_results.target_date >= start_date_delayed, ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
 	df3.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
 	df3['Tipo'] = 'Poyección' 
+
+
+	# Future Prediction reduction 25%
+	df4 = df_prediction_mobility.loc[ (df_prediction_mobility.ratio == 0.75) & (df_prediction_mobility.target_date >= start_date), ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
+	#df4 = df_prediction_mobility.loc[ (df_prediction_mobility.ratio == 0.75), ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
+	df4.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
+	df4['Tipo'] = 'Poyección Reduccion 25% Movilidad ' 
+
+	df5 = df_prediction_mobility.loc[ (df_prediction_mobility.ratio == 1.25) & (df_prediction_mobility.target_date >= start_date), ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
+	#df5 = df_prediction_mobility.loc[ (df_prediction_mobility.ratio == 1.25), ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
+	df5.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
+	df5['Tipo'] = 'Poyección Aumento 25% Movilidad ' 
+
 
 	# Errors
 	# Computes RMSE
@@ -127,7 +169,7 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 	upper_bound_accum = [ y_values[i] + rmse*(i+1) for i in range(len(y_values))]
 
 
-	df_plot = pd.concat((df1,df2,df3), ignore_index = True)
+	df_plot = pd.concat((df1,df2,df3,df4,df5), ignore_index = True)
 
 	df_plot['cases'] = df_plot.cases.astype(float)
 	df_plot['cases_accum'] = df_plot.cases_accum.astype(float)
@@ -170,6 +212,7 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 			file.write('      {}: {}'.format(concept, summary_dict[concept]) + '\n')
 			
 
+	weights.to_csv(os.path.join(folder_location, 'weights.csv'), index = False)
 
 	print(ident + 'Done!')
 

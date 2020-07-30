@@ -56,7 +56,7 @@ class Unifier(GenericUnifier):
 		cols['Fecha recuperado'] = 'date_recovered'
 		cols['Fecha reporte web'] = 'date_reported_web'
 
-		df = pd.read_csv(file_name, parse_dates = ['Fecha diagnostico','FIS','Fecha de muerte','Fecha recuperado','Fecha reporte web'], date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
+		df = pd.read_csv(file_name, parse_dates = ['Fecha diagnostico','FIS','Fecha de muerte','Fecha recuperado'], date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
 		df = df.rename(columns=cols)
 
 		df.dropna(subset = ['date_time', 'attention'], inplace = True)

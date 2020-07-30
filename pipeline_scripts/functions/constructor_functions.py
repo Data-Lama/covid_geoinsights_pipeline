@@ -204,6 +204,13 @@ def build_prediction_dataset_for_nodes(node_ids, nodes, edges, days_back, days_a
 
 	'''
 
+	# Converts all to string
+	#node_ids = [str(n) for n in node_ids]
+	#nodes.node_id = nodes.node_id.astype(str)
+	#edges.start_id = edges.start_id.astype(str)
+	#edges.end_id = edges.end_id.astype(str)
+
+
 	date_min = nodes.date_time.min() + timedelta(days = days_back)
 	date_max = nodes.date_time.max()
 
@@ -225,8 +232,9 @@ def build_prediction_dataset_for_nodes(node_ids, nodes, edges, days_back, days_a
 	while current_date <= date_max:
 
 
-		# Nodes
+		# Nodes		
 		passed_nodes = nodes.loc[(nodes.date_time >= (current_date - timedelta(days = days_back))) & (nodes.date_time < current_date)]
+
 
 		back_dates = passed_nodes[['date_time']].drop_duplicates().sort_values('date_time')
 
