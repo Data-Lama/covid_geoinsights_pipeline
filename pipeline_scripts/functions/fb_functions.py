@@ -147,7 +147,8 @@ def check_movement_integrity(folder_name, fb_location_name, type_data, start_dat
 			if file.endswith('.csv'):
 				if name_string not in file or type_data_string not in file:
 					wrong_files.append(file)
-				else:
+				elif os.stat(os.path.join(directory, file)).st_size > 0:
+
 					date_string = file.split('_')[-1]
 					date_string = date_string.split('.')[0]
 					d = pd.to_datetime(date_string)
@@ -272,8 +273,8 @@ def build_dataset_in_directory(directory, dropna = False):
 
 	datasets = []
 	for file in os.listdir(directory):
-		if file.endswith('.csv'):
-			file_name = os.path.join(directory, file)
+		file_name = os.path.join(directory, file)
+		if file_name.endswith('.csv') and os.stat(file_name).st_size > 0:			
 			datasets.append(read_single_file(file_name, dropna = dropna))
 
 	df = pd.concat(datasets, ignore_index = True)

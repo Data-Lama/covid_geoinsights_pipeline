@@ -166,6 +166,11 @@ def extract_polygon_movement_distance(location, agglomeration_method, polygon_id
 
 	current = extract_all_timeseries_movement(locations = [location], polygons_ids = [polygon_id],  movement_type = movement_type,  agglomeration_method = agglomeration_method, lag = lag, smooth_days = smooth_days, verbose = verbose)
 
+	if current is None:
+		return None
+
+
+
 	if start_day > current.day.max():
 		raise ValueError('The time series for {} of {} has only {} days. Cannot start at: {}'.format(polygon_id, location, current.day.max(), start_day))
 
@@ -434,6 +439,9 @@ def extract_all_timeseries_movement(locations, agglomeration_method, movement_ty
 			all_dfs.append(df_mov)
 	
 
+	if len(all_dfs) == 0:
+		return None
+
 	return(pd.concat(all_dfs, ignore_index = True))		
 
 
@@ -466,12 +474,21 @@ def get_closest_neighbors(location, agglomeration_method, polygon_id, k = None, 
 									  verbose = False, 									  
 									  smooth_days = smooth_days)
 
-		df_mov.rename(columns = {'dist':'mov_dist', 'total_dif':'total_dif_mov', 'max_day':'max_day_mov'}, inplace = True)
-		df_cases.rename(columns = {'dist':'cases_dist', 'total_dif':'total_dif_cases',  'max_day':'max_day_cases'}, inplace = True)
+		if df_mov is not None:
+			df_mov.rename(columns = {'dist':'mov_dist', 'total_dif':'total_dif_mov', 'max_day':'max_day_mov'}, inplace = True)
+
+			df_cases.rename(columns = {'dist':'cases_dist', 'total_dif':'total_dif_cases',  'max_day':'max_day_cases'}, inplace = True)
 
 
-		df = df_cases.merge(df_mov, on = ['location','polygon_id','polygon_name'])
-		df['dist'] = df['mov_dist'] + df['cases_dist']
+			df = df_cases.merge(df_mov, on = ['location','polygon_id','polygon_name'])
+			df['dist'] = df['mov_dist'] + df['cases_dist']			
+
+		else:
+			# Has only cases
+			print(f'Polygon: {polygon_id} from {location} has no movement on agglomeration: {agglomeration_method}. Will only take into account cases.')
+			df = df_cases
+
+
 		df.sort_values('dist', inplace = True)
 
 	else:
