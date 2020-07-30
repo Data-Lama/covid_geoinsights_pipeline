@@ -31,7 +31,7 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
-from pipeline_scripts.functions.general_functions import load_README
+from pipeline_scripts.functions.general_functions import load_README, get_neighbors_cases_average, get_mean_external_movement
 
 # Direcotries
 from global_config import config
@@ -133,41 +133,8 @@ with open(output_readme_file, 'w') as f:
     f.write("max_date: {}\n".format(max_time))
     f.write("date_zero: {}\n".format(date_zero))
 
-def get_mean_external_movement(node_id, time):
-    df_neighbors = df_edges.loc[(df_edges['start_id'] == node_id) | (df_edges['end_id'] == node_id)]
-    if df_neighbors.dropna().empty:
-        return 0
-    else:
-        df_neighbors = df_neighbors.loc[df_neighbors['date_time'] == time]
-        if df_neighbors.dropna().empty:
-            return 0
-        else:
-            return df_neighbors.mean()['movement']
 
-# Returns a list of the neighbors of a given node at a given time
-def get_neighbors(node_id, date_time):
-    df_neighbors = df_edges.loc[(df_edges['start_id'] == node_id) | (df_edges['end_id'] == node_id)]
-    if df_neighbors.dropna().empty:
-        return None
-    else:
-        df_neighbors = df_neighbors.loc[df_neighbors['date_time'] == date_time]
-        if df_neighbors.dropna().empty:
-            return None
-        else:
-            neighbors = pd.unique(df_neighbors[['start_id', 'end_id']].values.ravel('K'))
-            return neighbors[neighbors != node_id]
 
-def get_neighbor_cases_average(neighbors, date_time):
-    total = 0
-    for node in neighbors:
-        df_num_cases = df_nodes.loc[(df_nodes['node_id']==node) & (df_nodes['date_time']==date_time)].reset_index()
-        total += df_num_cases.iloc[0]['num_cases']
-    return total / len(neighbors)
-
-def get_neighbors_cases_average(node_id, date_time):
-    neighbors = get_neighbors(node_id, date_time)
-    if neighbors is not None:
-        return get_neighbor_cases_average(neighbors, date_time)
 
 def get_sinlge_window(min_time, max_time):
     df_window = df_nodes.loc[(df_nodes['date_time'] >= min_time) & (df_nodes['date_time'] < max_time)]
@@ -178,8 +145,8 @@ def get_sinlge_window(min_time, max_time):
     # Add neighbor_cases_average backward window
     df_window_avg_info = pd.DataFrame()
     df_window_avg_info['node_id'] = df_window['node_id']
-    df_window_avg_info['external_movement'] = df_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time), axis=1).fillna(0)
-    df_window_avg_info['external_num_cases'] = df_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time), axis=1).fillna(0)
+    df_window_avg_info['external_movement'] = df_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time, df_edges), axis=1).fillna(0)
+    df_window_avg_info['external_num_cases'] = df_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time, df_edges, df_nodes), axis=1).fillna(0)
     df_window_avg_info = df_window_avg_info.groupby(['node_id']).mean().reset_index()
     df_final = df_window_avg_info.merge(df_window_avg, on=['node_id'], how='outer')
     df_final = df_final.set_index(df_final['node_id']).drop(['node_id'], axis=1)
@@ -212,8 +179,8 @@ def get_window_information(date_zero, min_time, max_time):
     # Add neighbor_cases_average backward window
     df_backward_window_info = pd.DataFrame()
     df_backward_window_info['node_id'] = df_backward_window['node_id']
-    df_backward_window_info['external_movement'] = df_backward_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time), axis=1).fillna(0)
-    df_backward_window_info['external_num_cases'] = df_backward_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time), axis=1).fillna(0)
+    df_backward_window_info['external_movement'] = df_backward_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time, df_edges), axis=1).fillna(0)
+    df_backward_window_info['external_num_cases'] = df_backward_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time, df_edges, df_nodes), axis=1).fillna(0)
     df_backward_window_info = df_backward_window_info.groupby(['node_id']).mean().reset_index()
     df_final_backward = df_backward_window_info.merge(df_cases_avg_backward, on=['node_id'], how='outer')
     df_final_backward = df_final_backward.set_index(df_final_backward['node_id']).drop(['node_id'], axis=1)
@@ -221,8 +188,8 @@ def get_window_information(date_zero, min_time, max_time):
     # Add neighbor_cases_average forward window
     df_forward_window_info = pd.DataFrame()
     df_forward_window_info['node_id'] = df_forward_window['node_id']
-    df_forward_window_info['external_movement'] = df_forward_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time), axis=1).fillna(0)
-    df_forward_window_info['external_num_cases'] = df_forward_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time), axis=1).fillna(0)
+    df_forward_window_info['external_movement'] = df_forward_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time, df_edges), axis=1).fillna(0)
+    df_forward_window_info['external_num_cases'] = df_forward_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time, df_edges, df_nodes), axis=1).fillna(0)
     df_forward_window_info = df_forward_window_info.groupby(['node_id']).mean().reset_index()
     df_final_forward = df_forward_window_info.merge(df_cases_avg_forward, on=['node_id'], how='outer')
     df_final_forward = df_final_forward.set_index(df_final_forward['node_id']).drop(['node_id'], axis=1)
@@ -230,8 +197,8 @@ def get_window_information(date_zero, min_time, max_time):
     # Add neighbor_cases_average to middle window
     df_middle_window_info = pd.DataFrame()
     df_middle_window_info['node_id'] = df_middle_window['node_id']
-    df_middle_window_info['external_movement'] = df_middle_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time), axis=1).fillna(0)
-    df_middle_window_info['external_num_cases'] = df_middle_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time), axis=1).fillna(0)
+    df_middle_window_info['external_movement'] = df_middle_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time, df_edges), axis=1).fillna(0)
+    df_middle_window_info['external_num_cases'] = df_middle_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time, df_edges, df_nodes), axis=1).fillna(0)
     df_middle_window_info = df_middle_window_info.groupby(['node_id']).mean().reset_index()
     df_final_middle = df_middle_window_info.merge(df_cases_avg_middle, on=['node_id'], how='outer')
     df_final_middle = df_final_middle.set_index(df_final_middle['node_id']).drop(['node_id'], axis=1)
@@ -239,8 +206,8 @@ def get_window_information(date_zero, min_time, max_time):
     # Add neighbor_cases_average to total window
     df_total_window_info = pd.DataFrame()
     df_total_window_info['node_id'] = df_total_window['node_id']
-    df_total_window_info['external_movement'] = df_total_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time), axis=1).fillna(0)
-    df_total_window_info['external_num_cases'] = df_total_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time), axis=1).fillna(0)
+    df_total_window_info['external_movement'] = df_total_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time, df_edges), axis=1).fillna(0)
+    df_total_window_info['external_num_cases'] = df_total_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time, df_edges, df_nodes), axis=1).fillna(0)
     df_total_window_info = df_total_window_info.groupby(['node_id']).mean().reset_index()
     df_final_total = df_total_window_info.merge(df_cases_avg_total, on=['node_id'], how='outer')
     df_final_total = df_final_total.set_index(df_final_total['node_id']).drop(['node_id'], axis=1)

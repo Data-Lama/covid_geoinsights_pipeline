@@ -37,11 +37,10 @@ Prediction Colombia,figure,colombia/community/prediction/entire_location/predict
 Tabla Hitos,table,colombia/community/movement_plots/milestones.csv,milestones.csv
 Mapa Cloroplético Historico,figure,colombia/geometry/polygon_info_window/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
 Mapa Cloroplético Reciente,figure,colombia/geometry/polygon_info_window/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
-Mapa Alertas Casos Internos,figure,colombia/geometry/polygon_info_window/map_internal_num_cases_alert.png,map_internal_num_cases_alert.png
-Mapa Alertas Movimiento Interno,figure,colombia/geometry/polygon_info_window/map_internal_movement_alert.png,map_internal_movement_alert.png
-Mapa Alertas Casos Externos,figure,colombia/geometry/polygon_info_window/map_external_num_cases_alert.png,map_external_num_cases_alert.png
-Mapa Alertas Movimiento Externo,figure,colombia/geometry/polygon_info_window/map_external_movement_alert.png,map_external_movement_alert.png
+Mapa Alerta Externa,figure,colombia/geometry/alerts/map_external_alert.png,map_external_alert.png
+Mapa Alerta Interna,figure,colombia/geometry/alerts/map_internal_alert.png,map_internal_alert.png
 Detalles Mapa Cloroplético Reciente,table,colombia/geometry/polygon_info_window/detail_choropleth_recent.csv,detail_choropleth_recent.csv
-Alertas Rojas,table,colombia/geometry/polygon_info_window/alerts.csv,alerts.csv
+Detalles Mapa Cloroplético Reciente Rios,table,colombia/geometry/polygon_info_window/detail_choropleth_recent_rivers.csv,detail_choropleth_recent_rivers.csv
+Alertas Rojas,table,colombia/geometry/alerts/alerts.csv,alerts.csv
 Estadisticas Municipio,table,colombia/geometry/stats/general_stats.csv,geometry_statistics.csv
 Estadisticas Unidad Funcional,table,colombia/community/stats/general_stats.csv,community_statistics.csv

@@ -143,3 +143,105 @@ def is_encrypted(location_folder_name):
 
 	return(False)
 
+# Returns a list of the neighbors of a given node at a given time
+def get_neighbors(node_id, date_time, df_edges):
+    df_neighbors = df_edges.loc[(df_edges['start_id'] == node_id) | (df_edges['end_id'] == node_id)]
+    if df_neighbors.dropna().empty:
+        return None
+    else:
+        df_neighbors = df_neighbors.loc[df_neighbors['date_time'] == date_time]
+        if df_neighbors.dropna().empty:
+            return None
+        else:
+            neighbors = pd.unique(df_neighbors[['start_id', 'end_id']].values.ravel('K'))
+            return neighbors[neighbors != node_id]
+
+def get_neighbor_cases_average(neighbors, date_time, df_nodes):
+    total = 0
+    for node in neighbors:
+        df_num_cases = df_nodes.loc[(df_nodes['node_id']==node) & (df_nodes['date_time']==date_time)].reset_index()
+        total += df_num_cases.iloc[0]['num_cases']
+    return total / len(neighbors)
+
+def get_neighbors_cases_average(node_id, date_time, df_edges, df_nodes):
+    neighbors = get_neighbors(node_id, date_time, df_edges)
+    if neighbors is not None:
+        return get_neighbor_cases_average(neighbors, date_time, df_nodes)
+
+def get_mean_external_movement(node_id, time, df_edges):
+    df_neighbors = df_edges.loc[(df_edges['start_id'] == node_id) | (df_edges['end_id'] == node_id)]
+    if df_neighbors.dropna().empty:
+        return 0
+    else:
+        df_neighbors = df_neighbors.loc[df_neighbors['date_time'] == time]
+        if df_neighbors.dropna().empty:
+            return 0
+        else:
+            return df_neighbors.sum()['movement']
+		
+def get_min_average_mov(df_node):
+    smallest = df_node.nsmallest(10, 'inner_movement').mean()
+    return smallest['inner_movement']
+
+# returns dataframe with the average movement of the lowest 10 datapoints
+def get_min_internal_movement(df_nodes):
+	df_min_internal_movement = pd.DataFrame({'node_id': df_nodes['node_id'].unique()})
+	df_min_internal_movement['min_avg_movement'] = df_min_internal_movement.apply(lambda x: get_min_average_mov(df_nodes[df_nodes['node_id'] == int(x.node_id)]), axis=1)
+	return df_min_internal_movement
+
+# returns dataframe with the average movement
+def get_mean_internal_movement(df_nodes):
+	return df_nodes.groupby('node_id')['inner_movement'].mean()
+
+# returns dataframe with the standard deviation movement
+def get_std_internal_movement(df_nodes):
+	# print(node_id)
+	# df = df_nodes.groupby('node_id')['inner_movement'].std()
+	# print(df.at[node_id])
+	return df_nodes.groupby('node_id')['inner_movement'].std()
+
+# returns dataframe with the average movement of the lowest 10 datapoints
+def get_min_external_movement(df_edges):
+    return NotImplemented
+
+def get_mean_neighbor_movement(node_id, df_edges):
+    df_neighbors = df_edges.loc[(df_edges['start_id'] == node_id) | (df_edges['end_id'] == node_id)]
+    if df_neighbors.dropna().empty:
+        return 0
+    else:
+        df_neighbors = df_neighbors.groupby('date_time')['movement'].sum()
+        if df_neighbors.dropna().empty:
+            return 0
+        else:
+            return df_neighbors.mean()
+        
+def get_std_neighbor_movement(node_id, df_edges):
+    df_neighbors = df_edges.loc[(df_edges['start_id'] == node_id) | (df_edges['end_id'] == node_id)]
+    if df_neighbors.dropna().empty:
+        return 0
+    else:
+        df_neighbors = df_neighbors.groupby('date_time')['movement'].sum()
+        if df_neighbors.dropna().empty:
+            return 0
+        else:
+            return df_neighbors.std()
+
+def get_external_movement_stats_overtime(df_nodes, df_edges):
+	df_external_movement = pd.DataFrame({'node_id':df_nodes['node_id'].unique()})
+	df_external_movement['mean_external_movement'] = df_external_movement.apply(lambda x: get_mean_neighbor_movement(x.node_id, df_edges), axis=1)
+	df_external_movement['std_external_movement'] = df_external_movement.apply(lambda x: get_std_neighbor_movement(x.node_id, df_edges), axis=1)
+	df_external_movement['external_movement_one_std'] = df_external_movement['mean_external_movement'].add(df_external_movement['std_external_movement'])
+	df_external_movement['external_movement_two_std'] = df_external_movement['external_movement_one_std'].add(df_external_movement['std_external_movement'])
+	return df_external_movement
+
+def get_internal_movement_stats_overtime(df_nodes):
+	df_internal_movement = pd.DataFrame({'node_id':df_nodes['node_id'].unique()})
+	df_internal_movement['mean_internal_movement'] = df_internal_movement.apply(lambda x: get_mean_internal_movement(df_nodes).at[int(x.node_id)], axis=1)
+	df_internal_movement['std_internal_movement'] = df_internal_movement.apply(lambda x: get_std_internal_movement(df_nodes).at[int(x.node_id)], axis=1)
+	df_internal_movement['internal_movement_one_std'] = df_internal_movement['mean_internal_movement'].add(df_internal_movement['std_internal_movement'])
+	df_internal_movement['internal_movement_two_std'] = df_internal_movement['internal_movement_one_std'].add(df_internal_movement['std_internal_movement'])
+	return df_internal_movement
+
+# returns dataframe with the standard deviation movement
+def get_std_external_movement(df_nodes):
+	return df_nodes.group_by('node_id').std()

@@ -3,16 +3,21 @@
 
 
 # Necesary imports
-import geopandas as gpd
-import pandas as pd
-import numpy as np
-from pathlib import Path
+
+
+
+
 import os
-from geopy.geocoders import Nominatim
-import time
-from sklearn.metrics import pairwise_distances
-from datetime import timedelta
 import ot
+import time
+import numpy as np
+import pandas as pd
+from shapely import wkt
+import geopandas as gpd
+from pathlib import Path
+from datetime import timedelta
+from geopy.geocoders import Nominatim
+from sklearn.metrics import pairwise_distances
 
 
 #Directories
@@ -93,7 +98,7 @@ def extract_lon(poly, pos = 1):
 
 def extract_lat(poly, pos = 1):
 	'''
-	Extracts the longitud from the polygon string
+	Extracts the latitude from the polygon string
 	'''
 	poly = poly[12:-1]
 	poly = poly.replace(', ', ',')
@@ -106,10 +111,15 @@ def extract_lat(poly, pos = 1):
 # --- Movement Range to Movement Tile ----
 # ----------------------------------------
 
-def get_polygon(GALM_id, df_GALM=None):
-	if df_GALM == None:
-		path = os.path.join(data_dir, 'data_stages', 'colombia', 'raw', 'geo', 'gadm36_COL_shp', 'gadm36_COL_2.shp')
-		df_GALM = gpd.read_file(path)
 
-	polygon = df_GALM[df_GALM['GID_2'] == GALM_id]['geometry']
-	return polygon
+def get_GADM_polygon(GADM_id, df_GADM=None):
+	if df_GADM == None:
+		path = os.path.join(data_dir, 'data_stages', 'colombia', 'raw', 'geo', 'gadm36_COL_shp', 'gadm36_COL_2.shp')
+		# GADM geodataset originally crs = {epsg:4326}
+		df_GADM = gpd.read_file(path)
+
+	polygon = df_GADM[df_GADM['GID_2'] == GADM_id]['geometry']
+	polygons = []
+	for i in polygon:
+		polygons.append(i)
+	return polygons[0]
