@@ -103,11 +103,23 @@ for(agglomeration_method in agglomeration_methods)
     polygons$incidence = 10*polygons$incidence
   }
   
-    
+  # Creates the population groups
+  div = 1000
+  qs = quantile(round(polygons$attr_population/div), probs = c(0.3,0.6,0.9))
+  
+  labels = c(paste0("< ", qs[[1]]), paste0("[",qs[[1]], ",", qs[[2]] ,")"),  paste0("[",qs[[2]], ",", qs[[3]] ,"]"), paste0("> ", qs[[3]]))
+  
+  polygons$group = labels[1]
+  polygons$group[polygons$attr_population/div >= qs[[1]]] = labels[2]
+  polygons$group[polygons$attr_population/div >= qs[[2]]] = labels[3]
+  polygons$group[polygons$attr_population/div > qs[[3]]] = labels[4]
+  
   polygons = polygons[order(-1*polygons$incidence),]
   
+  poly_export = polygons[1:10,c('poly_name', 'incidence', 'attr_population')]
+  poly_export$incidence = round(poly_export$incidence)
   # Saves
-  write.csv(polygons[,c('poly_name', 'incidence')], file = file.path( export_folder,"incidences.csv"), row.names = FALSE)
+  write.csv(poly_export, file = file.path( export_folder,"incidences.csv"), quote = FALSE, row.names = FALSE)
   
   
   # Map location
@@ -133,12 +145,14 @@ for(agglomeration_method in agglomeration_methods)
   df_plot = polygons[order(polygons$incidence),]
   
   p =  ggmap(map)
-  p = p + geom_point(data = df_plot, aes(x = poly_lon, y = poly_lat, color = incidence, size = incidence, alpha = incidence))
+  p = p + geom_point(data = df_plot, aes(x = poly_lon, y = poly_lat, color = incidence, size = incidence, alpha = incidence, shape = group ))
   p = p + guides(size=FALSE, alpha = FALSE)
+  p = p + scale_shape(breaks = labels)
   p = p + scale_alpha_continuous(range = c(0.4, 1))
   p = p + scale_color_gradient(low = "darkblue", high = "red")
-  p = p + labs(color = paste0("Incidencia\n(Casos por ",per_capita ,"\nPersonas)"))
+  p = p + labs(color = paste0("Incidencia\n(Casos por ",per_capita ,"\nPersonas)"), shape = 'Población\n(Miles)')
   p = p + ggtitle(paste0("COVID-19: Incidencia por Municipio (Casos por ",per_capita ," Personas)"))
+  p
   
   ggsave(file.path( export_folder,"incidence_map.jpeg"), plot = p, width = width, height = height, device = 'jpeg')
   

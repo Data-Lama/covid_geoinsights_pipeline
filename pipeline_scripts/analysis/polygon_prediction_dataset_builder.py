@@ -5,6 +5,8 @@ from timeseries_functions import *
 from prediction_functions import *
 from general_functions import *
 
+import constants as cons
+
 # Other imports
 import os, sys
 
@@ -55,13 +57,10 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 
     # Global variables
     # Prediction build
-    days_back = 5
-    days_ahead = 8
-    smooth_days = 2
+    days_back = cons.days_back
+    days_ahead = cons.days_ahead
+    smooth_days = cons.smooth_days
 
-
-    # Mobility Range
-    mobility_range = [0.5, 0.75, 1, 1.25, 1.5]
 
     # Extracts Neighbors
     print(ident + '   Extracts the {} closest neighbors'.format(k))
@@ -82,17 +81,6 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 
     # Constructs the data with mobility ratio
 
-    dfs_mobility = []
-    for ratio in mobility_range:
-        print(ident + f'      For Ratio: {ratio}')
-        df_temp = extract_prediction_data(agglomeration_method, [location], [polygon_id], days_back, days_ahead, max_day = None, smooth_days = smooth_days, mobility_ratio = ratio)
-        df_temp['mobility_ratio'] = ratio
-
-        dfs_mobility.append(df_temp)
-
-    df_mobility = pd.concat(dfs_mobility, ignore_index = True)
-
-
     locations = df_neighbors.location.values.tolist()
     polygons_ids = df_neighbors.polygon_id.values.tolist()
 
@@ -110,7 +98,6 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
     print(ident + '   Saves')
     df_prediction.to_csv(os.path.join(folder_location ,'training_data.csv'), index = False)
 
-    df_mobility.to_csv(os.path.join(folder_location ,'mobility_ratio_data.csv'), index = False)
 
     print(ident + '   Exports Statistics')
 

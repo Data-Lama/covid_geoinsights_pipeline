@@ -99,6 +99,7 @@ class Unifier(GenericUnifier):
 
 				print()
 
+
 	def build_cases(self):
 		file_name = os.path.join(self.raw_folder, 'cases', self.get('cases_file_name'))
 
@@ -109,4 +110,9 @@ class Unifier(GenericUnifier):
 		df.reset_index(inplace=True)
 		df = pd.melt(df, id_vars=['index'], value_vars = df.columns[1:])
 		df = df.rename(columns={'index':'date_time'})
+
+		df['num_cases'] = 1
+
+		df = df.groupby(['date_time','geo_id']).sum().reset_index()
+
 		return(df)

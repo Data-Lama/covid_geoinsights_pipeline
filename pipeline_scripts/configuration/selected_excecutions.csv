@@ -106,4 +106,4 @@ Colombia,colombia,POS,analysis,3,NO,choropleth_maps,python,colombia geometry
 Colombia,colombia,POS,analysis,3,NO,general_statistics,python,colombia geometry
 Colombia,colombia,POS,analysis,3,NO,general_statistics,python,colombia community
 Colombia,colombia,POS,analysis,3,NO,incidence_map,r,Colombia colombia geometry
-All,,POS,POS,5,NO,copy_report_files.py,python,
+All,,POS,POS,5,YES,copy_report_files.py,python,

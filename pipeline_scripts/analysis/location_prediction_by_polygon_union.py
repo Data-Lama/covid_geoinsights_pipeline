@@ -82,19 +82,19 @@ for agglomeration_method in agglomeration_methods:
 
     # Extract the prediction results for all polygon
     dfs = []
-    dfs_mobility = []
+    dfs_simulations = []
 
     for folder in os.listdir(predictions_folder_location):        
         if os.path.isdir(os.path.join(predictions_folder_location, folder)) and folder != folder_name:
             data_set_location = os.path.join(predictions_folder_location, folder, 'predicted_data.csv')
-            data_set_location_mobility = os.path.join(predictions_folder_location, folder, 'predicted_data_mobility_ratio..csv')
+            data_set_location_simulation = os.path.join(predictions_folder_location, folder, 'simulation_data.csv')
             # If exists it imports it
             if os.path.exists(data_set_location):
                 data_set = pd.read_csv(data_set_location, parse_dates = ['target_date'])
                 dfs.append(data_set)
 
-                data_set_mob = pd.read_csv(data_set_location_mobility, parse_dates = ['target_date'])
-                dfs_mobility.append(data_set_mob)
+                data_set_simulations = pd.read_csv(data_set_location_simulation, parse_dates = ['target_date'])
+                dfs_simulations.append(data_set_simulations)
                 
 
     if len(dfs) == 0:
@@ -103,7 +103,9 @@ for agglomeration_method in agglomeration_methods:
 
     # Concatenates all data frames
     df_results = pd.concat(dfs)
-    df_prediction_mobility = pd.concat(dfs_mobility)
+    df_simulations = pd.concat(dfs_simulations)
+
+
 
     # Extract the selected Polygons
     included_polygons = df_results.polygon_id.unique()
@@ -114,6 +116,10 @@ for agglomeration_method in agglomeration_methods:
     # Extracts the real cases
     df_real_cases = cases.loc[cases['date_time'].isin(df_results['target_date']), ['date_time','num_cases']].rename(columns = {'num_cases':'cases','date_time':'target_date'})
     df_real_cases = df_real_cases.groupby('target_date').sum().reset_index()
+
+    # Smoothes
+    df_real_cases['cases'] = df_real_cases['cases'].rolling(con.smooth_days, min_periods=1).mean()
+
     df_real_cases['cases_accum'] = df_real_cases['cases'].rolling(min_periods=1, window=df_real_cases.shape[0]).sum()
 
 
@@ -151,28 +157,6 @@ for agglomeration_method in agglomeration_methods:
     # Adjusts
     df3['cases'] = df3['cases']/coverage
     df3['cases_accum'] = df3['cases_accum']/coverage
-
-
-    # Future Prediction reduction 25%
-    df4 = df_prediction_mobility.loc[ (df_prediction_mobility.ratio == 0.75) & (df_prediction_mobility.target_date >= start_date), ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
-    #df4 = df_prediction_mobility.loc[ (df_prediction_mobility.ratio == 0.75), ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
-    df4 = df4.groupby('target_date').sum().reset_index() 
-    df4.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
-    df4['Tipo'] = 'Poyección Reduccion 25% Movilidad ' 
-
-    # Adjusts
-    df4['cases'] = df4['cases']/coverage
-    df4['cases_accum'] = df4['cases_accum']/coverage
-
-    df5 = df_prediction_mobility.loc[ (df_prediction_mobility.ratio == 1.25) & (df_prediction_mobility.target_date >= start_date), ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
-    #df5 = df_prediction_mobility.loc[ (df_prediction_mobility.ratio == 1.25), ['target_date','predicted_num_cases','predicted_num_cases_accum']].copy()
-    df5 = df5.groupby('target_date').sum().reset_index() 
-    df5.rename(columns = {'predicted_num_cases': 'cases', 'predicted_num_cases_accum': 'cases_accum'}, inplace = True)
-    df5['Tipo'] = 'Poyección Aumento 25% Movilidad ' 
-
-    # Adjusts
-    df5['cases'] = df5['cases']/coverage
-    df5['cases_accum'] = df5['cases_accum']/coverage
 
 
     # Errors
@@ -232,6 +216,48 @@ for agglomeration_method in agglomeration_methods:
     fig.tight_layout(pad=3.0)
 
     fig.savefig(os.path.join(folder_location, 'prediction_{}.png'.format(location_folder)))
+
+    plt.close()
+
+    print(ident + '   Plots Simulations')
+
+
+    # Adjusts simulations
+    df_simulations = df_simulations.groupby(['target_date','ratio']).sum().reset_index()
+    df_simulations['predicted_num_cases_accum'] = df_simulations['predicted_num_cases_accum']/coverage
+    df_simulations['predicted_num_cases'] = df_simulations['predicted_num_cases']/coverage
+
+
+    df_plot = df_simulations.copy()
+
+
+    df_plot['Porcentaje Movilidad (%)'] = df_plot['ratio'].apply(lambda r: int(100*r)).astype(int)
+
+    # Plots
+    fig, ax = plt.subplots(2,1, figsize=(15,8))
+
+    fig.suptitle('Simulación de Cambio en la Movilidad para {}'.format(location_name), fontsize=suptitle_font_size)
+
+    # Plot individual Lines
+    sns.lineplot(x = 'target_date', y = 'predicted_num_cases', hue = 'Porcentaje Movilidad (%)', data = df_plot, ax = ax[0])
+    sns.lineplot(x = 'target_date', y = 'predicted_num_cases_accum', hue = 'Porcentaje Movilidad (%)', data = df_plot, ax = ax[1])
+
+
+    # Plot titles
+    ax[0].set_title('Flujo Casos', fontsize=individual_plot_size)
+    ax[1].set_title('Flujo Casos' + ' (Acumulados)', fontsize=individual_plot_size)
+
+    # Plots Axis
+    ax[0].set_xlabel('Fecha', fontsize=axis_font_size)
+    ax[1].set_xlabel('Fecha', fontsize=axis_font_size)
+    ax[0].set_ylabel('Casos', fontsize=axis_font_size)
+    ax[1].set_ylabel('Casos (Acumulados)', fontsize=axis_font_size)
+
+
+    fig.tight_layout(pad=3.0)
+    fig.savefig(os.path.join(folder_location, 'simulations_{}.png'.format(location_folder)))    
+
+    plt.close()
 
     print(ident + '   Exports Statistics')
 
