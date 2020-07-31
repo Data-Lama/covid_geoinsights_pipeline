@@ -232,6 +232,7 @@ def get_external_movement_stats_overtime(df_nodes, df_edges):
 	df_external_movement['mean_external_movement'] = df_external_movement.apply(lambda x: get_mean_neighbor_movement(x.node_id, df_edges), axis=1)
 	df_external_movement['std_external_movement'] = df_external_movement.apply(lambda x: get_std_neighbor_movement(x.node_id, df_edges), axis=1)
 	df_external_movement['external_movement_one_std'] = df_external_movement['mean_external_movement'].add(df_external_movement['std_external_movement'])
+	df_external_movement['external_movement_one-half_std'] = df_external_movement['external_movement_one_std'].add(df_external_movement['std_external_movement'].divide(2))
 	df_external_movement['external_movement_two_std'] = df_external_movement['external_movement_one_std'].add(df_external_movement['std_external_movement'])
 	return df_external_movement
 
@@ -240,6 +241,7 @@ def get_internal_movement_stats_overtime(df_nodes):
 	df_internal_movement['mean_internal_movement'] = df_internal_movement.apply(lambda x: get_mean_internal_movement(df_nodes).at[int(x.node_id)], axis=1)
 	df_internal_movement['std_internal_movement'] = df_internal_movement.apply(lambda x: get_std_internal_movement(df_nodes).at[int(x.node_id)], axis=1)
 	df_internal_movement['internal_movement_one_std'] = df_internal_movement['mean_internal_movement'].add(df_internal_movement['std_internal_movement'])
+	df_internal_movement['internal_movement_one-half_std'] = df_internal_movement['internal_movement_one_std'].add(df_internal_movement['std_internal_movement'].divide(2))
 	df_internal_movement['internal_movement_two_std'] = df_internal_movement['internal_movement_one_std'].add(df_internal_movement['std_internal_movement'])
 	return df_internal_movement
 

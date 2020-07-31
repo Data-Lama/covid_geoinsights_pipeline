@@ -162,7 +162,7 @@ translate = {'internal_num_cases_alert':'Alerta numero de casos',
                         'node_name':'Municipio',
                         'community_name': 'Unidad funcional'}
 alerts.rename(columns=translate, inplace=True)
-alerts.drop(columns=['lat', 'lon', 'poly_id', 'node_id'], inplace=True)
+alerts.drop(columns=['lat', 'lon', 'poly_id'], inplace=True)
 alerts.sort_values(by=['Unidad funcional'], inplace=True)
 
 alerts.to_csv(os.path.join(output_file_path, 'alerts.csv'), columns=['Unidad funcional',
@@ -172,6 +172,11 @@ alerts.to_csv(os.path.join(output_file_path, 'alerts.csv'), columns=['Unidad fun
                                         'Alerta numero de casos en municipios vecinos',
                                         'Alerta flujo hacia el municipio'], index=False)
 
+alerts.to_csv(os.path.join(output_file_path, 'alerts_num_cases_delta.csv'), columns=['node_id','Unidad funcional',
+                                        'Municipio',                                          
+                                        'Alerta numero de casos',
+                                        'Alerta numero de casos en municipios vecinos'], index=False)
+
 
 # Map alerts
 df_polygons = geo_df.merge(df_polygons, left_on='Codigo_Dan', right_on='node_id')
@@ -179,6 +184,7 @@ cmap = ListedColormap([(1,0.8,0), (0.8, 0, 0), (0,0.4,0)], name='alerts')
 df_polygons.to_crs(epsg=3857, inplace=True)
 
 print(ident+ "  Drawing alert maps.")
+
 # Draw maps
 for i in ['internal_num_cases_alert', 'internal_movement_alert', 
             'external_num_cases_alert', 'external_movement_alert', 

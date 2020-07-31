@@ -74,8 +74,6 @@ def convert_movement_range(f, gdf_polygons):
         gdf_movement_range.crs = 'epsg:4326'
         gdf_movement_range = gdf_movement_range.to_crs('epsg:3116')
 
-        # This dict stores for each node_id, the GADM nodes that intersect and the area of intersection
-        # intersections_dict = {}
         with open(output_file_name, 'w') as out:
             out.write("{},{}\n".format('poly_id', 'extrapolated_relative_movement'))
             for poly_id in gdf_polygons['poly_id'].unique():
