@@ -1,46 +1,51 @@
-name,type,source,destination
-Accumulative Cases Colombia Sel Polygons,figure,colombia/community/agglomerated_polygons_plots/cases_accum_selected_polygons_colombia.png,cases_accum_selected_polygons_colombia.png
-Cases Colombia Sel Polygons,figure,colombia/community/agglomerated_polygons_plots/cases_selected_polygons_colombia.png,cases_selected_polygons_colombia.png
-Graph Map First Day,figure,colombia/community/TDA/maps_by_day/map_by_[0].jpeg,map_by_start_colombia.jpeg
-Graph Map Last 15 Days,figure,colombia/community/TDA/maps_by_day/map_by_[-15].jpeg,map_by_previous_15_colombia.jpeg
-Graph Map Current Day,figure,colombia/community/TDA/maps_by_day/map_by_*.jpeg,map_by_current_colombia.jpeg
-Polygon Internal Movement,figure,colombia/community/agglomerated_polygons_plots/internal_movement_selected_polygons_colombia.png,internal_movement_selected_polygons_colombia.png
-Polygon External Movement,figure,colombia/community/agglomerated_polygons_plots/external_movement_selected_polygons_colombia.png,external_movement_selected_polygons_colombia.png
-Movement Change Colombia,figure,colombia/community/movement_plots/movement_change_last_days.jpeg,movement_change_last_days_colombia.jpeg
-Movement Change Bogota,figure,bogota/geometry/movement_plots/movement_change_last_days.jpeg,movement_change_last_days_bogota.jpeg
-TDA Filter Graph,figure,colombia/community/TDA/movement_progress.png,movement_progress.png
-TDA 1 Skeleton,figure,colombia/community/TDA/tda_int_vs_ext.png,tda_int_vs_ext.png
-Selected Polygon,figure,colombia/community/agglomerated_polygons_plots/movement_selected_community_last_days.jpeg,movement_selected_community_last_days.jpeg
-Movement Selected Polygons,figure,colombia/community/agglomerated_polygons_plots/selected_polygons_community.jpeg,selected_polygons_community.jpeg
-Movement FB Polygons,figure,colombia/community/movement_plots/mov_range_fb_polygon_colombia.png,mov_fb_polygon_colombia.png
-Movement FB Colombia,figure,colombia/community/movement_plots/mov_range_colombia.png,mov_pais_Colombia.png
-Neighbor Series barranquilla,figure,colombia/community/neighbors/barranquilla/neighbor_timeseries_barranquilla.png,neighbor_timeseries_barranquilla.png
-Prediction barranquilla,figure,colombia/community/prediction/barranquilla/prediction_barranquilla.png,prediction_barranquilla.png
-Neighbor Series cali,figure,colombia/community/neighbors/cali/neighbor_timeseries_cali.png,neighbor_timeseries_cali.png
-Prediction cali,figure,colombia/community/prediction/cali/prediction_cali.png,prediction_cali.png
-Neighbor Series cartagena,figure,colombia/community/neighbors/cartagena_de_indias/neighbor_timeseries_cartagena_de_indias.png,neighbor_timeseries_cartagena.png
-Prediction cartagena,figure,colombia/community/prediction/cartagena_de_indias/prediction_cartagena_de_indias.png,prediction_cartagena.png
-Neighbor Series medellin,figure,colombia/community/neighbors/medellin/neighbor_timeseries_medellin.png,neighbor_timeseries_medellin.png
-Prediction medellin,figure,colombia/community/prediction/medellin/prediction_medellin.png,prediction_medellin.png
-Neighbor Series san_andres_tumaco,figure,colombia/community/neighbors/pasto/neighbor_timeseries_pasto.png,neighbor_timeseries_pasto.png
-Prediction pasto,figure,colombia/community/prediction/pasto/prediction_pasto.png,prediction_pasto.png
-Neighbor Series soledad,figure,colombia/community/neighbors/soledad/neighbor_timeseries_soledad.png,neighbor_timeseries_soledad.png
-Prediction soledad,figure,colombia/community/prediction/soledad/prediction_soledad.png,prediction_soledad.png
-Neighbor Series Bogota,figure,colombia/community/neighbors/bogota_dc/neighbor_timeseries_bogota_dc.png,neighbor_timeseries_bogota.png
-Prediction Bogota,figure,colombia/community/prediction/bogota_dc/prediction_bogota_dc.png,prediction_bogota.png
-Neighbor Series soledad,figure,colombia/community/neighbors/popayan/neighbor_timeseries_popayan.png,neighbor_timeseries_popayan.png
-Prediction popayan,figure,colombia/community/prediction/popayan/prediction_popayan.png,prediction_popayan.png
-Neighbor Series Ibague,figure,colombia/community/neighbors/ibague/neighbor_timeseries_ibague.png,neighbor_timeseries_ibague.png
-Prediction Ibague,figure,colombia/community/prediction/ibague/prediction_ibague.png,prediction_ibague.png
-Neighbor Series Colombia,figure,colombia/community/neighbors/entire_location/neighbor_timeseries_colombia.png,neighbor_timeseries_colombia.png
-Prediction Colombia,figure,colombia/community/prediction/entire_location/prediction_colombia.png,prediction_colombia.png
-Tabla Hitos,table,colombia/community/movement_plots/milestones.csv,milestones.csv
-Mapa Cloroplético Historico,figure,colombia/geometry/polygon_info_window/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
-Mapa Cloroplético Reciente,figure,colombia/geometry/polygon_info_window/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
-Mapa Alerta Externa,figure,colombia/geometry/alerts/map_external_alert.png,map_external_alert.png
-Mapa Alerta Interna,figure,colombia/geometry/alerts/map_internal_alert.png,map_internal_alert.png
-Detalles Mapa Cloroplético Reciente,table,colombia/geometry/polygon_info_window/detail_choropleth_recent.csv,detail_choropleth_recent.csv
-Detalles Mapa Cloroplético Reciente Rios,table,colombia/geometry/polygon_info_window/detail_choropleth_recent_rivers.csv,detail_choropleth_recent_rivers.csv
-Alertas Rojas,table,colombia/geometry/alerts/alerts.csv,alerts.csv
-Estadisticas Municipio,table,colombia/geometry/stats/general_stats.csv,geometry_statistics.csv
-Estadisticas Unidad Funcional,table,colombia/community/stats/general_stats.csv,community_statistics.csv
+name,folder,type,source,destination
+Accumulative Cases Colombia Sel Polygons,analysis,figure,colombia/community/agglomerated_polygons_plots/cases_accum_selected_polygons_colombia.png,cases_accum_selected_polygons_colombia.png
+Cases Colombia Sel Polygons,analysis,figure,colombia/community/agglomerated_polygons_plots/cases_selected_polygons_colombia.png,cases_selected_polygons_colombia.png
+Graph Map First Day,analysis,figure,colombia/community/TDA/maps_by_day/map_by_[0].jpeg,map_by_start_colombia.jpeg
+Graph Map Last 15 Days,analysis,figure,colombia/community/TDA/maps_by_day/map_by_[-15].jpeg,map_by_previous_15_colombia.jpeg
+Graph Map Current Day,analysis,figure,colombia/community/TDA/maps_by_day/map_by_*.jpeg,map_by_current_colombia.jpeg
+Polygon Internal Movement,analysis,figure,colombia/community/agglomerated_polygons_plots/internal_movement_selected_polygons_colombia.png,internal_movement_selected_polygons_colombia.png
+Polygon External Movement,analysis,figure,colombia/community/agglomerated_polygons_plots/external_movement_selected_polygons_colombia.png,external_movement_selected_polygons_colombia.png
+Movement Change Colombia,analysis,figure,colombia/community/movement_plots/movement_change_last_days.jpeg,movement_change_last_days_colombia.jpeg
+Movement Change Bogota,analysis,figure,bogota/geometry/movement_plots/movement_change_last_days.jpeg,movement_change_last_days_bogota.jpeg
+TDA Filter Graph,analysis,figure,colombia/community/TDA/movement_progress.png,movement_progress.png
+TDA 1 Skeleton,analysis,figure,colombia/community/TDA/tda_int_vs_ext.png,tda_int_vs_ext.png
+Selected Polygon,analysis,figure,colombia/community/agglomerated_polygons_plots/movement_selected_community_last_days.jpeg,movement_selected_community_last_days.jpeg
+Movement Selected Polygons,analysis,figure,colombia/community/agglomerated_polygons_plots/selected_polygons_community.jpeg,selected_polygons_community.jpeg
+Movement FB Polygons,analysis,figure,colombia/community/movement_plots/mov_range_fb_polygon_colombia.png,mov_fb_polygon_colombia.png
+Movement FB Colombia,analysis,figure,colombia/community/movement_plots/mov_range_colombia.png,mov_pais_Colombia.png
+Neighbor Series barranquilla,analysis,figure,colombia/community/neighbors/barranquilla/neighbor_timeseries_barranquilla.png,neighbor_timeseries_barranquilla.png
+Prediction barranquilla,analysis,figure,colombia/community/prediction/barranquilla/prediction_barranquilla.png,prediction_barranquilla.png
+Neighbor Series cali,analysis,figure,colombia/community/neighbors/cali/neighbor_timeseries_cali.png,neighbor_timeseries_cali.png
+Prediction cali,analysis,figure,colombia/community/prediction/cali/prediction_cali.png,prediction_cali.png
+Neighbor Series cartagena,analysis,figure,colombia/community/neighbors/cartagena_de_indias/neighbor_timeseries_cartagena_de_indias.png,neighbor_timeseries_cartagena.png
+Prediction cartagena,analysis,figure,colombia/community/prediction/cartagena_de_indias/prediction_cartagena_de_indias.png,prediction_cartagena.png
+Neighbor Series medellin,analysis,figure,colombia/community/neighbors/medellin/neighbor_timeseries_medellin.png,neighbor_timeseries_medellin.png
+Prediction medellin,analysis,figure,colombia/community/prediction/medellin/prediction_medellin.png,prediction_medellin.png
+Neighbor Series san_andres_tumaco,analysis,figure,colombia/community/neighbors/pasto/neighbor_timeseries_pasto.png,neighbor_timeseries_pasto.png
+Prediction pasto,analysis,figure,colombia/community/prediction/pasto/prediction_pasto.png,prediction_pasto.png
+Neighbor Series soledad,analysis,figure,colombia/community/neighbors/soledad/neighbor_timeseries_soledad.png,neighbor_timeseries_soledad.png
+Prediction soledad,analysis,figure,colombia/community/prediction/soledad/prediction_soledad.png,prediction_soledad.png
+Neighbor Series Bogota,analysis,figure,colombia/community/neighbors/bogota_dc/neighbor_timeseries_bogota_dc.png,neighbor_timeseries_bogota.png
+Prediction Bogota,analysis,figure,colombia/community/prediction/bogota_dc/prediction_bogota_dc.png,prediction_bogota.png
+Neighbor Series soledad,analysis,figure,colombia/community/neighbors/popayan/neighbor_timeseries_popayan.png,neighbor_timeseries_popayan.png
+Prediction popayan,analysis,figure,colombia/community/prediction/popayan/prediction_popayan.png,prediction_popayan.png
+Neighbor Series Ibague,analysis,figure,colombia/community/neighbors/ibague/neighbor_timeseries_ibague.png,neighbor_timeseries_ibague.png
+Prediction Ibague,analysis,figure,colombia/community/prediction/ibague/prediction_ibague.png,prediction_ibague.png
+Neighbor Series Colombia,analysis,figure,colombia/community/neighbors/entire_location/neighbor_timeseries_colombia.png,neighbor_timeseries_colombia.png
+Prediction Colombia,analysis,figure,colombia/community/prediction/entire_location/prediction_colombia.png,prediction_colombia.png
+Simulacion Colombia,analysis,figure,colombia/community/prediction/entire_location/simulations_colombia.png,simulations_colombia.png
+Tabla Hitos,analysis,table,colombia/community/movement_plots/milestones.csv,milestones.csv
+Mapa Cloroplético Historico,analysis,figure,colombia/geometry/polygon_info_window/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
+Mapa Cloroplético Reciente,analysis,figure,colombia/geometry/polygon_info_window/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
+Mapa Alerta Externa,analysis,figure,colombia/geometry/alerts/map_external_alert.png,map_external_alert.png
+Mapa Alerta Interna,analysis,figure,colombia/geometry/alerts/map_joint_internal_alert.png,map_internal_alert.png
+Detalles Mapa Cloroplético Reciente,analysis,table,colombia/geometry/polygon_info_window/detail_choropleth_recent.csv,detail_choropleth_recent.csv
+Detalles Mapa Cloroplético Reciente Rios,analysis,table,colombia/geometry/polygon_info_window/detail_choropleth_recent_rivers.csv,detail_choropleth_recent_rivers.csv
+Alertas Rojas,analysis,table,colombia/geometry/alerts/alerts.csv,alerts.csv
+Estadisticas Municipio,analysis,table,colombia/geometry/stats/general_stats.csv,geometry_statistics.csv
+Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/general_stats.csv,community_statistics.csv
+Estadisticas Prediccion,analysis,table,colombia/community/prediction/entire_location/statistics.csv,prediction_statistics.csv
+Incidence Map,analysis,figure,colombia/geometry/incidence_maps/incidence_map.jpeg,incidence_map_geometry.jpeg
+Incidence Table,analysis,table,colombia/geometry/incidence_maps/incidences.csv,incidences_geometry.csv
+Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv

@@ -11,6 +11,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_squared_error
 
+from datetime import timedelta
+
 import numpy as np
 
 import os
@@ -47,7 +49,7 @@ def get_graphs(agglomeration_method, location):
 
 
 
-def extract_prediction_data(agglomeration_method, locations, polygons_ids, days_back, days_ahead, max_day = None, smooth_days = 1, mobility_ratio = 1):
+def extract_prediction_data(agglomeration_method, locations, polygons_ids, days_back, days_ahead, smooth_days = 1, max_day = None, mobility_ratio = 1):
 	
 	dfs = []
 	
@@ -244,5 +246,101 @@ def predict_location(location, poly_id, df_prediction, alpha_options = [80,100,1
 	
 	
 	return(df_plot, summary_dict, final_clf, scaler, coef_w)
+
+
+
+
+def run_simulation(node_ids, nodes, edges, clf, scaler, days_back, days_ahead, smooth_days, from_days, mobility_adj, verbose = False):
+	'''
+	Method that runs a simulation on the given nodes of the location with the adjustmenet in mobility
+	'''
+	#converts to string
+	nodes.node_id = nodes.node_id.astype(str)
+	edges.start_id = edges.start_id.astype(str)
+	edges.end_id = edges.end_id.astype(str)
+
+	node_ids = [str(n) for n in node_ids]
+
+	# Filters the nodes and the edges
+	global_start = nodes.date_time.max() - timedelta(days = from_days)
+
+	# Extract the total number of cases
+	historic_cases = nodes[(nodes.date_time < global_start + timedelta(days = days_back + days_ahead)) & (nodes.node_id.isin(node_ids))].num_cases.sum()
+
+	nodes = nodes[nodes.date_time >= global_start].copy()
+	edges = edges[edges.date_time >= global_start].copy()
+
+	# Adjusts the mobility
+	nodes.inner_movement = nodes.inner_movement*mobility_adj
+	edges.movement = edges.movement*mobility_adj
+
+	date_min = nodes.date_time.min() + timedelta(days = days_back)
+	date_max = nodes.date_time.max()
+
+	nodes.sort_values(['day','node_id'], inplace = True)
+	for n_id in nodes.node_id.unique():
+		nodes.loc[nodes.node_id == n_id,'num_cases'] = nodes[nodes.node_id == n_id].num_cases.rolling(smooth_days, min_periods=1).mean()
+
+
+	date_min = nodes.date_time.min() + timedelta(days = days_back)
+	date_max = nodes.date_time.max()
+
+	current_date = date_min
+
+	resp = []
+
+
+	while current_date <= date_max:
+
+
+		# Nodes		
+		passed_nodes = nodes.loc[(nodes.date_time >= (current_date - timedelta(days = days_back))) & (nodes.date_time < current_date)]
+
+
+		# Current number of cases
+		if (current_date + timedelta(days_ahead)) <= date_max:
+			target_nodes = nodes.loc[nodes.date_time == (current_date + timedelta(days_ahead))]
+			
+			target_num_cases = target_nodes.loc[target_nodes.node_id.isin(node_ids),'num_cases'].sum()
+		else:
+			# Projection
+			target_num_cases = None
+
+			
+		# Edges
+		passed_edges_all = edges.loc[(edges.date_time >= (current_date - timedelta(days = days_back))) & (edges.date_time < current_date)]
+
+
+		final_dict = constr.build_prediction_input_for_nodes(node_ids, passed_nodes, passed_edges_all, days_back)
+
+		frame = pd.DataFrame(final_dict, index = [0])
+
+		predicted_num_cases  = clf.predict( scaler.transform(frame))[0]
+
+		record = {'target_date': current_date + timedelta(days_ahead),'target_num_cases':target_num_cases, 'predicted_num_cases':predicted_num_cases}
+		
+		resp.append(record)
+
+		if verbose:
+			print(f'Current: {target_num_cases} Predicted: {predicted_num_cases}')
+
+		# Saves the predicted cases
+		if (current_date + timedelta(days_ahead)) <= date_max:
+
+			# Divides the prediction equally
+			new_cases = target_nodes.loc[target_nodes.node_id.isin(node_ids),['num_cases']].copy()
+			new_cases = predicted_num_cases*(new_cases/target_num_cases)
+
+			if verbose:
+				print(new_cases)
+			
+			nodes.loc[new_cases.index, 'num_cases'] = new_cases['num_cases']
+
+
+		# Advances
+		current_date += timedelta(days = 1)
+
+	response = pd.DataFrame(resp)
+
 	
-	
+	return(response)

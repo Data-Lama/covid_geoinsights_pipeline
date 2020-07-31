@@ -109,6 +109,10 @@ for agglomeration_method in agglomeration_methods:
 	df_cases_all = df_cases_raw.rename(columns = {'num_cases':'value', 'geo_id': 'polygon_id'})
 	df_cases_all = df_cases_all[['date_time','value', 'polygon_id']].copy()
 	df_cases = df_cases_all[['date_time','value']].groupby('date_time').sum().reset_index()
+
+	# Somooths
+	df_cases['value'] = df_cases['value'].rolling(con.smooth_days, min_periods=1).mean()
+
 	df_cases['type'] = 'cases' 
 
 	# Loads milestones

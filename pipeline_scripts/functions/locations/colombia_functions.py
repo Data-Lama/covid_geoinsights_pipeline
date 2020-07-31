@@ -60,6 +60,9 @@ class Unifier(GenericUnifier):
 		df = df.rename(columns=cols)
 
 		df.dropna(subset = ['date_time', 'attention'], inplace = True)
+
+		# Rounds to day
+		df['date_time'] = df['date_time'].dt.round('D')
 		df.geo_id = df.geo_id.apply(str).astype(str)
 
 		df['num_cases'] = 1

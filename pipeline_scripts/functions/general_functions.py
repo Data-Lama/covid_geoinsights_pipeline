@@ -246,3 +246,5 @@ def get_internal_movement_stats_overtime(df_nodes):
 # returns dataframe with the standard deviation movement
 def get_std_external_movement(df_nodes):
 	return df_nodes.group_by('node_id').std()
+
+

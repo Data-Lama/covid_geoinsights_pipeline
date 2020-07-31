@@ -198,17 +198,11 @@ def build_graph_values(nodes, edges):
 
 
 
-def build_prediction_dataset_for_nodes(node_ids, nodes, edges, days_back, days_ahead, smooth_days = 1, max_day = None):
+def build_prediction_dataset_for_nodes(node_ids, nodes, edges, days_back, days_ahead, smooth_days, max_day = None):
 	'''
 	Builds Prediction data set for indivdual nodes
 
 	'''
-
-	# Converts all to string
-	#node_ids = [str(n) for n in node_ids]
-	#nodes.node_id = nodes.node_id.astype(str)
-	#edges.start_id = edges.start_id.astype(str)
-	#edges.end_id = edges.end_id.astype(str)
 
 
 	date_min = nodes.date_time.min() + timedelta(days = days_back)
@@ -217,8 +211,6 @@ def build_prediction_dataset_for_nodes(node_ids, nodes, edges, days_back, days_a
 	nodes.sort_values(['day','node_id'], inplace = True)
 	for n_id in nodes.node_id.unique():
 		nodes.loc[nodes.node_id == n_id,'num_cases'] = nodes[nodes.node_id == n_id].num_cases.rolling(smooth_days, min_periods=1).mean()
-
-
 
 
 	date_min = nodes.date_time.min() + timedelta(days = days_back)
@@ -236,8 +228,6 @@ def build_prediction_dataset_for_nodes(node_ids, nodes, edges, days_back, days_a
 		passed_nodes = nodes.loc[(nodes.date_time >= (current_date - timedelta(days = days_back))) & (nodes.date_time < current_date)]
 
 
-		back_dates = passed_nodes[['date_time']].drop_duplicates().sort_values('date_time')
-
 		# Current number of cases
 		if (current_date + timedelta(days_ahead)) <= date_max:
 			target_nodes = nodes.loc[nodes.date_time == (current_date + timedelta(days_ahead))]
@@ -250,58 +240,8 @@ def build_prediction_dataset_for_nodes(node_ids, nodes, edges, days_back, days_a
 			
 		# Edges
 		passed_edges_all = edges.loc[(edges.date_time >= (current_date - timedelta(days = days_back))) & (edges.date_time < current_date)]
-		
-		# End
-		passed_edges_end = passed_edges_all.loc[(passed_edges_all.end_id.isin(node_ids))]
-		passed_edges_end = passed_edges_end[['date_time','start_id','movement']].rename(columns = {'start_id':'node_id'})
-		
-		# Start
-		#passed_edges_start = passed_edges_all.loc[(passed_edges_all.start_id.isin(node_ids))]
-		#passed_edges_start = passed_edges_start[['date_time','end_id','movement']].rename(columns = {'end_id':'node_id'})
-		
-		passed_edges = pd.concat([passed_edges_end], ignore_index = True)
-		
-		# Attaches number of cases and calculates the in_degree
-		passed_edges = passed_edges.merge(passed_nodes[['date_time','node_id', 'num_cases']], on = ['date_time','node_id'])
-		passed_edges['degree'] = passed_edges.movement*passed_edges.num_cases
-		
-		# Sets to zero the missing values
-		passed_edges = back_dates.merge(passed_edges, on = ['date_time'], how = 'left').fillna(0)
 
-		#print()
-		#print(passed_edges)
-
-		# Calculates in degree
-		in_degree = passed_edges[['date_time', 'degree']].groupby('date_time').sum().reset_index().sort_values('date_time').degree.values
-		in_movement = passed_edges[['date_time', 'movement']].groupby('date_time').sum().reset_index().sort_values('date_time').movement.values
-		in_cases = passed_edges[['date_time', 'num_cases']].groupby('date_time').sum().reset_index().sort_values('date_time').num_cases.values
-		
-		# Calculates the passed internal movement and internal degree
-
-		history = passed_nodes.loc[passed_nodes.node_id.isin(node_ids),['date_time','inner_movement','num_cases']]
-
-		history['degree'] = history.inner_movement*history.num_cases
-		
-		internal_degree = history[['date_time', 'degree']].groupby('date_time').sum().reset_index().sort_values('date_time').degree.values
-		internal_movement = history[['date_time', 'inner_movement']].groupby('date_time').sum().reset_index().sort_values('date_time').inner_movement.values
-		internal_cases = history[['date_time', 'num_cases']].groupby('date_time').sum().reset_index().sort_values('date_time').num_cases.values
-		
-
-		final_dict = {}
-		for i in range(0, days_back):
-			day = days_back - i
-			# values
-			final_dict['interal_movement_{}'.format(day)] = internal_movement[i]
-			final_dict['internal_degree_{}'.format(day)] = internal_degree[i]
-			final_dict['internal_cases_{}'.format(day)] = internal_cases[i]
-			final_dict['in_degree_{}'.format(day)] = in_degree[i]
-			final_dict['in_movement_{}'.format(day)] = in_movement[i]
-			final_dict['in_cases_{}'.format(day)] = in_cases[i]
-
-		final_dict['elapsed_days'] = passed_nodes.day.max() + 1
-
-			
-
+		final_dict = build_prediction_input_for_nodes(node_ids, passed_nodes, passed_edges_all, days_back)
 
 		frame = pd.DataFrame(final_dict, index = [0])
 		frame['current_date'] = current_date
@@ -319,6 +259,67 @@ def build_prediction_dataset_for_nodes(node_ids, nodes, edges, days_back, days_a
 		df_ml = df_ml[df_ml.elapsed_days <= max_day]
 	
 	return(df_ml)
+
+
+
+
+def build_prediction_input_for_nodes(node_ids, passed_nodes, passed_edges_all, days_back):
+	'''
+	Contruct the input for a node.
+
+	Returns the strucutre in a dictionary
+	'''
+
+	back_dates = passed_nodes[['date_time']].drop_duplicates().sort_values('date_time')
+		
+	# End
+	passed_edges_end = passed_edges_all.loc[(passed_edges_all.end_id.isin(node_ids))]
+	passed_edges_end = passed_edges_end[['date_time','start_id','movement']].rename(columns = {'start_id':'node_id'})
+
+	
+	passed_edges = pd.concat([passed_edges_end], ignore_index = True)
+	
+	# Attaches number of cases and calculates the in_degree
+	passed_edges = passed_edges.merge(passed_nodes[['date_time','node_id', 'num_cases']], on = ['date_time','node_id'])
+	passed_edges['degree'] = passed_edges.movement*passed_edges.num_cases
+	
+	# Sets to zero the missing values
+	passed_edges = back_dates.merge(passed_edges, on = ['date_time'], how = 'left').fillna(0)
+
+	#print()
+
+	# Calculates in degree
+	in_degree = passed_edges[['date_time', 'degree']].groupby('date_time').sum().reset_index().sort_values('date_time').degree.values
+	in_movement = passed_edges[['date_time', 'movement']].groupby('date_time').sum().reset_index().sort_values('date_time').movement.values
+	in_cases = passed_edges[['date_time', 'num_cases']].groupby('date_time').sum().reset_index().sort_values('date_time').num_cases.values
+	
+	# Calculates the passed internal movement and internal degree
+	history = passed_nodes.loc[passed_nodes.node_id.isin(node_ids),['date_time','inner_movement','num_cases']]
+
+
+	history['degree'] = history.inner_movement*history.num_cases
+	
+	internal_degree = history[['date_time', 'degree']].groupby('date_time').sum().reset_index().sort_values('date_time').degree.values
+	internal_movement = history[['date_time', 'inner_movement']].groupby('date_time').sum().reset_index().sort_values('date_time').inner_movement.values
+	internal_cases = history[['date_time', 'num_cases']].groupby('date_time').sum().reset_index().sort_values('date_time').num_cases.values
+	
+
+	final_dict = {}
+	for i in range(0, days_back):
+		day = days_back - i
+		# values
+		final_dict['interal_movement_{}'.format(day)] = internal_movement[i]
+		final_dict['internal_degree_{}'.format(day)] = internal_degree[i]
+		final_dict['internal_cases_{}'.format(day)] = internal_cases[i]
+		final_dict['in_degree_{}'.format(day)] = in_degree[i]
+		final_dict['in_movement_{}'.format(day)] = in_movement[i]
+		final_dict['in_cases_{}'.format(day)] = in_cases[i]
+
+	final_dict['elapsed_days'] = passed_nodes.day.max() + 1
+
+
+
+	return(final_dict)
 
 
 
