@@ -85,19 +85,19 @@ Mexico,mexico,unify,unifiers,1,NO,universal_generic_unifier,python,Mexico mexico
 Mexico,mexico,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Mexico mexico 10
 Mexico,mexico,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,Mexico mexico
 Mexico,mexico,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Mexico mexico all
-Colombia,colombia,POS,analysis,1,NO,location_selected_polygon_prediction_analysis,python,Colombia colombia community 0.8 20
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community ibague 73001 Ibagué-Tolima
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community ibague 73001 Ibagué-Tolima 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community ibague 73001 Ibagué-Tolima
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community popayan 19001 Popayán-Cauca
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community popayan 19001 Popayán-Cauca 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community popayan 19001 Popayán-Cauca
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community villavicencio 50001 Villavicencio-Meta
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community villavicencio 50001 Villavicencio-Meta 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community villavicencio 50001 Villavicencio-Meta
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community santa_marta 47001 SantaMarta-Magdalena
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community santa_marta 47001 SantaMarta-Magdalena 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community santa_marta 47001 SantaMarta-Magdalena
+Colombia,colombia,POS,analysis,1,YES,location_selected_polygon_prediction_analysis,python,Colombia colombia community 0.8 20
+Colombia,colombia,POS,analysis,1,YES,neighbors_polygon_extraction,python,colombia community ibague 73001 Ibagué-Tolima
+Colombia,colombia,POS,analysis,2,YES,polygon_prediction_dataset_builder,python,colombia community ibague 73001 Ibagué-Tolima 20
+Colombia,colombia,POS,analysis,3,YES,polygon_prediction_analysis,python,colombia community ibague 73001 Ibagué-Tolima
+Colombia,colombia,POS,analysis,1,YES,neighbors_polygon_extraction,python,colombia community popayan 19001 Popayán-Cauca
+Colombia,colombia,POS,analysis,2,YES,polygon_prediction_dataset_builder,python,colombia community popayan 19001 Popayán-Cauca 20
+Colombia,colombia,POS,analysis,3,YES,polygon_prediction_analysis,python,colombia community popayan 19001 Popayán-Cauca
+Colombia,colombia,POS,analysis,1,YES,neighbors_polygon_extraction,python,colombia community villavicencio 50001 Villavicencio-Meta
+Colombia,colombia,POS,analysis,2,YES,polygon_prediction_dataset_builder,python,colombia community villavicencio 50001 Villavicencio-Meta 20
+Colombia,colombia,POS,analysis,3,YES,polygon_prediction_analysis,python,colombia community villavicencio 50001 Villavicencio-Meta
+Colombia,colombia,POS,analysis,1,YES,neighbors_polygon_extraction,python,colombia community santa_marta 47001 SantaMarta-Magdalena
+Colombia,colombia,POS,analysis,2,YES,polygon_prediction_dataset_builder,python,colombia community santa_marta 47001 SantaMarta-Magdalena 20
+Colombia,colombia,POS,analysis,3,YES,polygon_prediction_analysis,python,colombia community santa_marta 47001 SantaMarta-Magdalena
 Colombia,colombia,POS,analysis,4,YES,location_prediction_by_polygon_union,python,Colombia colombia community
 Colombia,colombia,POS,analysis,3,NO,polygon_info_timewindow,python,colombia geometry 5 days
 Colombia,colombia,POS,analysis,3,NO,generate_alert_file,python,colombia geometry 5 days

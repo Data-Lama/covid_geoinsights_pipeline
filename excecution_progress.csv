@@ -1,3 +1,16 @@
 time,script_name,parameters,result
-2020-07-30 21:53:30.305754,location_prediction_by_polygon_union.py,Colombia colombia community,0
-2020-07-30 21:53:31.354224,copy_report_files.py,nan,256
+2020-07-31 19:11:35.416713,location_selected_polygon_prediction_analysis.py,Colombia colombia community 0.8 20,0
+2020-07-31 19:17:57.286955,neighbors_polygon_extraction.py,colombia community ibague 73001 Ibagué-Tolima,0
+2020-07-31 19:24:27.834861,neighbors_polygon_extraction.py,colombia community popayan 19001 Popayán-Cauca,0
+2020-07-31 19:30:50.554321,neighbors_polygon_extraction.py,colombia community villavicencio 50001 Villavicencio-Meta,0
+2020-07-31 19:37:32.758377,neighbors_polygon_extraction.py,colombia community santa_marta 47001 SantaMarta-Magdalena,0
+2020-07-31 19:42:57.877869,polygon_prediction_dataset_builder.py,colombia community ibague 73001 Ibagué-Tolima 20,0
+2020-07-31 19:48:48.490023,polygon_prediction_dataset_builder.py,colombia community popayan 19001 Popayán-Cauca 20,0
+2020-07-31 19:53:46.035712,polygon_prediction_dataset_builder.py,colombia community villavicencio 50001 Villavicencio-Meta 20,0
+2020-07-31 19:58:51.915246,polygon_prediction_dataset_builder.py,colombia community santa_marta 47001 SantaMarta-Magdalena 20,0
+2020-07-31 19:59:34.202597,polygon_prediction_analysis.py,colombia community ibague 73001 Ibagué-Tolima,0
+2020-07-31 20:00:17.043105,polygon_prediction_analysis.py,colombia community popayan 19001 Popayán-Cauca,0
+2020-07-31 20:00:58.953257,polygon_prediction_analysis.py,colombia community villavicencio 50001 Villavicencio-Meta,0
+2020-07-31 20:01:42.484951,polygon_prediction_analysis.py,colombia community santa_marta 47001 SantaMarta-Magdalena,0
+2020-07-31 20:01:45.653237,location_prediction_by_polygon_union.py,Colombia colombia community,0
+2020-07-31 20:01:46.751577,copy_report_files.py,nan,0

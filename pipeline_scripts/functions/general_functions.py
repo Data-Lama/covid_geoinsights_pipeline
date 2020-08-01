@@ -248,3 +248,15 @@ def get_std_external_movement(df_nodes):
 	return df_nodes.group_by('node_id').std()
 
 
+def smooth_curve(ser, days):
+    '''
+    Method that smoothes a curve given the days and preserves the integral
+    '''
+    
+    total = ser.sum()
+    
+    # Smoothes
+    resp =  ser.rolling(days,  min_periods=1).mean()
+    resp = resp + (total - resp.sum())/resp.size
+    
+    return(resp)

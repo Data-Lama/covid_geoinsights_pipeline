@@ -210,7 +210,7 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 	print(ident + '   Plots Simulations')
 
 	df_plot = df_simulations.copy()
-	df_plot['Porcentaje Movilidad (%)'] = df_plot['ratio'].apply(lambda r: int(100*r)).astype(int)
+	df_plot['Movilidad'] = df_plot['ratio'].apply(lambda r: f"{int(100*r)}%")
 
 	# Plots
 	fig, ax = plt.subplots(2,1, figsize=(15,8))
@@ -218,8 +218,8 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 	fig.suptitle('Simulación de Cambio en la Movilidad para {}'.format(polygon_display_name), fontsize=suptitle_font_size)
 
 	# Plot individual Lines
-	sns.lineplot(x = 'target_date', y = 'predicted_num_cases', hue = 'Porcentaje Movilidad (%)', data = df_plot, ax = ax[0])
-	sns.lineplot(x = 'target_date', y = 'predicted_num_cases_accum', hue = 'Porcentaje Movilidad (%)', data = df_plot, ax = ax[1])
+	sns.lineplot(x = 'target_date', y = 'predicted_num_cases', hue = 'Movilidad', data = df_plot, ax = ax[0])
+	sns.lineplot(x = 'target_date', y = 'predicted_num_cases_accum', hue = 'Movilidad', data = df_plot, ax = ax[1])
 
 
 	# Plot titles

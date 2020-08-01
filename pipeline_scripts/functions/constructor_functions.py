@@ -19,7 +19,7 @@ import geo_functions as geo
 km_constant = geo.km_constant
 
 
-
+import general_functions as gf
 
 
 def build_graphs(polygons, cases, movement, population):
@@ -210,7 +210,7 @@ def build_prediction_dataset_for_nodes(node_ids, nodes, edges, days_back, days_a
 
 	nodes.sort_values(['day','node_id'], inplace = True)
 	for n_id in nodes.node_id.unique():
-		nodes.loc[nodes.node_id == n_id,'num_cases'] = nodes[nodes.node_id == n_id].num_cases.rolling(smooth_days, min_periods=1).mean()
+		nodes.loc[nodes.node_id == n_id,'num_cases'] = gf.smooth_curve(nodes[nodes.node_id == n_id].num_cases, smooth_days )
 
 
 	date_min = nodes.date_time.min() + timedelta(days = days_back)

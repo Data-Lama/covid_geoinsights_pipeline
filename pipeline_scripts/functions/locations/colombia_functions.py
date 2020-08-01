@@ -88,7 +88,7 @@ class Unifier(GenericUnifier):
 		df = df[['date_time','geo_id','location','lon','lat', 'num_cases', 'num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house']]
 
 		# Removes last day (usually is incomplete)
-		df = df[df['date_time'] < df['date_time'].max()].copy()
+		#df = df[df['date_time'] < df['date_time'].max()].copy()
 
 		return(df)	
 

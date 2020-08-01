@@ -15,6 +15,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import constants as con
+import general_functions as gf
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -24,6 +25,7 @@ sns.set_style("whitegrid")
 from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
+
 
 
 ident = '         '
@@ -118,7 +120,8 @@ for agglomeration_method in agglomeration_methods:
     df_real_cases = df_real_cases.groupby('target_date').sum().reset_index()
 
     # Smoothes
-    df_real_cases['cases'] = df_real_cases['cases'].rolling(con.smooth_days, min_periods=1).mean()
+    df_real_cases['cases'] = gf.smooth_curve(df_real_cases['cases'], con.smooth_days )
+
 
     df_real_cases['cases_accum'] = df_real_cases['cases'].rolling(min_periods=1, window=df_real_cases.shape[0]).sum()
 
@@ -231,7 +234,22 @@ for agglomeration_method in agglomeration_methods:
     df_plot = df_simulations.copy()
 
 
-    df_plot['Porcentaje Movilidad (%)'] = df_plot['ratio'].apply(lambda r: int(100*r)).astype(int)
+    def get_legend(ratio):
+
+
+        if ratio == 1:
+            return('Sin Cambio')
+
+        elif ratio < 1:
+            return(f'Disminución {int(np.round(100*(1-ratio)))}%')
+
+        else:
+            return(f'Aumento {int(np.round(100*(ratio-1)))}%')
+
+
+
+    df_plot['Movilidad'] = df_plot.ratio.apply(get_legend)
+
 
     # Plots
     fig, ax = plt.subplots(2,1, figsize=(15,8))
@@ -239,8 +257,8 @@ for agglomeration_method in agglomeration_methods:
     fig.suptitle('Simulación de Cambio en la Movilidad para {}'.format(location_name), fontsize=suptitle_font_size)
 
     # Plot individual Lines
-    sns.lineplot(x = 'target_date', y = 'predicted_num_cases', hue = 'Porcentaje Movilidad (%)', data = df_plot, ax = ax[0])
-    sns.lineplot(x = 'target_date', y = 'predicted_num_cases_accum', hue = 'Porcentaje Movilidad (%)', data = df_plot, ax = ax[1])
+    sns.lineplot(x = 'target_date', y = 'predicted_num_cases', hue = 'Movilidad', data = df_plot, ax = ax[0])
+    sns.lineplot(x = 'target_date', y = 'predicted_num_cases_accum', hue = 'Movilidad', data = df_plot, ax = ax[1])
 
 
     # Plot titles

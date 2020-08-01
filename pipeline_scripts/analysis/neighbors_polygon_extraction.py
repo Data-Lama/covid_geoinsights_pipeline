@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set_style("whitegrid")
 
+import constants as con
 
 #Directories
 from global_config import config
@@ -52,7 +53,7 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
     lag = 0
     strech = 30
     k = None # Includes all neighbors
-    smooth_days = 2
+    smooth_days = con.smooth_days
 
 
     # Plotting

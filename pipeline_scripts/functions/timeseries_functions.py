@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import os
 
+import general_functions as gf
 
 #Directories
 from global_config import config
@@ -337,7 +338,7 @@ def extract_all_timeseries_cases(locations, agglomeration_method, lag = 0, accum
 			df_cases = df_cases[['day','num_cases']].merge(pd.DataFrame({'day':range(df_cases.day.max() + 1)}), on = 'day', how = 'right').fillna(0).sort_values('day')
 			
 			# Smoothes
-			df_cases['num_cases'] = df_cases.num_cases.rolling(smooth_days, min_periods=1).mean()
+			df_cases['num_cases'] = gf.smooth_curve(df_cases['num_cases'], smooth_days )
 
 			if accum:
 				df_cases = accumulate_timeseries(df_cases, 'num_cases')
@@ -423,7 +424,8 @@ def extract_all_timeseries_movement(locations, agglomeration_method, movement_ty
 			df_mov = df_mov[['day','movement']].merge(pd.DataFrame({'day':range(df_mov.day.max() + 1)}), on = 'day', how = 'right').fillna(0).sort_values('day')
 			
 			# Smoothes
-			df_mov['movement'] = df_mov.movement.rolling(smooth_days, min_periods=1).mean()
+			df_mov['movement'] =  gf.smooth_curve(df_mov['movement'], smooth_days )
+
 
 			if accum:
 				df_mov = accumulate_timeseries(df_mov, 'movement')
