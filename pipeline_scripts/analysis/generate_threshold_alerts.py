@@ -101,7 +101,7 @@ first_day = pd.Timestamp('today') - datetime.timedelta(days = WINDOW_SIZE)
 
 # Get nodes
 # df_nodes_recent = df_nodes[df_nodes['date_time'] >= first_day]
-df_nodes_recent = df_nodes.loc[df_nodes['date_time'] >= first_day]
+df_nodes_recent = df_nodes.loc[df_nodes['date_time'] >= first_day].copy()
 df_nodes_recent['external_movement'] = df_nodes_recent.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time, df_edges), axis=1)
 
 
@@ -190,7 +190,7 @@ df_alerts['max_alert_color'] = df_alerts.apply(lambda x: set_color(x.max_alert),
 # df_alerts.to_csv(os.path.join(output_file_path, 'alerts.csv'), index=False)
 
 # Write alerts table
-red_alerts = df_alerts.loc[(df_alerts['max_alert'] == 'ROJO')]
+red_alerts = df_alerts.loc[(df_alerts['max_alert'] == 'ROJO')].copy()
 red_alerts.sort_values(by=['Departamento','Municipio'], inplace=True)
 red_alerts.rename(columns={'internal_alert': 'Alerta interna (movimiento)', 'community_name':'Unidad funcional',
 'external_alert':'Alerta externa (movimiento)', 'alert_first_case':'Alerta de primer caso detectado'}, inplace=True)
