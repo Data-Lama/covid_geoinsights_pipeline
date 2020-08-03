@@ -130,7 +130,13 @@ for agglomeration_method in agglomeration_methods:
 		df_cases_other_date = pd.read_csv(os.path.join(raw_folder_location, 'cases/cases_raw.csv'), parse_dates = ['fecha reporte web', 'Fecha de notificación'], 
 			date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
 
-		df_cases_other_date = df_cases_other_date[[date]].rename(columns = {date:'date_time'})		
+		df_cases_other_date = df_cases_other_date[[date]].rename(columns = {date:'date_time'})
+
+
+		# If max date is established
+		#df_cases_other_date = df_cases_other_date[df_cases_other_date.date_time < pd.to_datetime('2020-08-01')].copy()		
+
+
 		df_cases_other_date['value'] = 1
 		df_cases_other_date = df_cases_other_date[['date_time','value']].groupby('date_time').sum().reset_index()
 
