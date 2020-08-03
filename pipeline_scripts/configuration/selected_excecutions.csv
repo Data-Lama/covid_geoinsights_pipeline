@@ -101,7 +101,7 @@ Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia 
 Colombia,colombia,POS,analysis,4,NO,location_prediction_by_polygon_union,python,Colombia colombia community
 Colombia,colombia,POS,analysis,3,NO,polygon_info_timewindow,python,colombia geometry 5 days
 Colombia,colombia,POS,analysis,3,NO,generate_alert_file,python,colombia geometry 5 days
-Colombia,colombia,POS,analysis,3,YES,generate_threshold_alerts,python,colombia geometry min_record
+Colombia,colombia,POS,analysis,3,NO,generate_threshold_alerts,python,colombia geometry min_record
 Colombia,colombia,POS,analysis,3,NO,choropleth_maps,python,colombia geometry
 Colombia,colombia,POS,analysis,3,NO,general_statistics,python,colombia geometry
 Colombia,colombia,POS,analysis,3,NO,general_statistics,python,colombia community

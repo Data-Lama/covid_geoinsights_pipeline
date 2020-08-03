@@ -1,3 +1,2 @@
 time,script_name,parameters,result
-2020-08-02 18:37:28.573139,generate_threshold_alerts.py,colombia geometry min_record,0
-2020-08-02 18:37:29.641263,copy_report_files.py,nan,0
+2020-08-02 19:04:27.839357,copy_report_files.py,nan,0
