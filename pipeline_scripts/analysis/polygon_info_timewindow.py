@@ -7,13 +7,9 @@ and the other the time-window going forward and including from t_0. They both ha
 
 The script calculates for each node of the given agglomeration.
     1. num_cases: number of cases in the node averaged over the time window
-    2. inner_movement: internal movement in the node averaged over the time window
-    3. external_movement: external movement between the node and its imediate neighbors over the time window
-    4. external_num_cases: number of cases in the node's imediate neighbors over the time window
-    5. delta_num_cases: the percentage increase of cases in the node 
-    6. delta_inner_movement: the percentage increase of movement in the node 
-    7. delta_external_cases: the percentage increase of cases in the neighboring nodes
-    8. delta_external_movement: the percentage increase of movement between the node and its imediate neighbors
+    2. external_num_cases: number of cases in the node's imediate neighbors over the time window
+    3. delta_num_cases: the percentage increase of cases in the node 
+    4. delta_external_cases: the percentage increase of cases in the neighboring nodes
 
     ** Deltas are calculated as follows:
     backward-window: ((t_0 - t_-1) / t_-1)
@@ -31,7 +27,7 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
-from pipeline_scripts.functions.general_functions import load_README, get_neighbors_cases_average, get_mean_external_movement
+from pipeline_scripts.functions.general_functions import load_README, get_neighbor_cases_total
 
 # Direcotries
 from global_config import config
@@ -45,26 +41,19 @@ window_size_parameter = sys.argv[3] # window size
 time_unit = sys.argv[4] # time unit for window [days, hours]
 
 # Get name of files
-constructed_file_path = os.path.join(data_dir, 'data_stages', location_name, 'constructed', location_folder, 'daily_graphs')
+agglomerated_file_path = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', location_folder)
 output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window')
-edges = os.path.join(constructed_file_path, 'edges.csv')
+cases = os.path.join(agglomerated_file_path, 'cases.csv')
+movement = os.path.join(agglomerated_file_path, 'movement.csv')
 
-if len(sys.argv) < 6:
-    date_zero = None
-    output_backward_file = os.path.join(output_file_path, 'polygon_info_backward_window_{}{}.csv'.format(window_size_parameter,time_unit))
-    output_forward_file = os.path.join(output_file_path,'polygon_info_forward_window_{}{}.csv'.format(window_size_parameter,time_unit))
-    output_forward_file = os.path.join(output_file_path,'polygon_info_forward_window_{}{}.csv'.format(window_size_parameter,time_unit))
-    output_total_file = os.path.join(output_file_path,'polygon_info_total_window_{}{}.csv'.format(window_size_parameter,time_unit))
-    output_readme_file = os.path.join(output_file_path,'polygon_info_readme_{}{}.txt'.format(window_size_parameter,time_unit))
-    nodes = os.path.join(constructed_file_path, 'nodes.csv')
-else:
-    date_zero = sys.argv[5] # time around which to calculate window
-    output_backward_file = os.path.join(output_file_path,'polygon_info_backward_window_{}{}-{}.csv'.format(window_size_parameter,time_unit,date_zero))
-    output_forward_file = os.path.join(output_file_path,'polygon_info_forward_window_{}{}-{}.csv'.format(window_size_parameter,time_unit,date_zero))
-    output_forward_file = os.path.join(output_file_path,'polygon_info_forward_window_{}{}-{}.csv'.format(window_size_parameter,time_unit,date_zero))
-    output_total_file = os.path.join(output_file_path,'polygon_info_total_window_{}{}-{}.csv'.format(window_size_parameter,time_unit,date_zero))
-    output_readme_file = os.path.join(output_file_path,'polygon_info_readme_{}{}-{}.txt'.format(window_size_parameter,time_unit,date_zero))
-    nodes = os.path.join(constructed_file_path, 'nodes.csv')
+date_zero = None
+output_backward_delta_file = os.path.join(output_file_path, 'deltas_backward_window_{}{}.csv'.format(window_size_parameter,time_unit))
+output_forward_delta_file = os.path.join(output_file_path,'deltas_forward_window_{}{}.csv'.format(window_size_parameter,time_unit))
+output_total_delta_file = os.path.join(output_file_path,'deltas_total_window_{}{}.csv'.format(window_size_parameter,time_unit))
+output_backward_file = os.path.join(output_file_path, 'backward_window_{}{}.csv'.format(window_size_parameter,time_unit))
+output_forward_file = os.path.join(output_file_path,'forward_window_{}{}.csv'.format(window_size_parameter,time_unit))
+output_total_file = os.path.join(output_file_path,'total_window_{}{}.csv'.format(window_size_parameter,time_unit))
+output_readme_file = os.path.join(output_file_path,'polygon_info_readme_{}{}.txt'.format(window_size_parameter,time_unit))
 
 ident = '         '
 
@@ -88,20 +77,17 @@ margins = { 'hours': datetime.timedelta(hours = window_size),
 if not os.path.isdir(output_file_path):
     os.makedirs(output_file_path)
 
-# Get nodes and edges
-df_nodes = pd.read_csv(nodes, parse_dates=['date_time'])
-df_edges = pd.read_csv(edges, parse_dates=['date_time'])
+#Load movement and cases
+try:  
+    df_cases = pd.read_csv(cases, low_memory=False, parse_dates=['date_time'])
+except:
+    df_cases = pd.read_csv(cases, low_memory=False, encoding = 'latin-1', parse_dates=['date_time'])
 
-# # Visualize node trends
-# nodes = df_nodes['node_id'].unique()
-# print(len(nodes))
-# node_int = random.randint(1,1101)
-# print(node_int)
-# node = nodes[node_int]
-# df_rand_node = df_nodes[df_nodes['node_id'] == node]
-# print(df_rand_node.head())
-# plt.scatter(x=df_rand_node['date_time'], y=df_rand_node['inner_movement'])
-# plt.show()
+try:  
+    df_movement = pd.read_csv(movement, low_memory=False, parse_dates=['date_time'])
+except:
+    df_movement = pd.read_csv(movement, low_memory=False, encoding = 'latin-1', parse_dates=['date_time']) 
+
 
 # Get nodes within time window. Date zero will be counted with backward window.
 margin = margins[time_unit] 
@@ -136,23 +122,6 @@ with open(output_readme_file, 'w') as f:
 
 
 
-def get_sinlge_window(min_time, max_time):
-    df_window = df_nodes.loc[(df_nodes['date_time'] >= min_time) & (df_nodes['date_time'] < max_time)]
-
-    # Calculate average number of cases and inner movement
-    df_window_avg = df_window.groupby(['node_id']).mean().drop(['day', 'population'], axis=1).reset_index()
-
-    # Add neighbor_cases_average backward window
-    df_window_avg_info = pd.DataFrame()
-    df_window_avg_info['node_id'] = df_window['node_id']
-    df_window_avg_info['external_movement'] = df_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time, df_edges), axis=1).fillna(0)
-    df_window_avg_info['external_num_cases'] = df_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time, df_edges, df_nodes), axis=1).fillna(0)
-    df_window_avg_info = df_window_avg_info.groupby(['node_id']).mean().reset_index()
-    df_final = df_window_avg_info.merge(df_window_avg, on=['node_id'], how='outer')
-    df_final = df_final.set_index(df_final['node_id']).drop(['node_id'], axis=1)
-
-    return df_final
-
 def calculate_delta(t_0, t_1):
     df_delta = (t_1.sub(t_0, axis='columns')).divide(t_0, axis='columns').fillna(0)
     df_delta = df_delta.rename(columns = {'external_movement':'delta_external_movement',
@@ -165,87 +134,58 @@ def calculate_delta(t_0, t_1):
 def get_window_information(date_zero, min_time, max_time):
 
     # Get windows
-    df_backward_window = df_nodes.loc[(df_nodes['date_time'] < date_zero) & (df_nodes['date_time'] >= min_time)]
-    df_middle_window = df_nodes.loc[(df_nodes['date_time'] >= date_zero) & (df_nodes['date_time'] < max_time - margin)]
-    df_forward_window = df_nodes.loc[(df_nodes['date_time'] >= date_zero + margin) & (df_nodes['date_time'] <= max_time)]
-    df_total_window = df_nodes.loc[(df_nodes['date_time'] > min_time) & (df_nodes['date_time'] <= max_time)]
-
-    # Calculate average number of cases and inner movement 
-    df_cases_avg_backward = df_backward_window.groupby(['node_id']).mean().drop(['day', 'population'], axis=1).reset_index()
-    df_cases_avg_middle = df_middle_window.groupby(['node_id']).mean().drop(['day', 'population'], axis=1).reset_index()
-    df_cases_avg_forward = df_forward_window.groupby(['node_id']).mean().drop(['day', 'population'], axis=1).reset_index()
-    df_cases_avg_total = df_total_window.groupby(['node_id']).mean().drop(['day', 'population'], axis=1).reset_index()
+    df_backward_window = df_cases.loc[(df_cases['date_time'] < date_zero) & (df_cases['date_time'] >= min_time)].copy()
+    df_middle_window = df_cases.loc[(df_cases['date_time'] >= date_zero) & (df_cases['date_time'] < max_time - margin)].copy()
+    df_forward_window = df_cases.loc[(df_cases['date_time'] >= date_zero + margin) & (df_cases['date_time'] <= max_time)].copy()
+    df_total_window = df_cases.loc[(df_cases['date_time'] > min_time) & (df_cases['date_time'] <= max_time)].copy()
 
     # Add neighbor_cases_average backward window
-    df_backward_window_info = pd.DataFrame()
-    df_backward_window_info['node_id'] = df_backward_window['node_id']
-    df_backward_window_info['external_movement'] = df_backward_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time, df_edges), axis=1).fillna(0)
-    df_backward_window_info['external_num_cases'] = df_backward_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time, df_edges, df_nodes), axis=1).fillna(0)
-    df_backward_window_info = df_backward_window_info.groupby(['node_id']).mean().reset_index()
-    df_final_backward = df_backward_window_info.merge(df_cases_avg_backward, on=['node_id'], how='outer')
-    df_final_backward = df_final_backward.set_index(df_final_backward['node_id']).drop(['node_id'], axis=1)
+    df_backward_window["external_num_cases"] = df_backward_window.apply(lambda x: get_neighbor_cases_total(x.poly_id, x.date_time, df_movement, df_cases), axis=1)
+    df_backward_window =  df_backward_window.groupby("poly_id")[["num_cases", "external_num_cases"]].mean()
 
+    # Add neighbor_cases_average middle window
+    df_middle_window["external_num_cases"] = df_middle_window.apply(lambda x: get_neighbor_cases_total(x.poly_id, x.date_time, df_movement, df_cases), axis=1)
+    df_middle_window =  df_middle_window.groupby("poly_id")[["num_cases", "external_num_cases"]].mean()
+    
     # Add neighbor_cases_average forward window
-    df_forward_window_info = pd.DataFrame()
-    df_forward_window_info['node_id'] = df_forward_window['node_id']
-    df_forward_window_info['external_movement'] = df_forward_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time, df_edges), axis=1).fillna(0)
-    df_forward_window_info['external_num_cases'] = df_forward_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time, df_edges, df_nodes), axis=1).fillna(0)
-    df_forward_window_info = df_forward_window_info.groupby(['node_id']).mean().reset_index()
-    df_final_forward = df_forward_window_info.merge(df_cases_avg_forward, on=['node_id'], how='outer')
-    df_final_forward = df_final_forward.set_index(df_final_forward['node_id']).drop(['node_id'], axis=1)
+    df_forward_window["external_num_cases"] = df_forward_window.apply(lambda x: get_neighbor_cases_total(x.poly_id, x.date_time, df_movement, df_cases), axis=1)
+    df_forward_window =  df_forward_window.groupby("poly_id")[["num_cases", "external_num_cases"]].mean()
+    
+    # Add neighbor_cases_average total window
+    df_total_window["external_num_cases"] = df_total_window.apply(lambda x: get_neighbor_cases_total(x.poly_id, x.date_time, df_movement, df_cases), axis=1)
+    df_total_window =  df_total_window.groupby("poly_id")[["num_cases", "external_num_cases"]].mean()
+    
+    return [df_backward_window, df_middle_window, df_forward_window, df_total_window]
 
-    # Add neighbor_cases_average to middle window
-    df_middle_window_info = pd.DataFrame()
-    df_middle_window_info['node_id'] = df_middle_window['node_id']
-    df_middle_window_info['external_movement'] = df_middle_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time, df_edges), axis=1).fillna(0)
-    df_middle_window_info['external_num_cases'] = df_middle_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time, df_edges, df_nodes), axis=1).fillna(0)
-    df_middle_window_info = df_middle_window_info.groupby(['node_id']).mean().reset_index()
-    df_final_middle = df_middle_window_info.merge(df_cases_avg_middle, on=['node_id'], how='outer')
-    df_final_middle = df_final_middle.set_index(df_final_middle['node_id']).drop(['node_id'], axis=1)
-
-    # Add neighbor_cases_average to total window
-    df_total_window_info = pd.DataFrame()
-    df_total_window_info['node_id'] = df_total_window['node_id']
-    df_total_window_info['external_movement'] = df_total_window.apply(lambda x: get_mean_external_movement(x.node_id, x.date_time, df_edges), axis=1).fillna(0)
-    df_total_window_info['external_num_cases'] = df_total_window.apply(lambda x: get_neighbors_cases_average(x.node_id, x.date_time, df_edges, df_nodes), axis=1).fillna(0)
-    df_total_window_info = df_total_window_info.groupby(['node_id']).mean().reset_index()
-    df_final_total = df_total_window_info.merge(df_cases_avg_total, on=['node_id'], how='outer')
-    df_final_total = df_final_total.set_index(df_final_total['node_id']).drop(['node_id'], axis=1)
-
+def get_window_deltas(df_backward_window, df_middle_window, df_forward_window, df_total_window):
     ############# Calculate deltas ###############
     ##############################################
 
     # ((t_0 - t_-1) / t_-1)
-    df_delta_backward = (df_final_middle.sub(df_final_backward, axis='columns')).divide(df_final_backward, axis='columns').fillna(0)
-    df_delta_backward = df_delta_backward.rename(columns = {'external_movement':'delta_external_movement',
-                                                            'external_num_cases':'delta_external_num_cases',
-                                                            'inner_movement': 'delta_inner_movement',
+    df_delta_backward = (df_middle_window.sub(df_backward_window, axis='columns')).divide(df_backward_window, axis='columns').fillna(0)
+    df_delta_backward = df_delta_backward.rename(columns = {'external_num_cases':'delta_external_num_cases',
                                                             'num_cases': 'delta_num_cases'})
 
     # ((t_1 - t_0) / t_0)
-    df_delta_forward = (df_final_forward.sub(df_final_middle, axis='columns')).divide(df_final_middle, axis='columns').fillna(0)
-    df_delta_forward = df_delta_forward.rename(columns = {'external_movement':'delta_external_movement',
-                                                            'external_num_cases':'delta_external_num_cases',
-                                                            'inner_movement': 'delta_inner_movement',
+    df_delta_forward = (df_forward_window.sub(df_middle_window, axis='columns')).divide(df_middle_window, axis='columns').fillna(0)
+    df_delta_forward = df_delta_forward.rename(columns = {'external_num_cases':'delta_external_num_cases',
                                                             'num_cases': 'delta_num_cases'})
-
+    
     # ((t_1 - t_-1) / t_-1)
-    df_delta_total = (df_final_forward.sub(df_final_backward, axis='columns')).divide(df_final_backward, axis='columns').fillna(0)
-    df_delta_total = df_delta_total.rename(columns = {'external_movement':'delta_external_movement',
-                                                            'external_num_cases':'delta_external_num_cases',
-                                                            'inner_movement': 'delta_inner_movement',
+    df_delta_total = (df_forward_window.sub(df_backward_window, axis='columns')).divide(df_backward_window, axis='columns').fillna(0)
+    df_delta_total = df_delta_total.rename(columns = {'external_num_cases':'delta_external_num_cases',
                                                             'num_cases': 'delta_num_cases'})
 
-    # Add deltas
-    df_final_forward = df_final_forward.merge(df_delta_forward, left_index=True, right_index=True, how='outer').replace([np.inf, -np.inf], np.nan)
-    df_final_backward = df_final_backward.merge(df_delta_backward, left_index=True, right_index=True, how='outer').replace([np.inf, -np.inf], np.nan)
-    df_final_total = df_final_total.merge(df_delta_total, left_index=True, right_index=True, how='outer').replace([np.inf, -np.inf], np.nan)
-
-    return [df_final_backward, df_final_backward, df_final_total]
+    return [df_delta_backward, df_delta_forward, df_delta_total]
 
 windows = get_window_information(date_zero, min_time, max_time)
+deltas = get_window_deltas(windows[0], windows[1], windows[2], windows[3])
 
 # # Write to file
+deltas[0].to_csv(output_backward_delta_file)
+deltas[1].to_csv(output_forward_delta_file)
+deltas[2].to_csv(output_total_delta_file)
+
 windows[0].to_csv(output_backward_file)
-windows[1].to_csv(output_forward_file)
-windows[2].to_csv(output_total_file)
+windows[2].to_csv(output_forward_file)
+windows[3].to_csv(output_total_file)

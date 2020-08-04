@@ -115,13 +115,13 @@ min_inner_mov_day = get_day_max_min('inner_movement', df_nodes)[1]
 max_num_cases_day = get_day_max_min('num_cases', df_nodes)[0]
 min_num_cases_day = get_day_max_min('num_cases', df_nodes)[1]
 
-def new_cases():
+def new_cases(df_cases, window):
     # Get the number of polygons that reported having their first case in the last 5 days
     today = datetime.datetime.today()
-    x_days_ago = today - datetime.timedelta(days = WINDOW)
-    historic = df_nodes[df_nodes['date_time'] < x_days_ago]
-    historic_set = get_nodes_with_cases(historic)
-    current_set = get_nodes_with_cases(df_nodes)
+    x_days_ago = today - datetime.timedelta(days = window)
+    historic = df_cases[df_cases['date_time'] < x_days_ago]
+    historic_set = set(historic[historic["num_cases"] > 0]["poly_id"].unique())
+    current_set = set(df_cases[df_cases["num_cases"] > 0]["poly_id"].unique())
     intersection = current_set.intersection(historic_set)
 
     new_case_polygon = current_set - intersection
@@ -140,7 +140,7 @@ no_case_polygons_last_days = int((total_last_days.num_cases == 0).sum())
 
 
 stats = {
-    'num_first_case':len(new_cases()),
+    # 'num_first_case':len(new_cases()),
     'no_case_polygons_last_days':len(no_new_case_polygon),
     'day_max_mov': max_inner_mov_day['date'].strftime(date_format),
     'day_min_mov': min_inner_mov_day['date'].strftime(date_format),

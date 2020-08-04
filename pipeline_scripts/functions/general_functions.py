@@ -157,6 +157,18 @@ def get_neighbors(node_id, date_time, df_edges):
             neighbors = pd.unique(df_neighbors[['start_id', 'end_id']].values.ravel('K'))
             return neighbors[neighbors != node_id]
 
+def get_neighbors_poly(poly_id, date_time, df_movement):
+    df_neighbors = df_movement.loc[(df_movement['start_poly_id'] == poly_id) | (df_movement['end_poly_id'] == poly_id)]
+    if df_neighbors.dropna().empty:
+        return []
+    else:
+        df_neighbors = df_neighbors.loc[df_neighbors['date_time'] == date_time]
+        if df_neighbors.dropna().empty:
+            return []
+        else:
+            neighbors = pd.unique(df_neighbors[['start_poly_id', 'end_poly_id']].values.ravel('K'))
+            return neighbors[neighbors != poly_id]
+
 def get_neighbor_cases_average(neighbors, date_time, df_nodes):
     total = 0
     for node in neighbors:
@@ -180,6 +192,12 @@ def get_mean_external_movement(node_id, time, df_edges):
         else:
             return df_neighbors.sum()['movement']
 		
+def get_neighbor_cases_total(poly_id, date_time, df_movement, df_cases):
+	neighbors = get_neighbors_poly(poly_id, date_time, df_movement)
+	cases_neighbors = df_cases[df_cases["poly_id"].isin(neighbors)] 
+	cases_neighbors = cases_neighbors[cases_neighbors["date_time"] == date_time]
+	return cases_neighbors["num_cases"].sum()
+
 def get_min_average_mov(df_node):
     smallest = df_node.nsmallest(10, 'inner_movement').mean()
     return smallest['inner_movement']
@@ -205,37 +223,46 @@ def get_std_internal_movement(df_nodes):
 def get_min_external_movement(df_edges):
     return NotImplemented
 
-def get_mean_neighbor_movement(node_id, df_edges):
-    df_neighbors = df_edges.loc[(df_edges['start_id'] == node_id) | (df_edges['end_id'] == node_id)]
-    if df_neighbors.dropna().empty:
-        return 0
-    else:
-        df_neighbors = df_neighbors.groupby('date_time')['movement'].sum()
-        if df_neighbors.dropna().empty:
-            return 0
-        else:
-            return df_neighbors.mean()
-        
-def get_std_neighbor_movement(node_id, df_edges):
-    df_neighbors = df_edges.loc[(df_edges['start_id'] == node_id) | (df_edges['end_id'] == node_id)]
-    if df_neighbors.dropna().empty:
-        return 0
-    else:
-        df_neighbors = df_neighbors.groupby('date_time')['movement'].sum()
-        if df_neighbors.dropna().empty:
-            return 0
-        else:
-            return df_neighbors.std()
+def get_mean_neighbor_movement(node_id, df_edges, level):
+	keys = {"constructed": {"start":"start_id", "end":"end_id"},
+			"agglomerated": {"start":"start_poly_id", "end":"end_poly_id"}}
+	
+	df_neighbors = df_edges.loc[(df_edges[keys[level["start"]]] == node_id) | (df_edges[keys[level["end"]]] == node_id)]
+	if df_neighbors.dropna().empty:
+		return 0
+	else:
+		df_neighbors = df_neighbors.groupby('date_time')['movement'].sum()
+		if df_neighbors.dropna().empty:
+			return 0
+		else:
+			return df_neighbors.mean()
+	
 
-def get_external_movement_stats_overtime(df_nodes, df_edges):
-	df_external_movement = pd.DataFrame({'node_id':df_nodes['node_id'].unique()})
-	df_external_movement['mean_external_movement'] = df_external_movement.apply(lambda x: get_mean_neighbor_movement(x.node_id, df_edges), axis=1)
-	df_external_movement['std_external_movement'] = df_external_movement.apply(lambda x: get_std_neighbor_movement(x.node_id, df_edges), axis=1)
+def get_std_neighbor_movement(node_id, df_edges, level):
+	keys = {"constructed": {"start":"start_id", "end":"end_id"},
+			"agglomerated": {"start":"start_poly_id", "end":"end_poly_id"}}
+	df_neighbors = df_edges.loc[(df_edges[keys[level["start"]]] == node_id) | (df_edges[keys[level["end"]]] == node_id)]
+	if df_neighbors.dropna().empty:
+		return 0
+	else:
+		df_neighbors = df_neighbors.groupby('date_time')['movement'].sum()
+		if df_neighbors.dropna().empty:
+			return 0
+		else:
+			return df_neighbors.std()
+
+def get_external_movement_stats_overtime(df_nodes, df_edges, level):
+	keys = {"constructed": {"id":"node_id"},
+			"agglomerated": {"id":"poly_id"}}
+	
+	df_external_movement = pd.DataFrame({keys[level["id"]]:df_nodes[keys[level["id"]]].unique()})
+	df_external_movement['mean_external_movement'] = df_external_movement.apply(lambda x: get_mean_neighbor_movement(x.node_id, df_edges, level), axis=1)
+	df_external_movement['std_external_movement'] = df_external_movement.apply(lambda x: get_std_neighbor_movement(x.node_id, df_edges, level), axis=1)
 	df_external_movement['external_movement_one_std'] = df_external_movement['mean_external_movement'].add(df_external_movement['std_external_movement'])
 	df_external_movement['external_movement_one-half_std'] = df_external_movement['external_movement_one_std'].add(df_external_movement['std_external_movement'].divide(2))
 	df_external_movement['external_movement_two_std'] = df_external_movement['external_movement_one_std'].add(df_external_movement['std_external_movement'])
 	return df_external_movement
-
+	
 def get_internal_movement_stats_overtime(df_nodes):
 	df_internal_movement = pd.DataFrame({'node_id':df_nodes['node_id'].unique()})
 	df_internal_movement['mean_internal_movement'] = df_internal_movement.apply(lambda x: get_mean_internal_movement(df_nodes).at[int(x.node_id)], axis=1)
@@ -245,8 +272,38 @@ def get_internal_movement_stats_overtime(df_nodes):
 	df_internal_movement['internal_movement_two_std'] = df_internal_movement['internal_movement_one_std'].add(df_internal_movement['std_internal_movement'])
 	return df_internal_movement
 
+def get_mean_movement_stats_overtime(df_movement):
+
+	df_inner_movement = df_movement[df_movement['start_poly_id'] == df_movement['end_poly_id']].copy()
+	df_external_movement = df_movement[df_movement['start_poly_id'] != df_movement['end_poly_id']].copy()
+	df_external_movement = df_external_movement.groupby(["start_poly_id", "date_time"]).sum()
+	df_external_movement.reset_index(inplace=True)
+
+	df_inner_movement.rename(columns={"movement":"inner_movement", "start_poly_id":"poly_id"}, inplace=True)
+	df_inner_movement.drop(columns=["end_poly_id"], inplace=True)
+	df_external_movement.rename(columns={"movement":"external_movement", "start_poly_id":"poly_id"}, inplace=True)
+	df_external_movement.drop(columns=["end_poly_id"], inplace=True)
+
+	df_movement_stats = df_inner_movement.merge(df_external_movement, on=["poly_id", "date_time"], how="outer").fillna(0)
+	return df_movement_stats.groupby("poly_id").mean()
+
+def get_std_movement_stats_overtime(df_movement):
+
+	df_inner_movement = df_movement[df_movement['start_poly_id'] == df_movement['end_poly_id']].copy()
+	df_external_movement = df_movement[df_movement['start_poly_id'] != df_movement['end_poly_id']].copy()
+	df_external_movement = df_external_movement.groupby(["start_poly_id", "date_time"]).sum()
+	df_external_movement.reset_index(inplace=True)
+
+	df_inner_movement.rename(columns={"movement":"inner_movement", "start_poly_id":"poly_id"}, inplace=True)
+	df_inner_movement.drop(columns=["end_poly_id"], inplace=True)
+	df_external_movement.rename(columns={"movement":"external_movement", "start_poly_id":"poly_id"}, inplace=True)
+	df_external_movement.drop(columns=["end_poly_id"], inplace=True)
+
+	df_movement_stats = df_inner_movement.merge(df_external_movement, on=["poly_id", "date_time"], how="outer").fillna(0)
+	return df_movement_stats.groupby("poly_id").std()
+
 # returns dataframe with the standard deviation movement
 def get_std_external_movement(df_nodes):
-	return df_nodes.group_by('node_id').std()
+	return df_nodes.groupby('node_id').std()
 
 

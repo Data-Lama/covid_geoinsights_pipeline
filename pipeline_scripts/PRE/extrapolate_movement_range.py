@@ -35,12 +35,12 @@ transformed_movement_range_files = [f for f in os.listdir(output_file_path) if o
 movement_range_files = np.setdiff1d(original_movement_range_files,transformed_movement_range_files)
 print('{}Transforming {} movement range files.'.format(indent, len(movement_range_files)))
 
-def get_intersection_areas(polygon, gdf):
+def get_intersection_areas(polygon, gdf, pop_density):
     polygons = gdf[['external_polygon_id', 'geometry']]
     polygons['area'] = polygons['geometry'].area
     intersections = polygons['geometry'].intersection(polygon)
     polygons['intersections'] = intersections
-    df_polygons = polygons[~polygons['intersections'].is_empty]
+    df_polygons = polygons[~polygons['intersections'].is_empty].copy()
     df_polygons['area_intersection'] = polygons['intersections'].area
     df_polygons['area_proportion'] = df_polygons['area_intersection'].divide(df_polygons['area'])
     df_polygons.drop(columns=['intersections', 'geometry', 'area_intersection', 'area'], inplace=True)
@@ -53,7 +53,7 @@ def calculate_movement(intersections, df_movement_range):
     for i in intersections:
         external_id = i[0]
         factor = i[1]
-        movement = df_movement_range.at[external_id, 'all_day_bing_tiles_visited_relative_change']
+        movement = df_movement_range.at[external_id, 'all_day_bing_tiles_visited_relative_change'],
         total_movement += movement * factor
 
     return total_movement
@@ -78,8 +78,9 @@ def convert_movement_range(f, gdf_polygons):
             out.write("{},{}\n".format('poly_id', 'extrapolated_relative_movement'))
             for poly_id in gdf_polygons['poly_id'].unique():
                 polygon = gdf_polygons.loc[gdf_polygons['poly_id'] == poly_id, 'geometry']
+                pop_density = gdf_polygons.loc[gdf_polygons['poly_id'] == poly_id, 'pop_density']
                 polygon = polygon.to_numpy()[0]
-                intersections = get_intersection_areas(polygon, gdf_movement_range)
+                intersections = get_intersection_areas(polygon, gdf_movement_range, pop_density)
                 extrapolated_movement = calculate_movement(intersections, df_movement_range)
                 out.write("{},{}\n".format(poly_id, extrapolated_movement))
 
@@ -92,6 +93,7 @@ df_polygons['geometry'] = df_polygons['geometry'].apply(wkt.loads)
 gdf_polygons = gpd.GeoDataFrame(df_polygons, geometry='geometry')
 gdf_polygons.crs = 'epsg:4326'
 gdf_polygons = gdf_polygons.to_crs('epsg:3116')
+gdf_polygons["pop_density"] = gdf_polygons["attr_population"].divide(gdf_polygons["attr_area"])
 
 for f in movement_range_files:
     f = f.strip()
