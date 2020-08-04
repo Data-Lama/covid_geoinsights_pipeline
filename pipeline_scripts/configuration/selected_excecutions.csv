@@ -11,7 +11,7 @@ Colombia,colombia,construct,constructors,1,NO,universal_daily_graphs_constructor
 Colombia,colombia,analyse,analysis,1,NO,tda_script,r,Colombia colombia community
 Colombia,colombia,analyse,analysis,3,NO,movement_plots_script,python,Colombia colombia community
 Colombia,colombia,analyse,analysis,4,NO,movement_plots_script,r,Colombia colombia community 0.3 25
-Colombia,colombia,analyse,analysis,5,NO,movement_range_plots_script,python,Colombia colombia community
+Colombia,colombia,analyse,analysis,5,YES,movement_range_plots_script,python,Colombia colombia community
 Colombia,colombia,analyse,analysis,6,NO,agglomerated_units_plots_script,r,Colombia colombia community
 Colombia,colombia,analyse,analysis,7,NO,agglomerated_units_plots_script,python,Colombia colombia community
 Colombia,colombia,analyse,analysis,8,NO,neighbors_location_extraction,python,Colombia colombia community

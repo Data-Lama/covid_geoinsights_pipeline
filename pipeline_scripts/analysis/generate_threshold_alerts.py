@@ -210,7 +210,7 @@ df_alerts['first_case_color_alert'] = df_alerts.apply(lambda x: set_color(x.aler
 
 
 # Write alerts table
-red_alerts = df_alerts.loc[(df_alerts['max_alert'] == 'ROJO')]
+red_alerts = df_alerts.loc[(df_alerts['max_alert'] == 'ROJO')].copy()
 red_alerts.sort_values(by=['Departamento','Municipio'], inplace=True)
 red_alerts.rename(columns={'internal_alert': 'Alerta interna (movimiento)', 'community_name':'Unidad funcional',
 'external_alert':'Alerta externa (movimiento)', 'alert_first_case':'Alerta de primer caso detectado', 
