@@ -6,7 +6,7 @@ from shapely import wkt
 import geopandas as gpd
 
 # Import local modules
-from pipeline_scripts.functions.geo_functions import get_GADM_polygon
+from pipeline_scripts.functions.geo_functions import get_GADM_polygon, get_GADM_popdensity
 
 # Direcotries
 from global_config import config
@@ -22,7 +22,7 @@ indent = '         '
 # Get name of files
 constructed_file_path = os.path.join(data_dir, 'data_stages', location_name, 'constructed', location_folder, 'daily_graphs')
 movement_range_dir = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'movement_range')
-output_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'movement_range_by_{}'.format(location_folder))
+output_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'movement_range_by_{}_pop-density_2'.format(location_folder))
 polygons = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', location_folder, 'polygons.csv')
 
 # Check if folder exists
@@ -35,28 +35,33 @@ transformed_movement_range_files = [f for f in os.listdir(output_file_path) if o
 movement_range_files = np.setdiff1d(original_movement_range_files,transformed_movement_range_files)
 print('{}Transforming {} movement range files.'.format(indent, len(movement_range_files)))
 
-def get_intersection_areas(polygon, gdf, pop_density):
-    polygons = gdf[['external_polygon_id', 'geometry']]
+def get_intersection_areas(polygon, gdf):
+    polygons = gdf[['external_polygon_id', 'geometry', 'pop_density']].copy()
+    polygons['pop_density'] = polygons['pop_density']
     polygons['area'] = polygons['geometry'].area
     intersections = polygons['geometry'].intersection(polygon)
     polygons['intersections'] = intersections
     df_polygons = polygons[~polygons['intersections'].is_empty].copy()
     df_polygons['area_intersection'] = polygons['intersections'].area
-    df_polygons['area_proportion'] = df_polygons['area_intersection'].divide(df_polygons['area'])
-    df_polygons.drop(columns=['intersections', 'geometry', 'area_intersection', 'area'], inplace=True)
+    df_polygons['area_proportion'] = df_polygons['area_intersection'].multiply(df_polygons['pop_density'])
+    df_polygons.drop(columns=['intersections', 'geometry', 'area_intersection', 'area', 'pop_density'], inplace=True)
     df_polygons.dropna(inplace=True)
     return list(df_polygons.itertuples(index=False, name=None))
 
 def calculate_movement(intersections, df_movement_range):
     df_movement_range = df_movement_range.set_index('external_polygon_id')
     total_movement = 0
+    total_factor = 0
+    if intersections == []:
+        return 0
     for i in intersections:
         external_id = i[0]
         factor = i[1]
-        movement = df_movement_range.at[external_id, 'all_day_bing_tiles_visited_relative_change'],
+        total_factor += factor
+        movement = df_movement_range.at[external_id, 'all_day_bing_tiles_visited_relative_change']
         total_movement += movement * factor
 
-    return total_movement
+    return total_movement / total_factor
 
 def convert_movement_range(f, gdf_polygons):
     movement_range_file = os.path.join(movement_range_dir, f)
@@ -69,18 +74,19 @@ def convert_movement_range(f, gdf_polygons):
 
         # GADM geodataset originally crs = {epsg:4326}
         df_movement_range = pd.read_csv(movement_range_file)
+        # df_movement_range['geometry'] = df_movement_range.apply(lambda x: get_GADM_polygon(x.external_polygon_id), axis=1)
         df_movement_range['geometry'] = df_movement_range.apply(lambda x: get_GADM_polygon(x.external_polygon_id), axis=1)
+        df_movement_range['pop_density'] = df_movement_range.apply(lambda x: get_GADM_popdensity(x.external_polygon_id), axis=1)
         gdf_movement_range = gpd.GeoDataFrame(df_movement_range, geometry='geometry')
         gdf_movement_range.crs = 'epsg:4326'
-        gdf_movement_range = gdf_movement_range.to_crs('epsg:3116')
+        gdf_movement_range.to_crs("epsg:3410", inplace=True)
 
         with open(output_file_name, 'w') as out:
             out.write("{},{}\n".format('poly_id', 'extrapolated_relative_movement'))
             for poly_id in gdf_polygons['poly_id'].unique():
                 polygon = gdf_polygons.loc[gdf_polygons['poly_id'] == poly_id, 'geometry']
-                pop_density = gdf_polygons.loc[gdf_polygons['poly_id'] == poly_id, 'pop_density']
                 polygon = polygon.to_numpy()[0]
-                intersections = get_intersection_areas(polygon, gdf_movement_range, pop_density)
+                intersections = get_intersection_areas(polygon, gdf_movement_range)
                 extrapolated_movement = calculate_movement(intersections, df_movement_range)
                 out.write("{},{}\n".format(poly_id, extrapolated_movement))
 
@@ -92,8 +98,7 @@ df_polygons = pd.read_csv(polygons)
 df_polygons['geometry'] = df_polygons['geometry'].apply(wkt.loads)
 gdf_polygons = gpd.GeoDataFrame(df_polygons, geometry='geometry')
 gdf_polygons.crs = 'epsg:4326'
-gdf_polygons = gdf_polygons.to_crs('epsg:3116')
-gdf_polygons["pop_density"] = gdf_polygons["attr_population"].divide(gdf_polygons["attr_area"])
+gdf_polygons.to_crs("epsg:3410", inplace=True)
 
 for f in movement_range_files:
     f = f.strip()

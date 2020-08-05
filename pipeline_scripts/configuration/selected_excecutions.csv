@@ -1,6 +1,6 @@
 location_name,locations_folder,stage,folder_location,position,excecute,script_name,script_type,script_parameters
 All,,PRE,PRE,1,NO,download_facebook,python,
-Colombia,colombia,PRE,PRE,2,NO,extrapolate_movement_range.py,python,Colombia geometry
+Colombia,colombia,PRE,PRE,2,YES,extrapolate_movement_range.py,python,Colombia geometry
 USA,usa,PRE,extractors,2,NO,usa_extractor,python,
 Colombia,colombia,extract,extractors,1,NO,single_file_download_extractor,python,Colombia colombia
 Colombia,colombia,unify,unifiers,1,NO,universal_generic_unifier,python,Colombia colombia
@@ -11,7 +11,7 @@ Colombia,colombia,construct,constructors,1,NO,universal_daily_graphs_constructor
 Colombia,colombia,analyse,analysis,1,NO,tda_script,r,Colombia colombia community
 Colombia,colombia,analyse,analysis,3,NO,movement_plots_script,python,Colombia colombia community
 Colombia,colombia,analyse,analysis,4,NO,movement_plots_script,r,Colombia colombia community 0.3 25
-Colombia,colombia,analyse,analysis,5,YES,movement_range_plots_script,python,Colombia colombia community
+Colombia,colombia,analyse,analysis,5,NO,movement_range_plots_script,python,Colombia colombia community
 Colombia,colombia,analyse,analysis,6,NO,agglomerated_units_plots_script,r,Colombia colombia community
 Colombia,colombia,analyse,analysis,7,NO,agglomerated_units_plots_script,python,Colombia colombia community
 Colombia,colombia,analyse,analysis,8,NO,neighbors_location_extraction,python,Colombia colombia community
@@ -102,7 +102,7 @@ Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia 
 Colombia,colombia,POS,analysis,4,NO,location_prediction_by_polygon_union,python,Colombia colombia community
 Colombia,colombia,POS,analysis,3,NO,polygon_info_timewindow,python,colombia geometry 5 days
 Colombia,colombia,POS,analysis,3,NO,generate_threshold_alerts,python,colombia geometry min_record
-Colombia,colombia,POS,analysis,3,YES,choropleth_maps,python,colombia geometry
+Colombia,colombia,POS,analysis,3,NO,choropleth_maps,python,colombia geometry
 Colombia,colombia,POS,analysis,3,NO,general_statistics,python,colombia geometry
 Colombia,colombia,POS,analysis,3,NO,general_statistics,python,colombia community
 Colombia,colombia,POS,analysis,3,NO,incidence_map,r,Colombia colombia geometry

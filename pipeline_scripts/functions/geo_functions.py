@@ -117,9 +117,18 @@ def get_GADM_polygon(GADM_id, df_GADM=None):
 		path = os.path.join(data_dir, 'data_stages', 'colombia', 'raw', 'geo', 'gadm36_COL_shp', 'gadm36_COL_2.shp')
 		# GADM geodataset originally crs = {epsg:4326}
 		df_GADM = gpd.read_file(path)
+	df_GADM.set_index("GID_2", inplace=True)
+	# polygon = df_GADM[df_GADM['GID_2'] == GADM_id]['geometry']
+	# polygons = []
+	polygon = df_GADM.at[GADM_id, 'geometry']
+	return polygon
 
-	polygon = df_GADM[df_GADM['GID_2'] == GADM_id]['geometry']
-	polygons = []
-	for i in polygon:
-		polygons.append(i)
-	return polygons[0]
+def get_GADM_popdensity(GADM_id, df_GADM=None):
+	if df_GADM == None:
+		path = os.path.join(data_dir, 'data_stages', 'colombia', 'raw', 'geo', 'gadm36_COL_shp', 'gadm36_COL_2_population_density.csv')
+		# GADM geodataset originally crs = {epsg:4326}
+		df_GADM = pd.read_csv(path)
+	df_GADM.set_index("GID_2", inplace=True)
+	polygon = df_GADM.at[GADM_id, 'geometry']
+	pop_density = df_GADM.at[GADM_id, 'population_density']
+	return pop_density
