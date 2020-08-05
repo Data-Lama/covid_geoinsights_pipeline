@@ -88,7 +88,7 @@ class Unifier(GenericUnifier):
 		df = df[['date_time','geo_id','location','lon','lat', 'num_cases', 'num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house']]
 
 		# Cut at date
-		df = df[df['date_time'] < pd.to_datetime('2020-08-01')].copy()
+		#df = df[df['date_time'] < pd.to_datetime('2020-08-01')].copy()
 
 		return(df)	
 
