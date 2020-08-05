@@ -21,6 +21,8 @@ Neighbor Series Santa Marta,analysis,figure,colombia/community/neighbors/santa_m
 Prediction Santa Marta,analysis,figure,colombia/community/prediction/santa_marta/prediction_santa_marta.png,prediction_santa_marta.png
 Neighbor Series Villavicencio,analysis,figure,colombia/community/neighbors/villavicencio/neighbor_timeseries_villavicencio.png,neighbor_timeseries_villavicencio.png
 Prediction Villavicencio,analysis,figure,colombia/community/prediction/villavicencio/prediction_villavicencio.png,prediction_villavicencio.png
+Neighbor Series Cucuta,analysis,figure,colombia/community/neighbors/cucuta/neighbor_timeseries_cucuta.png,neighbor_timeseries_cucuta.png
+Prediction Cucuta,analysis,figure,colombia/community/prediction/cucuta/prediction_cucuta.png,prediction_cucuta.png
 Prediction Colombia,analysis,figure,colombia/community/prediction/entire_location/prediction_colombia.png,prediction_colombia.png
 Simulacion Colombia,analysis,figure,colombia/community/prediction/entire_location/simulations_colombia.png,simulations_colombia.png
 Tabla Hitos,analysis,table,colombia/community/movement_plots/milestones.csv,milestones.csv
