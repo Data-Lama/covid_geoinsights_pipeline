@@ -72,12 +72,16 @@ for agglomeration_method in agglomeration_methods:
 
 	i += 1
 
+
+	unit_type, unit_type_prural = gf.get_agglomeration_names(agglomeration_method)
+
 	# Agglomerated folder location
 	agglomerated_folder_location = os.path.join(data_dir, 'data_stages', location_folder, 'agglomerated', agglomeration_method)
 
-	if not os.path.exists(agglomerated_folder_location):
-		print(ident + 'No data found for {} Agglomeration ({} of {}). Skipping'.format(agglomeration_method,i , len(agglomeration_methods)))
+	if not os.path.exists(os.path.join(agglomerated_folder_location)):
+		print(ident + 'No Movement range data found for {} Agglomeration ({} of {}). Skipping'.format(agglomeration_method,i , len(agglomeration_methods)))
 		continue
+
 
 	# Export folder location
 	export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'movement_plots')
@@ -102,6 +106,7 @@ for agglomeration_method in agglomeration_methods:
 	# Loads the movement range
 	df_mov = pd.read_csv(os.path.join(unified_folder_location, 'movement_range.csv'), parse_dates = ['ds'])
 	df_mov.rename(columns = {'ds':'date_time','all_day_bing_tiles_visited_relative_change':'value'}, inplace = True)
+
 	df_mov = df_mov[['date_time','value', 'polygon_id']].copy()
 	df_mov['type'] = 'movement'
 	df_mov['Tipo'] = 'Movimiento'
@@ -220,6 +225,38 @@ for agglomeration_method in agglomeration_methods:
 
 	g.axes[1,0].xaxis.set_ticks(ticks)
 	g.savefig(os.path.join(export_folder_location,'mov_range_{}.png'.format(location_folder)))
+
+
+	# Plots by polygons if movement range (if they exists)
+	if os.path.exists(os.path.join(agglomerated_folder_location, 'movement_range.csv')):
+
+		print(ident + '   Plots Movement Range for Polygons {}'.format(location_name))
+
+		df_mov_range = pd.read_csv(os.path.join(agglomerated_folder_location, 'movement_range.csv'), parse_dates = ['date_time'])
+
+		# Reads Polygons
+		polygons = pd.read_csv(os.path.join(agglomerated_folder_location, 'polygons.csv'))
+
+		polygons = polygons.sort_values('num_cases', ascending = False)
+		polygons.loc[polygons.index[max_selected:],'poly_name'] = 'Otros (Promedio)'
+
+
+		df_plot = df_mov_range.merge(polygons, on = 'poly_id')
+
+		fig = plt.figure(figsize=fig_size)
+
+		ax = sns.lineplot(data = df_plot, x = 'date_time', y = 'movement_change', hue = 'poly_name')
+		ax.set_title('Cambio Porcentual en Movilidad en Unidades {} para {}'.format(unit_type_prural, location_name), fontsize=suptitle_font_size)
+		ax.set_xlabel('Fecha', fontsize=axis_font_size)
+		ax.set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
+		ax.legend().texts[0].set_text(f"Unidad {unit_type}")
+
+
+		# Adds the horizontal line
+		ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)		
+
+		fig.savefig(os.path.join(export_folder_location,'movement_range_selected_polygons_{}.png'.format(location_folder)))
+
 
 	
 

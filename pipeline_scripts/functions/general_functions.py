@@ -12,6 +12,26 @@ from global_config import config
 data_dir = config.get_property('data_dir')
 
 
+
+def get_agglomeration_names(agglomeration_method):
+
+    if agglomeration_method == 'radial':
+        unit_type = 'Radial'
+        unit_type_prural = 'Radiales'
+
+    elif agglomeration_method == 'geometry':
+        unit_type = 'Adminsitrativa'
+        unit_type_prural = 'Administrativas'
+
+    elif agglomeration_method == 'community':
+        unit_type = 'Funcional' 
+        unit_type_prural = 'Funcionales'
+
+    else:
+        raise ValueError(f'Unsupported agglomeration method: {agglomeration_method}')
+
+    return(unit_type, unit_type_prural) 
+
 def clean_for_publication(s):
 	'''
 	Function that cleans a string for publications

@@ -46,6 +46,7 @@ print()
 
 
 print(ident + 'Builds Datasets:')
+
 # ----------------
 # ---- Cases -----
 # ----------------
@@ -108,6 +109,14 @@ if os.path.exists( os.path.join(unifier.raw_folder, 'movement_range')):
 	print(ident + '   Movement Range')
 	df_movement_range = fb.build_movement_range(location_folder_name)
 	df_movement_range.to_csv(os.path.join(unified_dir, 'movement_range.csv'), index = False)
+
+
+# Checks if implementation supports movent range by polygons
+df_range_by_polygon =  unifier.build_movement_range_by_polygon()
+if df_range_by_polygon is not None:
+
+	print(ident + '   Movement By Polygon')
+	df_range_by_polygon.to_csv(os.path.join(unified_dir, 'movement_range_by_polygon.csv'), index = False)
 
 
 print(ident + 'Saving Dates')

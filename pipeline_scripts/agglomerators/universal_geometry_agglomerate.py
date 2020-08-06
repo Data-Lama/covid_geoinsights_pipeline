@@ -10,12 +10,14 @@ import pandas as pd
 from shapely import wkt
 import geopandas as geopandas
 import general_functions as gf
+import movement_range_functions as mov_fun
 
 # Direcotries
 from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 key_string = config.get_property('key_string') 
+
 
 
 # Method Name
@@ -38,7 +40,6 @@ location_folder = os.path.join(data_dir, 'data_stages', location_folder_name)
 agglomeration_folder = os.path.join(location_folder, 'agglomerated/', method_name)
 if not os.path.exists(agglomeration_folder):
 	os.makedirs(agglomeration_folder)
-
 
 
 ident = '         '
@@ -131,6 +132,22 @@ agg_movement = agg_movement.groupby(['date_time','start_poly_id','end_poly_id'])
 # TODO: fix population
 agg_population = pd.DataFrame(columns = ['date_time','poly_id','population'])
 
+
+
+# If location has movement range
+mov_range_file = os.path.join(location_folder,  'unified/movement_range.csv')
+agg_movement_range = None
+if os.path.exists(mov_range_file):
+
+	df_movement_range_unified = pd.read_csv(mov_range_file)
+	
+	# Computes the movement range by polygon
+	agg_movement_range = mov_fun.construct_movement_range_by_polygon(df_movement_range_unified, agg_polygons)
+
+
+
+
+
 print()
 print(ident + '   Saves Data:')
 
@@ -154,7 +171,13 @@ agg_polygons.to_csv(os.path.join(agglomeration_folder, 'polygons.csv'), index = 
 
 print(ident + '      Population')
 agg_population.to_csv(os.path.join(agglomeration_folder, 'population.csv'), index = False)
-agg_population
+
+
+if agg_movement_range is not None:
+	print(ident + '      Movement Range')
+	agg_movement_range.to_csv(os.path.join(agglomeration_folder, 'movement_range.csv'), index = False)
+
+
 
 print(ident + '   Saves Statistics:')
 

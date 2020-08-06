@@ -220,6 +220,48 @@ agg_pop = pop %>%
 
 
 
+# Checks if movent range exits
+agg_mov_range = NULL
+movement_range_file = file.path(agglomerated_folder,'movement_range.csv')
+if(file.exists(movement_range_file))
+{
+  df_movement_range = read.csv(movement_range_file)
+  
+  filtered_polys = polygons[,c('poly_id','community_id')]
+  filtered_polys$factor = 1
+  
+  'attr_population' %in% colnames(polygons)
+  
+  if('attr_density' %in% colnames(polygons))
+  {
+    filtered_polys$factor = polygons$attr_density
+    
+  }else if('attr_population' %in% colnames(polygons) && 'attr_area' %in% colnames(polygons))
+  {
+    filtered_polys$factor = polygons$attr_population / polygons$attr_area
+    
+  }else if('attr_population' %in% colnames(polygons))
+  {
+    filtered_polys$factor = polygons$attr_population
+    
+  }else if('attr_area' %in% colnames(polygons))
+  {
+    filtered_polys$factor = polygons$attr_area    
+  }
+  
+  agg_mov_range = df_movement_range %>% 
+                  inner_join(filtered_polys, by = c('poly_id' = 'poly_id')) %>%
+                  group_by(date_time, community_id)  %>%
+                  summarise(movement_change = factor_average(movement_change, factor)) %>%
+                  ungroup() %>%
+                  select(c('date_time', 'community_id', 'movement_change')) %>%
+                  rename(poly_id = community_id) %>%
+                  arrange(date_time)
+                  
+}
+
+
+
 cat(paste(ident, '   Saves Files','\n', sep = ""))
 # Saves all the datasets
 write.csv( agg_cases, file.path(export_folder,'cases.csv'), row.names = FALSE)
@@ -227,6 +269,11 @@ write.csv( agg_mov, file.path(export_folder,'movement.csv'), row.names = FALSE)
 write.csv(agg_poly, file.path(export_folder,'polygons.csv'), row.names = FALSE)
 write.csv(agg_pop, file.path(export_folder,'population.csv'), row.names = FALSE)
 write.csv(polygon_community_map, file.path(export_folder,'polygon_community_map.csv'), row.names = FALSE)
+
+if(!is.null(agg_mov_range))
+{
+  write.csv(agg_mov_range, file.path(export_folder,'movement_range.csv'), row.names = FALSE)
+}
 
 cat(paste(ident, 'Done!','\n', sep = ""))
 

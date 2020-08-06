@@ -2,6 +2,13 @@
 
 km_constant = 110.567 # For extarcting distances
 
+
+#Function that averages according to a factor
+factor_average = function(movement_change, factor)
+{
+  return(sum(movement_change*factor)/sum(factor))
+}
+
 # Function that extracts the name of the community
 exctract_name = function(location, num_cases)
 {
