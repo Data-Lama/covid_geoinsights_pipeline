@@ -40,7 +40,7 @@ if(debug)
   setwd("~/Dropbox/Projects/covid_fb_pipeline/covid_geoinsights_pipeline")
   location_name = 'Colombia'
   location_folder = 'colombia'
-  agglomeration_method_parameter = 'community'
+  agglomeration_method_parameter = 'geometry'
 }
 
 
@@ -96,7 +96,8 @@ for(agglomeration_method in agglomeration_methods)
   polygons = polygons[polygons$incidence > 0,]
   
   
-  per_capita = 1
+  per_capita = 100
+  polygons$incidence = 100*polygons$incidence
   while(max(polygons$incidence) < 1)
   {
     per_capita = 10*per_capita

@@ -130,8 +130,10 @@ for agglomeration_method in agglomeration_methods:
 
 	if location_name == 'Colombia':
 
+
+		# First Date
 		date = 'fecha reporte web'
-		# Adds teh date reported
+		# Adds the date reported
 		df_cases_other_date = pd.read_csv(os.path.join(raw_folder_location, 'cases/cases_raw.csv'), parse_dates = ['fecha reporte web', 'Fecha de notificación'], 
 			date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
 
@@ -154,6 +156,32 @@ for agglomeration_method in agglomeration_methods:
 
 		df_cases_plot = pd.concat((df_cases_plot, df_cases_other_date), ignore_index = True)
 
+
+		# Second Date
+		date = 'FIS'
+
+		# Adds the date reported
+		df_cases_other_date = pd.read_csv(os.path.join(raw_folder_location, 'cases/cases_raw.csv'), parse_dates = ['FIS', 'Fecha de notificación'], 
+			date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
+
+
+		df_cases_other_date = df_cases_other_date[[date]].rename(columns = {date:'date_time'})
+
+		# back days
+		back_days = 20
+		df_cases_other_date = df_cases_other_date[df_cases_other_date.date_time <= (df_cases_other_date.date_time.max() - timedelta(days = back_days))].copy()
+
+		df_cases_other_date['value'] = 1
+		df_cases_other_date = df_cases_other_date[['date_time','value']].groupby('date_time').sum().reset_index()
+
+		# Somooths
+		df_cases_other_date['value'] = gf.smooth_curve(df_cases_other_date['value'], 5 )
+
+		# Type
+		df_cases_other_date['Tipo'] = 'Casos (Inicio Síntomas)' 
+		df_cases_other_date['type'] = 'cases'
+
+		df_cases_plot = pd.concat((df_cases_plot, df_cases_other_date), ignore_index = True)		
 
 
 	# Loads milestones
