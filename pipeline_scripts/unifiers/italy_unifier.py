@@ -22,7 +22,7 @@ ident = '         '
 
 
 # Creates the folders if the don't exist
-unified_folder = os.path.join(data_dir, 'data_stages' country, 'unified/')
+unified_folder = os.path.join(data_dir, 'data_stages', country, 'unified/')
 if not os.path.exists(unified_folder):
 	os.makedirs(unified_folder)
 

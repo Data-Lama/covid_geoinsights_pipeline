@@ -43,7 +43,7 @@ fig_size = (15,8)
 suptitle_font_size = 14
 individual_plot_size = 12
 axis_font_size = 12
-max_selected = 8
+max_selected = 7
 height = 2.5
 aspect= 5
 num_ticks = 6
@@ -78,7 +78,16 @@ for agglomeration_method in agglomeration_methods:
 	# Agglomerated folder location
 	agglomerated_folder_location = os.path.join(data_dir, 'data_stages', location_folder, 'agglomerated', agglomeration_method)
 
-	if not os.path.exists(os.path.join(agglomerated_folder_location)):
+	# Unified folder location
+	unified_folder_location = os.path.join(data_dir, 'data_stages', location_folder, 'unified')
+
+	# Raw folder location
+	raw_folder_location = os.path.join(data_dir, 'data_stages', location_folder, 'raw')	
+
+
+	movement_range_file = os.path.join(agglomerated_folder_location, 'movement_range.csv')
+
+	if not os.path.exists(movement_range_file):
 		print(ident + 'No Movement range data found for {} Agglomeration ({} of {}). Skipping'.format(agglomeration_method,i , len(agglomeration_methods)))
 		continue
 
@@ -90,24 +99,48 @@ for agglomeration_method in agglomeration_methods:
 	if not os.path.exists(export_folder_location):
 		os.makedirs(export_folder_location)
 
-	# Unified folder location
-	unified_folder_location = os.path.join(data_dir, 'data_stages', location_folder, 'unified')
-	# raw
-	raw_folder_location = os.path.join(data_dir, 'data_stages', location_folder, 'raw')
-
-
 
 	print(ident + 'Excecuting Movement Analysis for {} with {} Agglomeration ({} of {}))'.format(location_name, agglomeration_method,i , len(agglomeration_methods)))
 
 	# Loads the data
 	print(ident + '   Extracts the movement and cases for {}'.format(location_name))
 
+	# Reads Polygons
+	polygons = pd.read_csv(os.path.join(agglomerated_folder_location, 'polygons.csv'))
+
+	df_mov_range = pd.read_csv(movement_range_file, parse_dates = ['date_time'])
 
 	# Loads the movement range
-	df_mov = pd.read_csv(os.path.join(unified_folder_location, 'movement_range.csv'), parse_dates = ['ds'])
-	df_mov.rename(columns = {'ds':'date_time','all_day_bing_tiles_visited_relative_change':'value'}, inplace = True)
+	df_mov = df_mov_range.copy()
 
-	df_mov = df_mov[['date_time','value', 'polygon_id']].copy()
+
+
+
+
+	# Merges with polygons
+	pop_attr = "attr_population"
+
+	if pop_attr in polygons.columns:
+		print(ident + '   Population Found, averaging movement by population.')
+
+		# Averages with population size as factor
+		df_mov = df_mov.merge(polygons, on = 'poly_id')
+		df_mov = df_mov[['date_time',pop_attr, 'movement_change']]
+
+		df_mov['prod'] = df_mov['movement_change']*df_mov[pop_attr]
+
+		# Grpoupby
+		df_mov = df_mov[['date_time','prod',pop_attr]].groupby('date_time').sum().reset_index()
+
+		# Final Variable
+		df_mov['value'] = df_mov['prod']/df_mov[pop_attr]
+
+
+	else:
+		df_mov.rename(columns = {'movement_change':'value'}, inplace = True)
+
+
+	df_mov = df_mov[['date_time','value']].copy()
 	df_mov['type'] = 'movement'
 	df_mov['Tipo'] = 'Movimiento'
 
@@ -255,35 +288,30 @@ for agglomeration_method in agglomeration_methods:
 	g.savefig(os.path.join(export_folder_location,'mov_range_{}.png'.format(location_folder)))
 
 
-	# Plots by polygons if movement range (if they exists)
-	if os.path.exists(os.path.join(agglomerated_folder_location, 'movement_range.csv')):
+	print(ident + '   Plots Movement Range for Polygons {}'.format(location_name))	
 
-		print(ident + '   Plots Movement Range for Polygons {}'.format(location_name))
+	# Reads Polygons
+	polygons = pd.read_csv(os.path.join(agglomerated_folder_location, 'polygons.csv'))
 
-		df_mov_range = pd.read_csv(os.path.join(agglomerated_folder_location, 'movement_range.csv'), parse_dates = ['date_time'])
-
-		# Reads Polygons
-		polygons = pd.read_csv(os.path.join(agglomerated_folder_location, 'polygons.csv'))
-
-		polygons = polygons.sort_values('num_cases', ascending = False)
-		polygons.loc[polygons.index[max_selected:],'poly_name'] = 'Otros (Promedio)'
+	polygons = polygons.sort_values('num_cases', ascending = False)
+	polygons.loc[polygons.index[max_selected:],'poly_name'] = 'Otros (Promedio)'
 
 
-		df_plot = df_mov_range.merge(polygons, on = 'poly_id')
+	df_plot = df_mov_range.merge(polygons, on = 'poly_id')
 
-		fig = plt.figure(figsize=fig_size)
+	fig = plt.figure(figsize=(19,8))
 
-		ax = sns.lineplot(data = df_plot, x = 'date_time', y = 'movement_change', hue = 'poly_name')
-		ax.set_title('Cambio Porcentual en Movilidad en Unidades {} para {}'.format(unit_type_prural, location_name), fontsize=suptitle_font_size)
-		ax.set_xlabel('Fecha', fontsize=axis_font_size)
-		ax.set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
-		ax.legend().texts[0].set_text(f"Unidad {unit_type}")
+	ax = sns.lineplot(data = df_plot, x = 'date_time', y = 'movement_change', hue = 'poly_name')
+	ax.set_title('Cambio Porcentual en Movilidad en Unidades {} para {}'.format(unit_type_prural, location_name), fontsize=suptitle_font_size)
+	ax.set_xlabel('Fecha', fontsize=axis_font_size)
+	ax.set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
+	ax.legend().texts[0].set_text(f"Unidad {unit_type}")
 
 
-		# Adds the horizontal line
-		ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)		
+	# Adds the horizontal line
+	ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)		
 
-		fig.savefig(os.path.join(export_folder_location,'movement_range_selected_polygons_{}.png'.format(location_folder)))
+	fig.savefig(os.path.join(export_folder_location,'movement_range_selected_polygons_{}.png'.format(location_folder)))
 
 
 	

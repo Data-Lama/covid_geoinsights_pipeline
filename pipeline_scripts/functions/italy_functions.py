@@ -6,6 +6,7 @@
 import pandas as pd
 import numpy as np
 import os
+import time
 
 from pathlib import Path
 import geo_functions as geo
@@ -66,26 +67,39 @@ def build_geo_cases():
 
 	df_cases = df_cases[['data','codice_provincia','denominazione_provincia','long','lat','totale_casi']].rename(columns = col_dict)
 
+	df_cases.dropna(subset = ['lon','lat'], inplace = True)
 	df_cases.sort_values(['date_time'], inplace = True)
 
 	# Cases are cumulative, restores them
 
 	# corrects wrong values
 	# Flattens!
+	j = 0
+	max_ite = 100000
+	tot = len(df_cases.geo_id.unique())
 	for geo_id in df_cases.geo_id.unique():
 
+		j += 1
 		val = df_cases[df_cases.geo_id == geo_id].num_cases.values
 		
 
+		ite = 0
 		finished = False		
 		while not finished:
 			finished = True
+			ite += 1
 			for i in range(1,len(val) - 1):
-				if val[i] > val[i+1]:
-					val[i] = int(np.floor((val[i-1] + val[i+1])/2))
+				if val[i] > val[i+1]:					
+					if i + 2  < len(val) and val[i] <= val[i+2]:
+						val[i+1] = int(np.floor((val[i] + val[i+2])/2))
+					else:
+						val[i] = int(np.floor((val[i-1] + val[i+1])/2))
+
 					finished = False
 
-
+			if ite > max_ite:
+				print('               Smoothing fialed. Max Iteration exceeded. Will continue')
+				finished = True
 
 		df_cases.loc[df_cases.geo_id == geo_id, 'num_cases'] = val
 
@@ -96,8 +110,11 @@ def build_geo_cases():
 		val = df_cases[df_cases.geo_id == geo_id].num_cases.values
 		new_val = val - np.roll(val, 1)
 		new_val[0] = val[0]
+		new_val[new_val < 0] = 0
+
 		df_cases.loc[df_cases.geo_id == geo_id,'num_cases'] = new_val
 
+	df_cases.to_csv('temp_2.csv')
 	return(df_cases)
 
 	

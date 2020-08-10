@@ -3,7 +3,7 @@ All,,PRE,PRE,1,NO,download_facebook,python,
 Colombia,colombia,PRE,PRE,2,NO,extrapolate_movement_range.py,python,colombia geometry
 USA,usa,PRE,extractors,2,NO,usa_extractor,python,
 Colombia,colombia,extract,extractors,1,NO,single_file_download_extractor,python,Colombia colombia
-Colombia,colombia,unify,unifiers,1,NO,universal_generic_unifier,python,Colombia colombia
+Colombia,colombia,unify,unifiers,1,NO,universal_generic_unifier,python,Colombia colombia 2020-08-07
 Colombia,colombia,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Colombia colombia 10
 Colombia,colombia,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,Colombia colombia
 Colombia,colombia,agglomerate,agglomerators,1,NO,universal_geometry_agglomerate,python,Colombia colombia
@@ -35,7 +35,6 @@ Germany,germany,unify,unifiers,1,NO,universal_generic_unifier,python,Germany ger
 Germany,germany,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Germany germany 10
 Germany,germany,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,Germany germany
 Germany,germany,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Germany germany all
-Germany,germany,analyse,analysis,5,NO,polygon_info_timewindow,python,germany community 2020-04-12 5 days
 Indiana,indiana_usa,unify,unifiers,1,NO,usa_state_unifier,python,Indiana indiana_usa
 Indiana,indiana_usa,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Indiana indiana_usa 10
 Indiana,indiana_usa,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,Indiana indiana_usa
@@ -86,27 +85,27 @@ Mexico,mexico,unify,unifiers,1,NO,universal_generic_unifier,python,Mexico mexico
 Mexico,mexico,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Mexico mexico 10
 Mexico,mexico,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,Mexico mexico
 Mexico,mexico,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Mexico mexico all
-Colombia,colombia,POS,analysis,1,NO,location_selected_polygon_prediction_analysis,python,Colombia colombia community 0.8 20
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community ibague 73001 Ibagué-Tolima
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community ibague 73001 Ibagué-Tolima 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community ibague 73001 Ibagué-Tolima
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community popayan 19001 Popayán-Cauca
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community popayan 19001 Popayán-Cauca 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community popayan 19001 Popayán-Cauca
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community villavicencio 50001 Villavicencio-Meta
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community villavicencio 50001 Villavicencio-Meta 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community villavicencio 50001 Villavicencio-Meta
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community santa_marta 47001 SantaMarta-Magdalena
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community santa_marta 47001 SantaMarta-Magdalena 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community santa_marta 47001 SantaMarta-Magdalena
-Colombia,colombia,POS,analysis,1,NO,neighbors_polygon_extraction,python,colombia community cucuta 54001 Cúcuta-NorteDeSantander
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_dataset_builder,python,colombia community cucuta 54001 Cúcuta-NorteDeSantander 20
-Colombia,colombia,POS,analysis,3,NO,polygon_prediction_analysis,python,colombia community cucuta 54001 Cúcuta-NorteDeSantander
-Colombia,colombia,POS,analysis,4,NO,location_prediction_by_polygon_union,python,Colombia colombia community
-Colombia,colombia,POS,analysis,3,NO,polygon_info_timewindow,python,colombia geometry 5 days
-Colombia,colombia,POS,analysis,3,NO,generate_threshold_alerts,python,colombia geometry min_record
-Colombia,colombia,POS,analysis,3,NO,choropleth_maps,python,colombia geometry
-Colombia,colombia,POS,analysis,3,NO,general_statistics,python,colombia geometry
-Colombia,colombia,POS,analysis,3,NO,general_statistics,python,colombia community
-Colombia,colombia,POS,analysis,3,NO,incidence_map,r,Colombia colombia geometry
-All,,POS,POS,5,YES,copy_report_files.py,python,
+Colombia,colombia,POS,analysis,2,NO,location_selected_polygon_prediction_analysis,python,Colombia colombia community 0.8 20
+Colombia,colombia,POS,analysis,2,NO,neighbors_polygon_extraction,python,colombia community ibague 73001 Ibagué-Tolima
+Colombia,colombia,POS,analysis,3,NO,polygon_prediction_dataset_builder,python,colombia community ibague 73001 Ibagué-Tolima 20
+Colombia,colombia,POS,analysis,4,NO,polygon_prediction_analysis,python,colombia community ibague 73001 Ibagué-Tolima
+Colombia,colombia,POS,analysis,2,NO,neighbors_polygon_extraction,python,colombia community popayan 19001 Popayán-Cauca
+Colombia,colombia,POS,analysis,3,NO,polygon_prediction_dataset_builder,python,colombia community popayan 19001 Popayán-Cauca 20
+Colombia,colombia,POS,analysis,4,NO,polygon_prediction_analysis,python,colombia community popayan 19001 Popayán-Cauca
+Colombia,colombia,POS,analysis,2,NO,neighbors_polygon_extraction,python,colombia community villavicencio 50001 Villavicencio-Meta
+Colombia,colombia,POS,analysis,3,NO,polygon_prediction_dataset_builder,python,colombia community villavicencio 50001 Villavicencio-Meta 20
+Colombia,colombia,POS,analysis,4,NO,polygon_prediction_analysis,python,colombia community villavicencio 50001 Villavicencio-Meta
+Colombia,colombia,POS,analysis,2,NO,neighbors_polygon_extraction,python,colombia community santa_marta 47001 SantaMarta-Magdalena
+Colombia,colombia,POS,analysis,3,NO,polygon_prediction_dataset_builder,python,colombia community santa_marta 47001 SantaMarta-Magdalena 20
+Colombia,colombia,POS,analysis,4,NO,polygon_prediction_analysis,python,colombia community santa_marta 47001 SantaMarta-Magdalena
+Colombia,colombia,POS,analysis,2,NO,neighbors_polygon_extraction,python,colombia community cucuta 54001 Cúcuta-NorteDeSantander
+Colombia,colombia,POS,analysis,3,NO,polygon_prediction_dataset_builder,python,colombia community cucuta 54001 Cúcuta-NorteDeSantander 20
+Colombia,colombia,POS,analysis,4,NO,polygon_prediction_analysis,python,colombia community cucuta 54001 Cúcuta-NorteDeSantander
+Colombia,colombia,POS,analysis,5,NO,location_prediction_by_polygon_union,python,Colombia colombia community
+Colombia,colombia,POS,analysis,1,NO,polygon_info_timewindow,python,colombia geometry 5 days
+Colombia,colombia,POS,analysis,1,NO,generate_threshold_alerts,python,colombia geometry min_record
+Colombia,colombia,POS,analysis,1,NO,choropleth_maps,python,colombia geometry
+Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia geometry
+Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia community
+Colombia,colombia,POS,analysis,1,NO,incidence_map,r,Colombia colombia geometry
+All,,POS,POS,6,YES,copy_report_files.py,python,
