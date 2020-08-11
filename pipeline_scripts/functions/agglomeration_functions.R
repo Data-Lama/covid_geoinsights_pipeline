@@ -46,10 +46,16 @@ extract_center= function(lon, lat, page_rank)
   return(c(lon[which.max(page_rank)], lat[which.max(page_rank)]))
 }
 
-# Function that extracts the center
+# Function that extracts the center by cases
 extract_center_by_cases = function(lon, lat, num_cases)
 {
   return(c(lon[which.max(num_cases)], lat[which.max(num_cases)]))
+}
+
+# Function that extracts the center by population
+extract_center_by_population = function(lon, lat, population)
+{
+  return(c(lon[which.max(population)], lat[which.max(population)]))
 }
 
 # Function that extracts the name of the community (by _cases)

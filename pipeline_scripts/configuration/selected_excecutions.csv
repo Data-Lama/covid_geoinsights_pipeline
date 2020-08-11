@@ -9,9 +9,11 @@ Colombia,colombia,agglomerate,agglomerators,2,NO,universal_community_agglomerate
 Colombia,colombia,agglomerate,agglomerators,1,NO,universal_geometry_agglomerate,python,Colombia colombia
 Colombia,colombia,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Colombia colombia all
 Colombia,colombia,analyse,analysis,1,NO,tda_script,r,Colombia colombia community
+Colombia,colombia,analyse,analysis,1,NO,graph_maps,r,Colombia colombia community
+Colombia,colombia,analyse,analysis,1,YES,graph_maps,r,Colombia colombia community norte_de_santander 54001 54051 54099 54109 54128 54172 54174 54223 54239 54245 54250 54313 54344 54347 54377 54405 54418 54498 54498 54518 54520 54520 54553 54660 54670 54680 54720 54743 54800 54810 54820 54871
 Colombia,colombia,analyse,analysis,3,NO,movement_plots_script,python,Colombia colombia community
 Colombia,colombia,analyse,analysis,4,NO,movement_plots_script,r,Colombia colombia community 0.3 25
-Colombia,colombia,analyse,analysis,5,YES,movement_range_plots_script,python,Colombia colombia community
+Colombia,colombia,analyse,analysis,5,NO,movement_range_plots_script,python,Colombia colombia community
 Colombia,colombia,analyse,analysis,6,NO,agglomerated_units_plots_script,r,Colombia colombia community
 Colombia,colombia,analyse,analysis,7,NO,agglomerated_units_plots_script,python,Colombia colombia community
 Colombia,colombia,analyse,analysis,8,NO,neighbors_location_extraction,python,Colombia colombia community

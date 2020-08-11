@@ -125,6 +125,11 @@ class Unifier(GenericUnifier):
 		polygons_final.loc[polygons_final.poly_id == '11001', 'poly_lon'] = -74.0939301
 		polygons_final.loc[polygons_final.poly_id == '11001', 'poly_lat'] = 4.6576632
 
+		# Manually adjusts adjusts Cucuta
+		polygons_final.loc[polygons_final.poly_id == '54001', 'poly_lon'] = -72.495447
+		polygons_final.loc[polygons_final.poly_id == '54001', 'poly_lat'] = 7.890634	
+
+
 		return(polygons_final)
 
 
