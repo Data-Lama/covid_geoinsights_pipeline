@@ -152,8 +152,8 @@ ax.set_axis_off()
 rivers_df.to_crs(epsg=3857, inplace=True)
 rivers_df.plot(ax=ax, alpha=0.1)
 ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
-plt.suptitle('Incremento Porcentual de Movimiento Incidente por Municipio')
-plt.title('Comparativo entre el día del reporte y 15 días atrás')
+# plt.suptitle('Incremento Porcentual de Movimiento Incidente por Municipio')
+plt.title('Comparativo entre el último Viernes y 15 días atrás')
 plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_15-day-window.png'.format(location_name)), bbox_inches="tight")
 
 choropleth_map_recent.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
@@ -171,8 +171,8 @@ ax.set_axis_off()
 ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
 rivers_df.to_crs(epsg=3857, inplace=True)
 rivers_df.plot(ax=ax, alpha=0.1)
-plt.suptitle('Incremento Porcentual de Movimiento Incidente por Municipio')
-plt.title('Comparativo entre el día del reporte y los primeros 15 días de Abril')
+# plt.suptitle('Incremento Porcentual de Movimiento Incidente por Municipio')
+plt.title('Comparativo entre el último Viernes y los primeros 15 días de Abril')
 plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_historic.png'.format(location_name)), bbox_inches="tight")
 
 choropleth_map_historic.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
@@ -184,7 +184,7 @@ translate = {'delta_inner_movement':'Incremento flujo dentro del municipio',
 
 # Get darker names in table
 df_highlights_recent = choropleth_map_recent[choropleth_map_recent['delta_external_movement'] > 0.5].fillna(0)
-df_highlights_historic = choropleth_map_historic[choropleth_map_historic['delta_external_movement'] > 5].fillna(0)
+df_highlights_historic = choropleth_map_historic[choropleth_map_historic['delta_external_movement'] > 1].fillna(0)
 
 # Get polygons on river
 choropleth_map_on_river = choropleth_map_recent[choropleth_map_recent['delta_external_movement'] > 0].fillna(0)

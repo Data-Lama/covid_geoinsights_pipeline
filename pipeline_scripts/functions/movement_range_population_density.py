@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import pandas as pd
 from shapely import wkt
 import geopandas as gpd
@@ -31,11 +32,15 @@ def get_population_density(polygon, gdf):
     df_intersections["intersection_empty"] = ~intersections.is_empty
     df_intersections = df_intersections[df_intersections["intersection_empty"] == True]
     area = df_intersections["intersection_area"].sum()
+    if area == 0:
+        print("area is zero")
+        return 0
     df_intersections = df_intersections.merge(polygons, how="outer", on="poly_id").dropna()
     df_intersections.drop(columns=["attr_population", "attr_area", 
                                    "intersection_empty", "area_poly",
                                   "geometry"], inplace=True)
     df_intersections["population"] = df_intersections["intersection_area"].multiply(df_intersections["population_density"])
+    df_intersections = df_intersections.replace([np.inf, -np.inf], np.nan).dropna(axis=0)
     pop_tot = df_intersections["population"].sum()
     pop_density = pop_tot / area
     
@@ -44,4 +49,5 @@ def get_population_density(polygon, gdf):
 gdf_GADM["population_density"] = gdf_GADM.apply(lambda x: get_population_density(x.geometry, gdf_polygons), axis=1)
 columns_to_drop = list(set(gdf_GADM.columns) - set(["GID_2", "geometry", "population_density"]))
 gdf_GADM.drop(columns=columns_to_drop, inplace=True)
+gdf_GADM.rename(columns={"GID_2":"external_polygon_id"}, inplace=True)
 gdf_GADM.to_csv(output_path, index=False)

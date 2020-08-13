@@ -58,6 +58,8 @@ time_window_file_path = os.path.join(analysis_dir, location_name, location_folde
 cases = os.path.join(agglomerated_file_path, 'cases.csv')
 movement = os.path.join(agglomerated_file_path, 'movement.csv')
 total_window = os.path.join(time_window_file_path, 'deltas_forward_window_5days.csv')
+age = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'socio_economic', 'edad_por_municipio.csv')
+ipm = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'socio_economic', 'ipm_por_municipio.csv')
 
 # Geofiles
 community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', 'community', 'polygon_community_map.csv')
@@ -92,6 +94,11 @@ df_total_window = pd.read_csv(total_window)
 
 # Set window size
 first_day = pd.Timestamp('today') - datetime.timedelta(days = WINDOW_SIZE)
+
+# Get socio-economic variables
+df_ipm = pd.read_csv(ipm)
+df_age = pd.read_csv(age, sep="\t")
+df_age["percentage_over_60"] = df_age["percentage_over_60"].multiply(100)
 
 # Get polygons
 df_movement_recent = df_movement.loc[df_movement['date_time'] >= first_day].copy()
@@ -211,15 +218,21 @@ df_alerts['first_case_color_alert'] = df_alerts.apply(lambda x: set_color(x.aler
 
 # Write alerts table
 red_alerts = df_alerts.loc[(df_alerts['max_alert'] == 'ROJO')].copy()
+red_alerts = red_alerts.merge(df_age, how="outer", left_on="poly_id", right_on="node_id").dropna()
+red_alerts = red_alerts.merge(df_ipm, how="outer", left_on="poly_id", right_on="node_id").dropna()
 red_alerts.sort_values(by=['Departamento','Municipio'], inplace=True)
 red_alerts.rename(columns={'internal_alert': 'Alerta interna (movimiento)', 'community_name':'Unidad funcional',
 'external_alert':'Alerta externa (movimiento)', 'alert_first_case':'Alerta de primer caso detectado', 
-"alert_external_num_cases":"Alerta numero de casos en municipios vecinos", "alert_internal_num_cases":"Alerta numero de casos"}, inplace=True)
+"alert_external_num_cases":"Alerta numero de casos en municipios vecinos", "alert_internal_num_cases":"Alerta numero de casos",
+"percentage_over_60":"Personas mayores a 60", "ipm":"IPM"}, inplace=True)
 red_alerts.to_csv(os.path.join(output_file_path, 'alerts.csv'), columns=['Departamento', 'Municipio', 'Unidad funcional',                                           
                                         'Alerta interna (movimiento)',
                                         'Alerta numero de casos',
                                         'Alerta de primer caso detectado',
-                                        'Alerta externa (movimiento)', 'Alerta numero de casos en municipios vecinos'], index=False)
+                                        'Alerta externa (movimiento)', 
+                                        'Alerta numero de casos en municipios vecinos',
+                                        'Personas mayores a 60',
+                                        'IPM'], index=False, float_format='%.3f', sep=",")
 
 # Map alerts
 df_alerts = geo_df.merge(df_alerts, left_on='Codigo_Dan', right_on='poly_id')
