@@ -25,9 +25,6 @@ ident = '         '
 
 
 args = commandArgs(trailingOnly=TRUE)
-location_name = args[1] # Location Name
-location_folder = args[2] # Location Folder
-agglomeration_method = args[3] # Agglomeration method to build on to
 
 # For Debug
 debug = FALSE
@@ -35,9 +32,14 @@ if(debug)
 {   
   cat("\n\n\n\n\n\n\n\n\n\n\n¡¡¡¡¡DEBUG IS ON!!!!\n\n\n\n\n\n\n\n\n")
   setwd("~/Dropbox/Projects/covid_fb_pipeline/covid_geoinsights_pipeline")
-  location_name = 'Colombia'
-  location_folder = 'colombia'
+  args = c('Colombia','colombia')
 }
+
+
+location_name = args[1] # Location Name
+location_folder = args[2] # Location Folder
+agglomeration_method = args[3] # Agglomeration method to build on to
+
 
 
 if(is.na(agglomeration_method))
@@ -140,7 +142,7 @@ if('attr_population' %in% colnames(polygons))
 {
     agg_poly_1 = polygons %>% 
     group_by(community_id) %>%
-    summarise(poly_name = exctract_name_by_population(poly_name, attr_population), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(poly_lon, poly_lat), poly_lon = extract_center_by_cases(poly_lon, poly_lat, num_cases)[1], poly_lat = extract_center_by_cases(poly_lon, poly_lat, num_cases)[2]) %>%
+    summarise(poly_name = exctract_name_by_population(poly_name, attr_population), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(poly_lon, poly_lat), poly_lon = extract_center_by_population(poly_lon, poly_lat, attr_population)[1], poly_lat = extract_center_by_population(poly_lon, poly_lat, attr_population)[2]) %>%
     ungroup()  
   
 }else

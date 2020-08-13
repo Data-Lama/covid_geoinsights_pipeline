@@ -87,9 +87,6 @@ class Unifier(GenericUnifier):
 		df.fillna(0, inplace = True)
 		df = df[['date_time','geo_id','location','lon','lat', 'num_cases', 'num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house']]
 
-		# Cut at date
-		#df = df[df['date_time'] < pd.to_datetime('2020-08-01')].copy()
-
 		return(df)	
 
 
@@ -127,6 +124,11 @@ class Unifier(GenericUnifier):
 		# Manually adjusts adjusts Bogota
 		polygons_final.loc[polygons_final.poly_id == '11001', 'poly_lon'] = -74.0939301
 		polygons_final.loc[polygons_final.poly_id == '11001', 'poly_lat'] = 4.6576632
+
+		# Manually adjusts adjusts Cucuta
+		polygons_final.loc[polygons_final.poly_id == '54001', 'poly_lon'] = -72.495447
+		polygons_final.loc[polygons_final.poly_id == '54001', 'poly_lat'] = 7.890634	
+
 
 		return(polygons_final)
 

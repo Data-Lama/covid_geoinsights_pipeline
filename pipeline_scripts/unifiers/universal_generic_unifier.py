@@ -8,9 +8,10 @@ import general_functions as gf
 
 # Other imports
 import os, sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 import constants as con
+import pandas as pd
 
 #Directories
 from global_config import config
@@ -18,10 +19,22 @@ data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 key_string = config.get_property('key_string') 
 
+ident = '         '
 
 # Unifies Facebook data
 location_name  = sys.argv[1] # Location name
 location_folder_name = sys.argv[2] # location folder name
+
+# If a third parameter is given is the max_date
+max_date = None
+if len(sys.argv) > 3:
+	max_date = pd.to_datetime( sys.argv[3])
+
+	# Adjusts max date (so that it can include the given date)
+	max_date = max_date + timedelta(days = 1) - timedelta(seconds = 1)
+	print(ident + f'   Max Date established: {max_date}')
+
+
 
 # Checks if its encrypted
 encrypted = gf.is_encrypted(location_folder_name)
@@ -29,7 +42,7 @@ encrypted = gf.is_encrypted(location_folder_name)
 # Loads the unifier class
 unifier = con.get_unifier_class(location_folder_name)
 
-ident = '         '
+
 
 unified_dir = unifier.unified_folder
 
@@ -53,6 +66,11 @@ print(ident + 'Builds Datasets:')
 print(ident + '   Cases')
 df_cases = unifier.build_cases_geo()
 
+# Checks if max date is given
+if max_date is not None:
+	df_cases = df_cases[df_cases.date_time < max_date]
+
+
 # Extracts date
 cases_date = df_cases.date_time.max()
 
@@ -69,6 +87,11 @@ else:
 print(ident + '   Movement')
 df_movement = fb.build_movement(location_folder_name)
 
+# Checks if max date is given
+if max_date is not None:
+	df_movement.date_time = pd.to_datetime(df_movement.date_time)
+	df_movement = df_movement[df_movement.date_time < max_date]
+
 # Extracts date
 movement_date = df_movement.date_time.max()
 
@@ -82,12 +105,18 @@ df_movement.to_csv(os.path.join(unified_dir, 'movement.csv'), index = False)
 print(ident + '   Population')
 df_population = fb.build_population(location_folder_name)
 
+
+# Checks if max date is given
+if max_date is not None:
+	df_population.date_time = pd.to_datetime(df_population.date_time)
+	df_population = df_population[df_population.date_time < max_date]
+
 # Extracts date
 population_date = df_population.date_time.max()
 
+
 # Saves
 df_population.to_csv(os.path.join(unified_dir, 'population.csv'), index = False)
-
 
 
 # -------------------
@@ -108,6 +137,12 @@ if os.path.exists( os.path.join(unifier.raw_folder, 'movement_range')):
 	
 	print(ident + '   Movement Range')
 	df_movement_range = fb.build_movement_range(location_folder_name)
+
+	# Checks if max date is given
+	if max_date is not None:
+		df_movement_range.ds = pd.to_datetime(df_movement_range.ds)
+		df_movement_range = df_movement_range[df_movement_range.ds < max_date]
+
 	df_movement_range.to_csv(os.path.join(unified_dir, 'movement_range.csv'), index = False)
 
 
@@ -116,6 +151,12 @@ df_range_by_polygon =  unifier.build_movement_range_by_polygon()
 if df_range_by_polygon is not None:
 
 	print(ident + '   Movement By Polygon')
+
+		# Checks if max date is given
+	if max_date is not None:
+		df_range_by_polygon.date_time = pd.to_datetime(df_range_by_polygon.date_time)
+		df_range_by_polygon = df_range_by_polygon[df_range_by_polygon.date_time < max_date]
+
 	df_range_by_polygon.to_csv(os.path.join(unified_dir, 'movement_range_by_polygon.csv'), index = False)
 
 

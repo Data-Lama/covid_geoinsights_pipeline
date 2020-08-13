@@ -1,6 +1,6 @@
 name,folder,type,source,destination
-Graph Map First Day,analysis,figure,colombia/community/TDA/maps_by_day/map_by_[0].jpeg,map_by_start_colombia.jpeg
-Graph Map Current Day,analysis,figure,colombia/community/TDA/maps_by_day/map_by_*.jpeg,map_by_current_colombia.jpeg
+Graph Map First Day,analysis,figure,colombia/community/graph_maps/entire_location/maps_by_day/map_by_[0].jpeg,map_by_start_colombia.jpeg
+Graph Map Current Day,analysis,figure,colombia/community/graph_maps/entire_location/maps_by_day/map_by_*.jpeg,map_by_current_colombia.jpeg
 Polygon Movement range,analysis,figure,colombia/community/movement_plots/movement_range_selected_polygons_colombia.png,internal_movement_selected_polygons_colombia.png
 Movement FB Colombia,analysis,figure,colombia/community/movement_plots/mov_range_colombia.png,mov_pais_Colombia.png
 Neighbor Series barranquilla,analysis,figure,colombia/community/neighbors/barranquilla/neighbor_timeseries_barranquilla.png,neighbor_timeseries_barranquilla.png
