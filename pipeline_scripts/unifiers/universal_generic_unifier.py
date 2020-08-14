@@ -146,19 +146,6 @@ if os.path.exists( os.path.join(unifier.raw_folder, 'movement_range')):
 	df_movement_range.to_csv(os.path.join(unified_dir, 'movement_range.csv'), index = False)
 
 
-# Checks if implementation supports movent range by polygons
-df_range_by_polygon =  unifier.build_movement_range_by_polygon()
-if df_range_by_polygon is not None:
-
-	print(ident + '   Movement By Polygon')
-
-		# Checks if max date is given
-	if max_date is not None:
-		df_range_by_polygon.date_time = pd.to_datetime(df_range_by_polygon.date_time)
-		df_range_by_polygon = df_range_by_polygon[df_range_by_polygon.date_time < max_date]
-
-	df_range_by_polygon.to_csv(os.path.join(unified_dir, 'movement_range_by_polygon.csv'), index = False)
-
 
 print(ident + 'Saving Dates')
 

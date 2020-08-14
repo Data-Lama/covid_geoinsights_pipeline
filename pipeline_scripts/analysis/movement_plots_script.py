@@ -54,7 +54,7 @@ for agglomeration_method in agglomeration_methods:
 		continue
 
 	# Export folder location
-	export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'movement_plots')
+	export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'movement_plots', 'entire_location')
 
 	# Creates the folder if does not exists
 	if not os.path.exists(export_folder_location):

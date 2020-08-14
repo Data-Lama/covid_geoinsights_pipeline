@@ -133,39 +133,6 @@ class Unifier(GenericUnifier):
 		return(polygons_final)
 
 
-	def build_movement_range_by_polygon(self):
-		'''
-		Builds movement range		
-		'''
-
-		# Movment range folder
-		mov_range_folder = os.path.join(self.raw_folder, 'movement_range_by_geometry_pop-density_2')
-
-		dfs = []
-
-		for file in os.listdir(mov_range_folder):
-			file_location = os.path.join(mov_range_folder,file)
-			if file.endswith('.csv') and os.stat(file_location).st_size > 0:
-
-				# Extracts Date
-				date_string = file.split('_')[-1]
-				date_string = date_string.split('.')[0]
-				d = pd.to_datetime(date_string)
-
-				# Adds Date
-				df_temp = pd.read_csv(file_location)
-				if df_temp.shape[0] > 0:
-					df_temp['date_time'] = d
-
-					dfs.append(df_temp)
-
-
-		df_resp = pd.concat(dfs, ignore_index = True)
-
-		return(df_resp)
-
-
-
 
 		
 

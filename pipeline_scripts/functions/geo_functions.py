@@ -112,7 +112,7 @@ def extract_lat(poly, pos = 1):
 # ----------------------------------------
 
 
-def get_GADM_polygon(GADM_id, df_GADM=None):
+def __get_GADM_polygon(GADM_id, df_GADM=None):
 	if df_GADM == None:
 		path = os.path.join(data_dir, 'data_stages', 'colombia', 'raw', 'geo', 'gadm36_COL_shp', 'gadm36_COL_2.shp')
 		# GADM geodataset originally crs = {epsg:4326}
@@ -123,7 +123,7 @@ def get_GADM_polygon(GADM_id, df_GADM=None):
 	polygon = df_GADM.at[GADM_id, 'geometry']
 	return polygon
 
-def get_GADM_popdensity(GADM_id, df_GADM=None):
+def __get_GADM_popdensity(GADM_id, df_GADM=None):
 	if df_GADM == None:
 		path = os.path.join(data_dir, 'data_stages', 'colombia', 'raw', 'geo', 'gadm36_COL_shp', 'gadm36_COL_2_population_density.csv')
 		# GADM geodataset originally crs = {epsg:4326}
@@ -132,3 +132,20 @@ def get_GADM_popdensity(GADM_id, df_GADM=None):
 	polygon = df_GADM.at[GADM_id, 'geometry']
 	pop_density = df_GADM.at[GADM_id, 'population_density']
 	return pop_density
+
+
+def get_gadm_polygons(location_name):
+	'''
+	Method that gets the  GADM polygons (the ones that facebook uses)
+	'''
+
+	gadm_dir = os.path.join(data_dir, 'geo', 'gadm_polygons', location_name, f"{location_name}_2.shp")
+
+	if not os.path.exists(gadm_dir):
+		raise ValueError('No GADM Polygons found for location: {}. Please save it in: {}'.format(location_name, gadm_dir))
+
+	df_GADM = gpd.read_file(gadm_dir).rename(columns = {'GID_2':'external_polygon_id'})
+
+	return(df_GADM)
+
+	

@@ -1,9 +1,5 @@
 # Agglomerates by comunnity
 options(warn=-1)
-# Checks if the R enviorment has the packages
-list.of.packages <- c("dplyr", "igraph","proxy", "ramify")
-new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.packages)
 
 # Imports the libraries
 suppressMessages(library("dplyr"))
@@ -85,7 +81,7 @@ attr_col = colnames(polygons)[as.vector(sapply(colnames(polygons), function(col)
 # Groups the dataframe
 g_mov = movement %>% 
         group_by(start_poly_id, end_poly_id) %>% 
-        summarise(movement = mean(movement)) %>%
+        summarise(movement = mean(movement), .groups = "keep") %>%
         ungroup() %>%
         select(start_poly_id, end_poly_id, movement)
 
@@ -118,14 +114,14 @@ if('attr_population' %in% colnames(polygons))
   final_community = polygons %>%
                     select(poly_id, community_id, attr_population) %>%
                     group_by(community_id) %>%
-                    summarise(final_id = exctract_id_by_population(poly_id, attr_population)) %>%
+                    summarise(final_id = exctract_id_by_population(poly_id, attr_population), .groups = "keep") %>%
                     ungroup()  
 }else
 {
     final_community = polygons %>%
                     select(poly_id, community_id, num_cases) %>%
                     group_by(community_id) %>%
-                    summarise(final_id = exctract_id_by_cases(poly_id, num_cases)) %>%
+                    summarise(final_id = exctract_id_by_cases(poly_id, num_cases), .groups = "keep") %>%
                     ungroup()  
 }
 
@@ -142,14 +138,14 @@ if('attr_population' %in% colnames(polygons))
 {
     agg_poly_1 = polygons %>% 
     group_by(community_id) %>%
-    summarise(poly_name = exctract_name_by_population(poly_name, attr_population), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(poly_lon, poly_lat), poly_lon = extract_center_by_population(poly_lon, poly_lat, attr_population)[1], poly_lat = extract_center_by_population(poly_lon, poly_lat, attr_population)[2]) %>%
+    summarise(poly_name = exctract_name_by_population(poly_name, attr_population), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(poly_lon, poly_lat), poly_lon = extract_center_by_population(poly_lon, poly_lat, attr_population)[1], poly_lat = extract_center_by_population(poly_lon, poly_lat, attr_population)[2], .groups = "keep") %>%
     ungroup()  
   
 }else
 {
   agg_poly_1 = polygons %>% 
   group_by(community_id) %>%
-  summarise(poly_name = exctract_name_by_cases(poly_name, num_cases), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(poly_lon, poly_lat), poly_lon = extract_center_by_cases(poly_lon, poly_lat, num_cases)[1], poly_lat = extract_center_by_cases(poly_lon, poly_lat, num_cases)[2]) %>%
+  summarise(poly_name = exctract_name_by_cases(poly_name, num_cases), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(poly_lon, poly_lat), poly_lon = extract_center_by_cases(poly_lon, poly_lat, num_cases)[1], poly_lat = extract_center_by_cases(poly_lon, poly_lat, num_cases)[2], .groups = "keep") %>%
   ungroup()  
 }
 
@@ -199,7 +195,7 @@ agg_mov = movement %>%
           mutate(end_poly_id = community_id) %>%
           select(date_time, start_poly_id, end_poly_id, movement) %>%
           group_by(date_time, start_poly_id, end_poly_id) %>%
-          summarise(movement = sum(movement)) %>%
+          summarise(movement = sum(movement), .groups = "keep") %>%
           ungroup() %>%
           arrange(date_time)
 
@@ -215,8 +211,8 @@ agg_pop = pop %>%
           inner_join(polygons %>% select(poly_id, community_id), by = c('poly_id' = 'poly_id')) %>%
           mutate(poly_id = community_id) %>%
           select(date_time, poly_id, population) %>%
-          group_by(date_time, poly_id, poly_id) %>%
-          summarise(population = sum(population)) %>%
+          group_by(date_time, poly_id) %>%
+          summarise(population = sum(population), .groups = "keep") %>%
           ungroup() %>%
           arrange(date_time)
 
@@ -254,7 +250,7 @@ if(file.exists(movement_range_file))
   agg_mov_range = df_movement_range %>% 
                   inner_join(filtered_polys, by = c('poly_id' = 'poly_id')) %>%
                   group_by(date_time, community_id)  %>%
-                  summarise(movement_change = factor_average(movement_change, factor)) %>%
+                  summarise(movement_change = factor_average(movement_change, factor), .groups = "keep") %>%
                   ungroup() %>%
                   select(c('date_time', 'community_id', 'movement_change')) %>%
                   rename(poly_id = community_id) %>%
