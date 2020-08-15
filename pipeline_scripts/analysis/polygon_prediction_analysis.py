@@ -205,7 +205,7 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 	fig.tight_layout(pad=3.0)
 
 	fig.savefig(os.path.join(folder_location, 'prediction_{}.png'.format(polygon_name)))
-
+	plt.close()
 
 	print(ident + '   Plots Simulations')
 
@@ -235,6 +235,7 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 
 	fig.tight_layout(pad=3.0)
 	fig.savefig(os.path.join(folder_location, 'simulations_{}.png'.format(polygon_name)))
+	plt.close()
 
 	print(ident + '   Exports Statistics')
 

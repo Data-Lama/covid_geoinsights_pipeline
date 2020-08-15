@@ -149,7 +149,7 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
     fig.tight_layout(pad=3.0)
 
     fig.savefig(os.path.join(folder_location , 'neighbor_timeseries_{}.png'.format(polygon_name)))
-
+    plt.close()
 
 if __name__ == "__main__":
     # Reads the parameters from excecution
