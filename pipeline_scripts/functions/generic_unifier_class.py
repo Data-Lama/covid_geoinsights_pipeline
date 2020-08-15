@@ -106,15 +106,6 @@ class GenericUnifier():
 		return(df_cases)
 
 
-	def build_movement_range_by_polygon(self):
-		'''
-		Gives the movmeent range by the polygon used in the unifier. By default return None, which does not save anything when excecuted
-		'''
-
-		return(None)
-
-
-
 	def update_geo(max_tries = 3):
 		'''
 		Updates the new missing geo_locations

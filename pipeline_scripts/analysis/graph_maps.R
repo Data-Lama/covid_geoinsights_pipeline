@@ -2,10 +2,11 @@
 
 options(warn=-1)
 
+# If they are placed before TDA something fails (No idea what)
+suppressMessages(library('ggplot2'))
+suppressMessages(library('ggmap'))
 suppressMessages(library("dplyr"))
-suppressMessages(library('igraph'))
-suppressMessages(library('proxy'))
-suppressMessages(library('ramify'))
+
 
 source('pipeline_scripts/functions/constants.R')
 
@@ -14,9 +15,7 @@ source("global_config/config.R")
 data_dir = get_property('data_dir')
 analysis_dir = get_property('analysis_dir')
 
-# If they are placed before TDA something fails (No idea what)
-suppressMessages(library('ggplot2'))
-suppressMessages(library('ggmap'))
+
 
 
 # Working Directory
@@ -206,7 +205,7 @@ for(agglomeration_method in agglomeration_methods)
     
     current_graph = current_graph %>% 
       group_by(lon, lat) %>% 
-      summarise(inner_movement = mean(inner_movement), num_cases = mean(num_cases)) %>%
+      summarise(inner_movement = mean(inner_movement), num_cases = mean(num_cases),  .groups = "keep") %>%
       ungroup()
     
     current_edges = edges[edges$day <= day + plus,]
@@ -214,15 +213,15 @@ for(agglomeration_method in agglomeration_methods)
     
     current_edges = current_edges %>% 
       group_by(lon.x, lat.x, lon.y, lat.y) %>% 
-      summarise(movement = mean(movement)) %>%
+      summarise(movement = mean(movement), .groups = "keep") %>%
       ungroup()
     
     # Only plots the one with at least one case
     current_graph = current_graph[current_graph$num_cases > 0, ]
     
     p =  ggmap(map)
-    p = p + geom_point(data = current_graph, aes(x = lon, y = lat, size = inner_movement, color = num_cases))
     p = p + geom_segment(data = current_edges, aes(x = lon.x, y = lat.x, xend = lon.y, yend = lat.y, alpha = movement), color = 'yellow', size = 1.5)
+    p = p + geom_point(data = current_graph, aes(x = lon, y = lat, size = inner_movement, color = num_cases))    
     p = p + scale_color_gradient(low = "darkblue", high = "red", limits=c(cases_min, cases_max))
     p = p + scale_size(limits=c(internal_min, internal_max))
     p = p + scale_alpha(limits=c(external_min, external_max))
@@ -271,9 +270,11 @@ for(agglomeration_method in agglomeration_methods)
     current_graph = nodes[nodes$day <= day + plus,]
     current_graph = current_graph[current_graph$day >= day - minus,]
     
+    current_graph = as.tbl(current_graph)
+    
     current_graph = current_graph %>% 
       group_by(lon, lat) %>% 
-      summarise(inner_movement = mean(inner_movement), num_cases = mean(num_cases)) %>%
+      summarise(inner_movement = mean(inner_movement), num_cases = mean(num_cases), .groups = "keep") %>%
       ungroup()
     
     # Adds the cases
@@ -288,15 +289,15 @@ for(agglomeration_method in agglomeration_methods)
     
     current_edges = current_edges %>% 
       group_by(lon.x, lat.x, lon.y, lat.y) %>% 
-      summarise(movement = mean(movement)) %>%
+      summarise(movement = mean(movement), .groups = "keep") %>%
       ungroup()
     
     # Only plots the one with at least one case
     current_graph = current_graph[current_graph$num_cases > 0, ]
     
     p =  ggmap(map)
-    p = p + geom_point(data = current_graph, aes(x = lon, y = lat, size = inner_movement, color = num_cases))
     p = p + geom_segment(data = current_edges, aes(x = lon.x, y = lat.x, xend = lon.y, yend = lat.y, alpha = movement), color = 'yellow', size = 1.5)
+    p = p + geom_point(data = current_graph, aes(x = lon, y = lat, size = inner_movement, color = num_cases))    
     p = p + scale_color_gradient(low = "darkblue", high = "red", limits=c(cases_min, cases_max))
     p = p + scale_size(limits=c(internal_min, internal_max))
     p = p + scale_alpha(limits=c(external_min, external_max))

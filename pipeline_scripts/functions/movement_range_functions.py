@@ -143,11 +143,11 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
 
 
         # Use intersections to calculate movement range
-        df_movement_range_by_polygon = pd.DataFrame(columns=["date_time", "poly_id", "movement"])
+        df_movement_range_by_polygon = pd.DataFrame(columns=["date_time", "poly_id", "movement_change"])
         for d in df_movement_range["ds"].unique():
             gdf_movement_range_sm = df_movement_range[df_movement_range["ds"] == d].copy()
             print("{}{}Calculating movement range for {}".format(ident, ident, d))
-            gdf_polygons["movement"] = \
+            gdf_polygons["movement_change"] = \
                 gdf_polygons.apply(lambda x: calculate_movement(x["intersections"], gdf_movement_range_sm), axis=1)
             gdf_polygons["date_time"] = d
             df_movement_range_by_polygon = pd.concat([df_movement_range_by_polygon, gdf_polygons], ignore_index=True, join="inner")
@@ -164,11 +164,11 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
         print("{}{}({} seconds to build intersections)".format(ident,ident, end-start))
 
         # Use intersections to calculate movement range
-        df_movement_range_by_polygon = pd.DataFrame(columns=["date_time", "poly_id", "movement"])
+        df_movement_range_by_polygon = pd.DataFrame(columns=["date_time", "poly_id", "movement_change"])
         for d in df_movement_range["ds"].unique():
             gdf_movement_range_sm = df_movement_range[df_movement_range["ds"] == d].copy()
             print("{}{}Calculating movement range for {}".format(ident, ident, d))
-            gdf_polygons["movement"] = \
+            gdf_polygons["movement_change"] = \
                 gdf_polygons.apply(lambda x: calculate_movement(x["intersections"], gdf_movement_range_sm), axis=1)
             gdf_polygons["date_time"] = d
             df_movement_range_by_polygon = pd.concat([df_movement_range_by_polygon, gdf_polygons], ignore_index=True, join="inner")

@@ -12,6 +12,8 @@ import geopandas as geopandas
 import general_functions as gf
 import movement_range_functions as mov_fun
 
+import geo_functions as geo
+
 # Direcotries
 from global_config import config
 data_dir = config.get_property('data_dir')
@@ -43,6 +45,9 @@ if not os.path.exists(agglomeration_folder):
 
 
 ident = '         '
+
+
+
 
 print(ident + 'Agglomerates for {}'.format(location_name))
 print()
@@ -105,6 +110,8 @@ agg_polygons = polygons.merge(agg_cases[['poly_id'] + cases_cols].groupby('poly_
 agg_polygons.sort_values('num_cases', ascending = False)
 
 
+
+
 print(ident + '      Agglomerates Movement')
 # Creates the agglomerated movement
 agg_movement = movement[['date_time','start_movement_lon','start_movement_lat','end_movement_lon','end_movement_lat','n_crisis']]
@@ -134,20 +141,6 @@ agg_population = pd.DataFrame(columns = ['date_time','poly_id','population'])
 
 
 
-# If location has movement range
-mov_range_file = os.path.join(location_folder,  'unified/movement_range.csv')
-agg_movement_range = None
-if os.path.exists(mov_range_file):
-
-	df_movement_range_unified = pd.read_csv(mov_range_file)
-	
-	# Computes the movement range by polygon
-	agg_movement_range = mov_fun.construct_movement_range_by_polygon(df_movement_range_unified, agg_polygons)
-
-
-
-
-
 print()
 print(ident + '   Saves Data:')
 
@@ -171,6 +164,27 @@ agg_polygons.to_csv(os.path.join(agglomeration_folder, 'polygons.csv'), index = 
 
 print(ident + '      Population')
 agg_population.to_csv(os.path.join(agglomeration_folder, 'population.csv'), index = False)
+
+
+
+
+
+# If location has movement range
+mov_range_file = os.path.join(location_folder,  'unified/movement_range.csv')
+agg_movement_range = None
+if os.path.exists(mov_range_file):
+
+	df_movement_range_unified = pd.read_csv(mov_range_file)
+	
+	# Computes the movement range by polygon
+	gadm_polygons = geo.get_gadm_polygons(location_folder_name)
+	agg_movement_range = mov_fun.construct_movement_range_by_polygon(df_movement_range_unified, agg_polygons,  gadm_polygons)
+
+
+
+
+
+
 
 
 if agg_movement_range is not None:
