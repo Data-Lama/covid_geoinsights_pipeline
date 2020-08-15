@@ -274,7 +274,7 @@ def build_dataset_in_directory(directory, dropna = False):
 	datasets = []
 	for file in os.listdir(directory):
 		file_name = os.path.join(directory, file)
-		if file_name.endswith('.csv') and os.stat(file_name).st_size > 0:			
+		if file_name.endswith('.csv') and os.stat(file_name).st_size > 0:		
 			datasets.append(read_single_file(file_name, dropna = dropna))
 
 	df = pd.concat(datasets, ignore_index = True)
