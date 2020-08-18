@@ -133,7 +133,7 @@ if pop_attr in polygons.columns:
 	print(ident + '   Population Found, averaging movement by population.')
 
 	# Averages with population size as factor
-	df_mov = df_mov.merge(polygons, on = 'poly_id')
+	df_mov = df_mov.merge(polygons[['poly_id',pop_attr]], on = 'poly_id')
 	df_mov = df_mov[['date_time',pop_attr, 'movement_change']]
 
 	df_mov['prod'] = df_mov['movement_change']*df_mov[pop_attr]
@@ -147,7 +147,7 @@ if pop_attr in polygons.columns:
 	# National Level
 
 	# Averages with population size as factor
-	df_mov_range_all = df_mov_range_all.merge(polygons_all, on = 'poly_id')
+	df_mov_range_all = df_mov_range_all.merge(polygons_all[['poly_id', pop_attr]], on = 'poly_id')
 	df_mov_range_all = df_mov_range_all[['date_time',pop_attr, 'movement_change']]
 
 	df_mov_range_all['prod'] = df_mov_range_all['movement_change']*df_mov_range_all[pop_attr]
@@ -244,7 +244,7 @@ if polygons.shape[0] > max_selected:
 	polygons.loc[polygons.index[max_selected:],'poly_name'] = 'Otros (Promedio)'
 
 
-df_plot = df_mov_range.merge(polygons, on = 'poly_id')
+df_plot = df_mov_range.merge(polygons[['poly_id','poly_name']], on = 'poly_id')
 
 fig = plt.figure(figsize=(19,8))
 

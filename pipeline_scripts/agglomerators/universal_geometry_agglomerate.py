@@ -140,6 +140,18 @@ agg_movement = agg_movement.groupby(['date_time','start_poly_id','end_poly_id'])
 agg_population = pd.DataFrame(columns = ['date_time','poly_id','population'])
 
 
+# If location has movement range
+mov_range_file = os.path.join(location_folder,  'unified/movement_range.csv')
+agg_movement_range = None
+if os.path.exists(mov_range_file):
+
+	print(ident + '      Movement Range')
+	df_movement_range_unified = pd.read_csv(mov_range_file)
+	
+	# Computes the movement range by polygon
+	gadm_polygons = geo.get_gadm_polygons(location_folder_name)
+	agg_movement_range = mov_fun.construct_movement_range_by_polygon(df_movement_range_unified, agg_polygons,  gadm_polygons)
+
 
 print()
 print(ident + '   Saves Data:')
@@ -164,26 +176,6 @@ agg_polygons.to_csv(os.path.join(agglomeration_folder, 'polygons.csv'), index = 
 
 print(ident + '      Population')
 agg_population.to_csv(os.path.join(agglomeration_folder, 'population.csv'), index = False)
-
-
-
-
-
-# If location has movement range
-mov_range_file = os.path.join(location_folder,  'unified/movement_range.csv')
-agg_movement_range = None
-if os.path.exists(mov_range_file):
-
-	df_movement_range_unified = pd.read_csv(mov_range_file)
-	
-	# Computes the movement range by polygon
-	gadm_polygons = geo.get_gadm_polygons(location_folder_name)
-	agg_movement_range = mov_fun.construct_movement_range_by_polygon(df_movement_range_unified, agg_polygons,  gadm_polygons)
-
-
-
-
-
 
 
 
