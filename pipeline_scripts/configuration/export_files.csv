@@ -36,3 +36,13 @@ Estadisticas Prediccion,analysis,table,colombia/community/prediction/entire_loca
 Incidence Map,analysis,figure,colombia/geometry/incidence_maps/incidence_map.jpeg,incidence_map_geometry.jpeg
 Incidence Table,analysis,table,colombia/geometry/incidence_maps/incidences.csv,incidences_geometry.csv
 Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv
+Socio-economic Statistics,analysis,table,colombia/community/socio-economic/bogota_d.c./socio-economic_data_bogota_d.c..csv,socio-economic_data_bogota_d.c..csv
+Socio-economic Statistics,analysis,table,colombia/community/socio-economic/cali/socio-economic_data_cali.csv,socio-economic_data_cali.csv
+Socio-economic Statistics,analysis,table,colombia/community/socio-economic/barranquilla/socio-economic_data_barranquilla.csv,socio-economic_data_barranquilla.csv
+Socio-economic Statistics,analysis,table,colombia/community/socio-economic/cartagena_de_indias/socio-economic_data_cartagena_de_indias.csv,socio-economic_data_cartagena_de_indias.csv
+Socio-economic Statistics,analysis,table,colombia/community/socio-economic/ibague/socio-economic_data_ibague.csv,socio-economic_data_ibague.csv
+Socio-economic Statistics,analysis,table,colombia/community/socio-economic/popayan/socio-economic_data_popayan.csv,socio-economic_data_popayan.csv
+Socio-economic Statistics,analysis,table,colombia/community/socio-economic/villavicencio/socio-economic_data_villavicencio.csv,socio-economic_data_villavicencio.csv
+Socio-economic Statistics,analysis,table,colombia/community/socio-economic/santa_marta/socio-economic_data_santa_marta.csv,socio-economic_data_santa_marta.csv
+Socio-economic Statistics,analysis,table,colombia/community/socio-economic/cucuta/socio-economic_data_cucuta.csv,socio-economic_data_cucuta.csv
+Socio-economic Statistics,analysis,table,colombia/community/socio-economic/bucaramanga/socio-economic_data_bucaramanga.csv,socio-economic_data_bucaramanga.csv

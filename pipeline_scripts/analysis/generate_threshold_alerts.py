@@ -58,8 +58,7 @@ time_window_file_path = os.path.join(analysis_dir, location_name, location_folde
 cases = os.path.join(agglomerated_file_path, 'cases.csv')
 movement = os.path.join(agglomerated_file_path, 'movement.csv')
 total_window = os.path.join(time_window_file_path, 'deltas_forward_window_5days.csv')
-age = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'socio_economic', 'edad_por_municipio.csv')
-ipm = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'socio_economic', 'ipm_por_municipio.csv')
+socioecon = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'socio_economic', 'estadisticas_por_municipio.csv')
 
 # Geofiles
 community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', 'community', 'polygon_community_map.csv')
@@ -96,9 +95,10 @@ df_total_window = pd.read_csv(total_window)
 first_day = pd.Timestamp('today') - datetime.timedelta(days = WINDOW_SIZE)
 
 # Get socio-economic variables
-df_ipm = pd.read_csv(ipm)
-df_age = pd.read_csv(age, sep="\t")
-df_age["percentage_over_60"] = df_age["percentage_over_60"].multiply(100)
+df_socioecon = pd.read_csv(socioecon)
+df_ipm = df_socioecon[["node_id", "ipm"]].copy()
+df_age = df_socioecon[["node_id","porcentaje_sobre_60"]].copy()
+df_age["porcentaje_sobre_60"] = df_age["porcentaje_sobre_60"].multiply(100)
 
 # Get polygons
 df_movement_recent = df_movement.loc[df_movement['date_time'] >= first_day].copy()
@@ -224,7 +224,7 @@ red_alerts.sort_values(by=['Departamento','Municipio'], inplace=True)
 red_alerts.rename(columns={'internal_alert': 'Alerta interna (movimiento)', 'community_name':'Unidad funcional',
 'external_alert':'Alerta externa (movimiento)', 'alert_first_case':'Alerta de primer caso detectado', 
 "alert_external_num_cases":"Alerta numero de casos en municipios vecinos", "alert_internal_num_cases":"Alerta numero de casos",
-"percentage_over_60":"Personas mayores a 60", "ipm":"IPM"}, inplace=True)
+"porcentaje_sobre_60":"Personas mayores a 60", "ipm":"IPM"}, inplace=True)
 red_alerts.to_csv(os.path.join(output_file_path, 'alerts.csv'), columns=['Departamento', 'Municipio', 'Unidad funcional',                                           
                                         'Alerta interna (movimiento)',
                                         'Alerta numero de casos',
