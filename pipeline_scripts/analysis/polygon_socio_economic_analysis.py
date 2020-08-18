@@ -34,14 +34,15 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
                                                     "porcentaje_subsidiado", "porcentaje_contributivo"]))
 
     df_variables.drop(columns=cols_to_drop, inplace=True)
+    df_variables.reset_index(inplace=True)
     df_variables = df_variables.transpose().reset_index()
     df_variables.set_index("index", inplace=True)
     df_national.set_index(0, inplace=True)
-
     df_variables = df_national.merge(df_variables, how="outer", left_index=True, right_index=True)
+    df_variables.drop("index", inplace=True)
     df_variables.rename(columns={1:"Nacional", 0:polygon_name}, inplace=True)
-
     df_variables.to_csv(os.path.join(folder_location, "socio-economic_data.csv"))
+    return os.path.join(folder_location, "socio-economic_data.csv")
 
 
 if __name__ == "__main__":
