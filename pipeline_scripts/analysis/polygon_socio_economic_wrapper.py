@@ -9,6 +9,8 @@ from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
+import general_functions as gf
+
 # import scripts
 import pipeline_scripts.analysis.polygon_socio_economic_analysis as polygon_socio_economic_analysis
 
@@ -64,10 +66,10 @@ for country in countries:
     for i in selected_polygons.index:
         poly_id = selected_polygons.at[i, "poly_id"]
         location_name = selected_polygons.at[i, "location_name"]
-        location_folder = selected_polygons.at[i, "folder_name"]
+        agglomeration = selected_polygons.at[i, "agglomeration"]
 
          # Get polygons
-        polygons = os.path.join(data_dir, "data_stages", location_name, "agglomerated", location_folder, "polygons.csv")
+        polygons = os.path.join(data_dir, "data_stages", location_name, "agglomerated", agglomeration, "polygons.csv")
         try:
             df_polygons = pd.read_csv(polygons, low_memory=False)
         except:
@@ -75,11 +77,9 @@ for country in countries:
 
         df_polygons.set_index("poly_id", inplace=True)
         poly_name = df_polygons.at[poly_id, "poly_name"]
-        city_name = poly_name.split("-")[0].split(" ")  
-        city_name = "_".join(city_name).lower()
-        city_name = unidecode.unidecode(city_name)
+        city_name = gf.create_folder_name(poly_name)
 
-        table = polygon_socio_economic_analysis.main(location_name, location_folder, city_name, poly_id, poly_name, ident = '         ')
+        table = polygon_socio_economic_analysis.main(location_name, agglomeration, city_name, poly_id, poly_name, ident = '         ')
         files_to_graph.append({city_name:table})
         files_to_export.append(table)
     

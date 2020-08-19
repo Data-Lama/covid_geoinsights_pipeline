@@ -91,9 +91,9 @@ Mexico,mexico,unify,unifiers,1,NO,universal_generic_unifier,python,Mexico mexico
 Mexico,mexico,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Mexico mexico 10
 Mexico,mexico,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,Mexico mexico
 Mexico,mexico,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Mexico mexico all
-Colombia,colombia,POS,analysis,2,NO,location_selected_polygon_prediction_analysis,python,Colombia colombia community 0.8 20
-Colombia,colombia,POS,analysis,2,NO,polygon_prediction_wrapper,python
-Colombia,colombia,POS,analysis,2,NO,polygon_socio_economic_wrapper,python
+Colombia,colombia,POS,analysis,2,NO,polygon_prediction_wrapper,python,
+Colombia,colombia,POS,analysis,2,YES,polygon_socio_economic_wrapper,python,
+Colombia,colombia,POS,analysis,3,NO,location_polygon_prediction_by_coverage_analysis.py,python,Colombia colombia community 0.8 20
 Colombia,colombia,POS,analysis,5,NO,location_prediction_by_polygon_union,python,Colombia colombia community
 Colombia,colombia,POS,analysis,1,NO,polygon_info_timewindow,python,colombia geometry 5 days
 Colombia,colombia,POS,analysis,1,NO,generate_threshold_alerts,python,colombia geometry min_record
@@ -101,4 +101,4 @@ Colombia,colombia,POS,analysis,1,NO,choropleth_maps,python,colombia geometry
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia geometry
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia community
 Colombia,colombia,POS,analysis,1,NO,incidence_map,r,Colombia colombia geometry
-All,,POS,POS,6,NO,copy_report_files.py,python,
+All,,POS,POS,6,YES,copy_report_files.py,python,

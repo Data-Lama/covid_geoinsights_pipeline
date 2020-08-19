@@ -158,6 +158,9 @@ for agglomeration_method in agglomeration_methods:
 	df_cases['type'] = 'cases'
 	df_cases['Tipo'] = 'Casos (Fecha Diagnóstico)' 
 
+	# Extracts the max date
+	max_date = df_cases.date_time.max()
+
 	df_cases_plot = df_cases[['date_time','value','type','Tipo']].copy()
 
 
@@ -174,7 +177,7 @@ for agglomeration_method in agglomeration_methods:
 
 
 		# If max date is established
-		#df_cases_other_date = df_cases_other_date[df_cases_other_date.date_time < pd.to_datetime('2020-08-01')].copy()		
+		df_cases_other_date = df_cases_other_date[df_cases_other_date.date_time <= max_date].copy()		
 
 
 		df_cases_other_date['value'] = 1

@@ -5,6 +5,7 @@ import shutil
 import glob
 import numpy as np
 import os
+import glob
 from datetime import datetime
 import re
 import constants as con
@@ -28,8 +29,6 @@ print(ident + 'Copying {} files:'.format(df_files.shape[0]))
 not_found = 0
 for ind, row in df_files.iterrows():
 
-
-	
 	if row['folder'] == 'analysis':		
 		source = os.path.join(analysis_dir,row.source)
 
@@ -48,17 +47,22 @@ for ind, row in df_files.iterrows():
 
 	else:
 		raise ValueError('No support for type: {} of file'.format(row['type']))
-	# Last
+
+
+	# Inserts into array
+	sources = [source]
+	destinations = [destination]
+
+	# Regex
 	if '*' in source:
-		start = source.split('*')[0]
-		end = source.split('*')[1]
-		options = glob.glob(source)
-		max_num = -1
-		for file in options:
-			num = int(file.replace(start,'').replace(end,''))
-			if num > max_num:
-				max_num = num
-				source = file
+		# Inserts into array
+		sources = []
+		destinations = []
+
+		for file in glob.glob(source):
+			sources.append(file)
+			destinations.append(destination.replace('*',file.split('/')[-1]))
+			
 
 	# At position
 	elif "[" in source:
@@ -83,18 +87,27 @@ for ind, row in df_files.iterrows():
 		else:
 			source = start + str(max_num + number) + end
 
+		# Inserts into array
+		sources = [source]
+		destinations = [destination]
 
-	print(ident + '   {}'.format(source))
+
+	for i in range(len(sources)):
+
+		source_temp = sources[i]
+		destination_temp = destinations[i]
+
+		print(ident + '   {}'.format(source_temp))
 
 
-	try:
-		shutil.copy(source, destination)
+		try:
+			shutil.copy(source_temp, destination_temp)
 
-	except FileNotFoundError:
-		# File NOt found
-		not_found += 1
-		print(f'File Not Found \n: {source}')
-		print("")
+		except FileNotFoundError:
+			# File NOt found
+			not_found += 1
+			print(f'File Not Found \n: {source}')
+			print("")
 
 
 print(ident + 'Write TimeStamp')
