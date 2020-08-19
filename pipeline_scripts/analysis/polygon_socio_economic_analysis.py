@@ -34,6 +34,10 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
                                                     "porcentaje_subsidiado", "porcentaje_contributivo"]))
 
     df_variables.drop(columns=cols_to_drop, inplace=True)
+    df_variables["porcentaje_sobre_60"] = df_variables["porcentaje_sobre_60"].multiply(100)
+    df_variables["porcentaje_subsidiado"] = df_variables["porcentaje_subsidiado"].multiply(100)
+    df_variables["porcentaje_contributivo"] = df_variables["porcentaje_contributivo"].multiply(100)
+    # df_variables.astype({'num_camas_UCI': 'int32', 'poblacion':'int32'})
     df_variables.reset_index(inplace=True)
     df_variables = df_variables.transpose().reset_index()
     df_variables.set_index("index", inplace=True)
@@ -41,13 +45,13 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
     df_variables = df_national.merge(df_variables, how="outer", left_index=True, right_index=True)
     df_variables.drop("index", inplace=True)
     df_variables.rename(columns={1:"Nacional", 0:polygon_name}, inplace=True)
-    df_variables.rename({"ipm":"Indice de Pobreza Multidimencional",
+    df_variables.rename({"ipm":"Indice de Pobreza Multidimensional (2018)",
                         "num_camas_UCI":"Número camas UCI",
                         "poblacion":"Población",
                         "porcentaje_contributivo":"Porcentaje en Régimen Contributivo (EPS)",
                         "porcentaje_subsidiado":"Porcentaje en Régimen Subsidiado (EPS)",
                         "porcentaje_sobre_60":"Porcentaje Población Mayor a 60"}, inplace=True)
-    df_variables.to_csv(os.path.join(folder_location, "socio-economic_data_{}.csv".format(polygon_name)))
+    df_variables.to_csv(os.path.join(folder_location, "socio-economic_data_{}.csv".format(polygon_name)), float_format='%.1f')
     return os.path.join(location, agglomeration_method, 'socio-economic', polygon_name, "socio-economic_data_{}.csv".format(polygon_name))
 
 

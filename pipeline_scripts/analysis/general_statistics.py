@@ -22,9 +22,11 @@ date_format = "%d/%m/%Y"
 
 # Get files
 constructed_file_path = os.path.join(data_dir, 'data_stages', location_name, 'constructed', location_folder, 'daily_graphs')
+agglomerated_file_path = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', location_folder)
 output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'stats')
 edges = os.path.join(constructed_file_path, 'edges.csv')
 nodes = os.path.join(constructed_file_path, 'nodes.csv')
+cases = os.path.join(agglomerated_file_path, 'cases.csv')
 
 # Check if folder exists
 if not os.path.isdir(output_file_path):
@@ -34,6 +36,11 @@ if not os.path.isdir(output_file_path):
 df_edges = pd.read_csv(edges, parse_dates=['date_time'])
 df_nodes = pd.read_csv(nodes, parse_dates=['date_time'])
 
+#Load num_cases 
+try:  
+    df_cases = pd.read_csv(cases, low_memory=False, parse_dates=['date_time'])
+except:
+    df_cases = pd.read_csv(cases, low_memory=False, encoding = 'latin-1', parse_dates=['date_time'])
 
 def get_max_min(variable, df):
     max_index = df[variable].idxmax()
@@ -140,7 +147,7 @@ no_case_polygons_last_days = int((total_last_days.num_cases == 0).sum())
 
 
 stats = {
-    # 'num_first_case':len(new_cases()),
+    'num_first_case':len(new_cases(df_cases, WINDOW)),
     'no_case_polygons_last_days':len(no_new_case_polygon),
     'day_max_mov': max_inner_mov_day['date'].strftime(date_format),
     'day_min_mov': min_inner_mov_day['date'].strftime(date_format),

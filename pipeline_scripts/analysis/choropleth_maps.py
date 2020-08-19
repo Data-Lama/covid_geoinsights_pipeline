@@ -145,7 +145,7 @@ print(ident+'   Building recent map (15 day window)')
 choropleth_map_recent = geo_df.merge(df_deltas_recent, left_on='Codigo_Dan', right_on='poly_id')
 choropleth_map_recent.to_crs(epsg=3857, inplace=True)
 scheme = [0, 0.49, 1, 2, 5, 10]
-ax = choropleth_map_recent.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(15,9),
+ax = choropleth_map_recent.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(30,18),
                                     scheme='user_defined', classification_kwds={'bins':scheme}, legend=True, linewidth=0.5)
 
 ax.set_axis_off()
@@ -164,7 +164,7 @@ print(ident+'   Building historic map (15 day window)')
 choropleth_map_historic = geo_df.merge(df_deltas_historic, left_on='Codigo_Dan', right_on='poly_id')
 choropleth_map_historic.replace([np.inf, -np.inf], np.nan, inplace=True)
 choropleth_map_historic.to_crs(epsg=3857, inplace=True)
-ax = choropleth_map_historic.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(15,9),
+ax = choropleth_map_historic.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(30,18),
                                     scheme='user_defined', classification_kwds={'bins':scheme}, k=6, legend=True, linewidth=0.5)
 ax.set_axis_off()
 
