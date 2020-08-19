@@ -1,8 +1,8 @@
 name,folder,type,source,destination
 Graph Map First Day,analysis,figure,colombia/community/graph_maps/entire_location/maps_by_day/map_by_[0].jpeg,map_by_start_colombia.jpeg
-Graph Map Current Day,analysis,figure,colombia/community/graph_maps/entire_location/maps_by_day/map_by_*.jpeg,map_by_current_colombia.jpeg
-Polygon Movement range,analysis,figure,colombia/community/movement_plots/movement_range_selected_polygons_colombia.png,internal_movement_selected_polygons_colombia.png
-Movement FB Colombia,analysis,figure,colombia/community/movement_plots/mov_range_colombia.png,mov_pais_Colombia.png
+Graph Map Current Day,analysis,figure,colombia/community/graph_maps/entire_location/maps_by_day/map_by_[-1].jpeg,map_by_current_colombia.jpeg
+Polygon Movement range,analysis,figure,colombia/community/movement_plots/entire_location/movement_range_selected_polygons_colombia.png,internal_movement_selected_polygons_colombia.png
+Movement FB Colombia,analysis,figure,colombia/community/movement_plots/entire_location/mov_range_colombia.png,mov_pais_Colombia.png
 Neighbor Series barranquilla,analysis,figure,colombia/community/neighbors/barranquilla/neighbor_timeseries_barranquilla.png,neighbor_timeseries_barranquilla.png
 Prediction barranquilla,analysis,figure,colombia/community/prediction/barranquilla/prediction_barranquilla.png,prediction_barranquilla.png
 Neighbor Series cali,analysis,figure,colombia/community/neighbors/cali/neighbor_timeseries_cali.png,neighbor_timeseries_cali.png
@@ -25,7 +25,7 @@ Neighbor Series Cucuta,analysis,figure,colombia/community/neighbors/cucuta/neigh
 Prediction Cucuta,analysis,figure,colombia/community/prediction/cucuta/prediction_cucuta.png,prediction_cucuta.png
 Prediction Colombia,analysis,figure,colombia/community/prediction/entire_location/prediction_colombia.png,prediction_colombia.png
 Simulacion Colombia,analysis,figure,colombia/community/prediction/entire_location/simulations_colombia.png,simulations_colombia.png
-Tabla Hitos,analysis,table,colombia/community/movement_plots/milestones.csv,milestones.csv
+Tabla Hitos,analysis,table,colombia/community/movement_plots/entire_location/milestones.csv,milestones.csv
 Mapa Alerta General,analysis,figure,colombia/geometry/alerts/map_max_alert.png,map_max_alert.png
 Mapa Cloroplético Historico,analysis,figure,colombia/geometry/polygon_info_window/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
 Mapa Cloroplético Reciente,analysis,figure,colombia/geometry/polygon_info_window/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
@@ -36,7 +36,7 @@ Estadisticas Prediccion,analysis,table,colombia/community/prediction/entire_loca
 Incidence Map,analysis,figure,colombia/geometry/incidence_maps/incidence_map.jpeg,incidence_map_geometry.jpeg
 Incidence Table,analysis,table,colombia/geometry/incidence_maps/incidences.csv,incidences_geometry.csv
 Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv
-Socio-economic Statistics,analysis,table,colombia/community/socio-economic/bogota_d.c./socio-economic_data_bogota_d.c..csv,socio-economic_data_bogota_d.c..csv
+Socio-economic Statistics,analysis,table,colombia/community/socio-economic/bogota_dc/socio-economic_data_bogota_dc.csv,socio-economic_data_bogota_dc.csv
 Socio-economic Statistics,analysis,table,colombia/community/socio-economic/cali/socio-economic_data_cali.csv,socio-economic_data_cali.csv
 Socio-economic Statistics,analysis,table,colombia/community/socio-economic/barranquilla/socio-economic_data_barranquilla.csv,socio-economic_data_barranquilla.csv
 Socio-economic Statistics,analysis,table,colombia/community/socio-economic/cartagena_de_indias/socio-economic_data_cartagena_de_indias.csv,socio-economic_data_cartagena_de_indias.csv

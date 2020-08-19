@@ -16,6 +16,8 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
+from datetime import datetime
+
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -239,14 +241,26 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 
 	print(ident + '   Exports Statistics')
 
-	with open(os.path.join(folder_location, 'prediction_statistics.txt'), 'w') as file:
-		
-		file.write('Agglomeration Method Used: {}'.format(agglomeration_method) + '\n')
-		file.write('   Result Statistics:' + '\n')
-		for concept in summary_dict:
-			file.write('      {}: {}'.format(concept, summary_dict[concept]) + '\n')
-			
+	var_name = []
+	var_value = []
 
+
+	# date time
+	var_name.append('date_time')
+	var_value.append(datetime.now())
+
+	# Agglomeration method
+	var_name.append('agglomeration_method')
+	var_value.append(agglomeration_method)
+
+	# General statistics
+	for concept in summary_dict:
+		var_name.append(concept)
+		var_value.append(summary_dict[concept])
+
+	statistics = pd.DataFrame({'name':var_name, 'value':var_value})
+	statistics.to_csv(os.path.join(folder_location, 'prediction_statistics.csv'), index = False)
+		
 	weights.to_csv(os.path.join(folder_location, 'weights.csv'), index = False)
 
 	print(ident + 'Done!')
