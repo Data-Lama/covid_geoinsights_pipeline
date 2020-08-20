@@ -40,6 +40,17 @@ location_folder =  sys.argv[2] # polygon name
 window_size_parameter = sys.argv[3] # window size
 time_unit = sys.argv[4] # time unit for window [days, hours]
 
+if len(sys.argv) <= 5:
+	selected_polygons_boolean = False
+else :
+    selected_polygons_boolean = True
+    selected_polygons = []
+    i = 5
+    while i < len(sys.argv):
+        selected_polygons.append(sys.argv[i])
+        i += 1
+    selected_polygon_name = selected_polygons.pop(0)
+
 # Get name of files
 agglomerated_file_path = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', location_folder)
 output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window')
@@ -47,14 +58,6 @@ cases = os.path.join(agglomerated_file_path, 'cases.csv')
 movement = os.path.join(agglomerated_file_path, 'movement.csv')
 
 date_zero = None
-output_backward_delta_file = os.path.join(output_file_path, 'deltas_backward_window_{}{}.csv'.format(window_size_parameter,time_unit))
-output_forward_delta_file = os.path.join(output_file_path,'deltas_forward_window_{}{}.csv'.format(window_size_parameter,time_unit))
-output_total_delta_file = os.path.join(output_file_path,'deltas_total_window_{}{}.csv'.format(window_size_parameter,time_unit))
-output_backward_file = os.path.join(output_file_path, 'backward_window_{}{}.csv'.format(window_size_parameter,time_unit))
-output_forward_file = os.path.join(output_file_path,'forward_window_{}{}.csv'.format(window_size_parameter,time_unit))
-output_total_file = os.path.join(output_file_path,'total_window_{}{}.csv'.format(window_size_parameter,time_unit))
-output_readme_file = os.path.join(output_file_path,'polygon_info_readme_{}{}.txt'.format(window_size_parameter,time_unit))
-
 ident = '         '
 
 # Import README
@@ -72,10 +75,6 @@ margins = { 'hours': datetime.timedelta(hours = window_size),
             'days': datetime.timedelta(days = window_size),
             'weeks': datetime.timedelta(weeks = window_size)
             }
-
-# Check if folder exists
-if not os.path.isdir(output_file_path):
-    os.makedirs(output_file_path)
 
 #Load movement and cases
 try:  
@@ -114,13 +113,6 @@ if max_time > max_data_avail:
 
 print(ident + "Getting information for {} with {} agglomeration between {} and {}".format(location_name, location_folder, min_time, max_time))
 
-with open(output_readme_file, 'w') as f:
-    f.write("min_date: {}\n".format(min_time))
-    f.write("max_date: {}\n".format(max_time))
-    f.write("date_zero: {}\n".format(date_zero))
-
-
-
 
 def calculate_delta(t_0, t_1):
     df_delta = (t_1.sub(t_0, axis='columns')).divide(t_0, axis='columns').fillna(0)
@@ -131,7 +123,7 @@ def calculate_delta(t_0, t_1):
 
     return df_delta
 
-def get_window_information(date_zero, min_time, max_time):
+def get_window_information(df_cases, date_zero, min_time, max_time):
 
     # Get windows
     df_backward_window = df_cases.loc[(df_cases['date_time'] < date_zero) & (df_cases['date_time'] >= min_time)].copy()
@@ -157,7 +149,7 @@ def get_window_information(date_zero, min_time, max_time):
     
     return [df_backward_window, df_middle_window, df_forward_window, df_total_window]
 
-def get_window_deltas(df_backward_window, df_middle_window, df_forward_window, df_total_window):
+def get_window_deltas(df_cases, df_backward_window, df_middle_window, df_forward_window, df_total_window):
     ############# Calculate deltas ###############
     ##############################################
 
@@ -178,8 +170,39 @@ def get_window_deltas(df_backward_window, df_middle_window, df_forward_window, d
 
     return [df_delta_backward, df_delta_forward, df_delta_total]
 
-windows = get_window_information(date_zero, min_time, max_time)
-deltas = get_window_deltas(windows[0], windows[1], windows[2], windows[3])
+if selected_polygons_boolean:
+    df_cases = df_cases[df_cases["poly_id"].isin(selected_polygons)]
+    output_file_path = os.path.join(output_file_path, selected_polygon_name)
+    output_backward_delta_file = os.path.join(output_file_path, 'deltas_backward_window_{}{}.csv'.format(window_size_parameter,time_unit))
+    output_forward_delta_file = os.path.join(output_file_path, 'deltas_forward_window_{}{}.csv'.format(window_size_parameter,time_unit))
+    output_total_delta_file = os.path.join(output_file_path,'deltas_total_window_{}{}.csv'.format(window_size_parameter,time_unit))
+    output_backward_file = os.path.join(output_file_path, 'backward_window_{}{}.csv'.format(window_size_parameter,time_unit))
+    output_forward_file = os.path.join(output_file_path,'forward_window_{}{}.csv'.format(window_size_parameter,time_unit))
+    output_total_file = os.path.join(output_file_path,'total_window_{}{}.csv'.format(window_size_parameter,time_unit))
+    output_readme_file = os.path.join(output_file_path, 'polygon_info_readme_{}{}.txt'.format(window_size_parameter,time_unit))
+else:
+    output_file_path = os.path.join(output_file_path, "entire_location")
+    output_backward_delta_file = os.path.join(output_file_path, 'deltas_backward_window_{}{}.csv'.format(window_size_parameter,time_unit))
+    output_forward_delta_file = os.path.join(output_file_path, 'deltas_forward_window_{}{}.csv'.format(window_size_parameter,time_unit))
+    output_total_delta_file = os.path.join(output_file_path, 'deltas_total_window_{}{}.csv'.format(window_size_parameter,time_unit))
+    output_backward_file = os.path.join(output_file_path, 'backward_window_{}{}.csv'.format(window_size_parameter,time_unit))
+    output_forward_file = os.path.join(output_file_path,'forward_window_{}{}.csv'.format(window_size_parameter,time_unit))
+    output_total_file = os.path.join(output_file_path, 'total_window_{}{}.csv'.format(window_size_parameter,time_unit))
+    output_readme_file = os.path.join(output_file_path, 'polygon_info_readme_{}{}.txt'.format(window_size_parameter,time_unit))
+
+# Check if folder exists
+if not os.path.isdir(output_file_path):
+    os.makedirs(output_file_path)
+
+# Write readme
+with open(output_readme_file, 'w') as f:
+    f.write("min_date: {}\n".format(min_time))
+    f.write("max_date: {}\n".format(max_time))
+    f.write("date_zero: {}\n".format(date_zero))
+
+
+windows = get_window_information(df_cases, date_zero, min_time, max_time)
+deltas = get_window_deltas(df_cases, windows[0], windows[1], windows[2], windows[3])
 
 # # Write to file
 deltas[0].to_csv(output_backward_delta_file)

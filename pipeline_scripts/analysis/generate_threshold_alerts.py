@@ -26,6 +26,17 @@ location_name  =  sys.argv[1] # location name
 location_folder =  sys.argv[2] # polygon name
 criteria_parameter = sys.argv[3] # min_record or min_date
 
+if len(sys.argv) <= 4:
+	selected_polygons_boolean = False
+else :
+    selected_polygons_boolean = True
+    selected_polygons = []
+    i = 4
+    while i < len(sys.argv):
+        selected_polygons.append(sys.argv[i])
+        i += 1
+    selected_polygon_name = selected_polygons.pop(0)
+
 # Constants
 ident = '         '
 WINDOW_SIZE = 7
@@ -54,11 +65,18 @@ COLORS_ = {'#b30000':'ROJO',
 # Get name of files
 agglomerated_file_path = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', location_folder)
 output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'alerts')
-time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window')
 cases = os.path.join(agglomerated_file_path, 'cases.csv')
 movement = os.path.join(agglomerated_file_path, 'movement.csv')
-total_window = os.path.join(time_window_file_path, 'deltas_forward_window_5days.csv')
 socioecon = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'socio_economic', 'estadisticas_por_municipio.csv')
+
+# If polygon_union_wrapper
+if selected_polygons_boolean:
+    time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', selected_polygon_name)
+else:
+    time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', "entire_location")
+
+total_window = os.path.join(time_window_file_path, 'deltas_forward_window_5days.csv')
+
 
 # Geofiles
 community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', 'community', 'polygon_community_map.csv')
@@ -215,6 +233,17 @@ df_alerts['external_num_cases_alert_color'] = df_alerts.apply(lambda x: set_colo
 df_alerts['internal_num_cases_alert_color'] = df_alerts.apply(lambda x: set_color(x.alert_internal_num_cases), axis=1)
 df_alerts['first_case_color_alert'] = df_alerts.apply(lambda x: set_color(x.alert_first_case), axis=1)
 
+# If asked for specific polygons, get subset
+if selected_polygons_boolean:
+    df_alerts = df_alerts[df_alerts["poly_id"].isin(selected_polygons)]
+    output_file_path = os.path.join(output_file_path, selected_polygon_name)
+else:
+    output_file_path = os.path.join(output_file_path, "entire_location")
+
+
+# Check if folder exists
+if not os.path.isdir(output_file_path):
+    os.makedirs(output_file_path)
 
 # Write alerts table
 red_alerts = df_alerts.loc[(df_alerts['max_alert'] == 'ROJO')].copy()

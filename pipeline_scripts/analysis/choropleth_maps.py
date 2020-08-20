@@ -24,6 +24,18 @@ analysis_dir = config.get_property('analysis_dir')
 location_name  =  sys.argv[1] # location name
 location_folder = sys.argv[2] # polygon name
 
+if len(sys.argv) <= 3:
+	selected_polygons_boolean = False
+else :
+    selected_polygons_boolean = True
+    selected_polygons = []
+    i = 3
+    while i < len(sys.argv):
+        selected_polygons.append(sys.argv[i])
+        i += 1
+    selected_polygon_name = selected_polygons.pop(0)
+
+
 # Constants
 ident = '         '
 RIVERS_DICT = {'sinu':'RÍO SINÚ',
@@ -137,31 +149,45 @@ df_deltas_historic = calculate_delta(df_municipalites_t0, df_municipalites_t2)
 df_deltas_historic = df_deltas_historic.replace([np.inf, -np.inf], np.nan).dropna(axis=0)
 
 df_deltas_recent = calculate_delta(df_municipalites_t1, df_municipalites_t2)
-df_deltas_recent = df_deltas_recent.replace([np.inf, -np.inf], np.nan).dropna(axis=0)
-                                                                        
+df_deltas_recent = df_deltas_recent.replace([np.inf, -np.inf], np.nan).dropna(axis=0)                                                                    
+
+# If asked for specific polygons, get subset
+if selected_polygons_boolean:
+       df_deltas_historic.reset_index(inplace=True)
+       df_deltas_recent.reset_index(inplace=True)
+       df_deltas_recent = df_deltas_recent[df_deltas_recent["poly_id"].isin(selected_polygons)].set_index("poly_id")
+       df_deltas_historic = df_deltas_historic[df_deltas_historic["poly_id"].isin(selected_polygons)].set_index("poly_id")
+       output_file_path = os.path.join(output_file_path, selected_polygon_name)
+
+       # Check if folder exists
+       if not os.path.isdir(output_file_path):
+              os.makedirs(output_file_path)
+
 print(ident+'   Building recent map (15 day window)')
 
 # Get choropleth map 15-day window 
 choropleth_map_recent = geo_df.merge(df_deltas_recent, left_on='Codigo_Dan', right_on='poly_id')
+choropleth_map_recent.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
+choropleth_map_recent.replace([np.inf, -np.inf], np.nan, inplace=True)
 choropleth_map_recent.to_crs(epsg=3857, inplace=True)
 scheme = [0, 0.49, 1, 2, 5, 10]
 ax = choropleth_map_recent.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(30,18),
                                     scheme='user_defined', classification_kwds={'bins':scheme}, legend=True, linewidth=0.5)
 
 ax.set_axis_off()
+
+ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
 rivers_df.to_crs(epsg=3857, inplace=True)
 rivers_df.plot(ax=ax, alpha=0.1)
-ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
-# plt.suptitle('Incremento Porcentual de Movimiento Incidente por Municipio')
 plt.title('Comparativo entre el último Viernes y 15 días atrás')
 plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_15-day-window.png'.format(location_name)), bbox_inches="tight")
 
-choropleth_map_recent.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
 
 print(ident+'   Building historic map (15 day window)')
 
 # Get choropleth map historic
 choropleth_map_historic = geo_df.merge(df_deltas_historic, left_on='Codigo_Dan', right_on='poly_id')
+choropleth_map_historic.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
 choropleth_map_historic.replace([np.inf, -np.inf], np.nan, inplace=True)
 choropleth_map_historic.to_crs(epsg=3857, inplace=True)
 ax = choropleth_map_historic.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(30,18),
@@ -171,11 +197,9 @@ ax.set_axis_off()
 ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
 rivers_df.to_crs(epsg=3857, inplace=True)
 rivers_df.plot(ax=ax, alpha=0.1)
-# plt.suptitle('Incremento Porcentual de Movimiento Incidente por Municipio')
 plt.title('Comparativo entre el último Viernes y los primeros 15 días de Abril')
 plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_historic.png'.format(location_name)), bbox_inches="tight")
 
-choropleth_map_historic.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
 
 translate = {'delta_inner_movement':'Incremento flujo dentro del municipio',
             'delta_external_movement':'Incremento flujo hacia el municipio',
