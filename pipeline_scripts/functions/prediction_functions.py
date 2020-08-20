@@ -31,23 +31,6 @@ analysis_dir = config.get_property('analysis_dir')
 data_folder = os.path.join(data_dir, 'data_stages')
 
 
-def get_graphs(agglomeration_method, location):
-	'''
-	Gets the graph for a given location
-	'''
-	
-	graphs_location = os.path.join(data_folder, location, 'constructed', agglomeration_method, 'daily_graphs/')
-	
-	if not os.path.exists(graphs_location):
-		raise ValueError('No graphs found for location: {}'.format(location))
-		
-	nodes = pd.read_csv(os.path.join(graphs_location, 'nodes.csv'), parse_dates = ['date_time'])
-	edges = pd.read_csv(os.path.join(graphs_location, 'edges.csv'), parse_dates = ['date_time'])
-	node_locations = pd.read_csv(os.path.join(graphs_location, 'node_locations.csv'))
-	
-	return(nodes,edges, node_locations)
-
-
 
 
 def extract_prediction_data(agglomeration_method, locations, polygons_ids, days_back, days_ahead, smooth_days = 1, max_day = None, mobility_ratio = 1):
@@ -58,8 +41,13 @@ def extract_prediction_data(agglomeration_method, locations, polygons_ids, days_
 		
 		loc = locations[i]
 		poly_id = polygons_ids[i]
+
+		equivalent_agglomeration_method = gf.get_agglomeration_equivalence(loc, agglomeration_method)
+
+		if equivalent_agglomeration_method is None:
+			raise(f'No equivaletn agglomeration found for {loc} with {agglomeration_method}')
 		
-		nodes, edges, node_locations = get_graphs(agglomeration_method,loc)
+		nodes, edges, node_locations = gf.get_graphs(equivalent_agglomeration_method,loc)
 
 		# Asjusted mobility
 		nodes.inner_movement = nodes.inner_movement*mobility_ratio
@@ -86,8 +74,13 @@ def extract_prediction_data_for_location(agglomeration_method, locations, days_b
 	for i in range(len(locations)):
 		
 		loc = locations[i]
+
+		equivalent_agglomeration_method = gf.get_agglomeration_equivalence(loc, agglomeration_method)
+
+		if equivalent_agglomeration_method is None:
+			raise(f'No equivaletn agglomeration found for {loc} with {agglomeration_method}')
 		
-		nodes, edges, node_locations = get_graphs(agglomeration_method, loc)
+		nodes, edges, node_locations = gf.get_graphs(equivalent_agglomeration_method, loc)
 
 		# Reduces mobility
 		nodes.inner_movement = nodes.inner_movement*mobility_ratio

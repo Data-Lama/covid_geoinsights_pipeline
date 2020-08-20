@@ -45,7 +45,7 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
         raise ValueError(f'No neighbors found for polygon {polygon_name} ({polygon_id}). Please excecute the script: neighbors_polygon_extraction.py, before this one.')
 
     # Constructs the export
-    folder_location = os.path.join(analysis_dir, location, agglomeration_method, 'prediction', polygon_name)
+    folder_location = os.path.join(analysis_dir, location, agglomeration_method, 'prediction/polygons', polygon_name)
 
 
     # Creates the folder if does not exists

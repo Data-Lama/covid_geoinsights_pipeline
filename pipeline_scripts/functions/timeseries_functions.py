@@ -54,15 +54,16 @@ def extract_location_cases_distance(location, agglomeration_method, start_day = 
 		loc_type = desc.loc['type','value']
 		loc_name = desc.loc['name','value']
 		
-		if loc != location and  has_aglomeration(loc, agglomeration_method) and loc_type in types:
-			
+		equivalent_agglomeration_method = gf.get_agglomeration_equivalence(loc, agglomeration_method)
 
+		if loc != location and  equivalent_agglomeration_method is not None and loc_type in types:
+			
 			if verbose:
 				print(ident + loc)
 
 				
 			# Extarcts Other
-			other = extract_timeseries_cases(loc, agglomeration_method, polygon_id = None, smooth_days = smooth_days)
+			other = extract_timeseries_cases(loc, equivalent_agglomeration_method, polygon_id = None, smooth_days = smooth_days)
 			other_max_day = other.day.max()
 				
 			# Filters
@@ -113,14 +114,6 @@ def accumulate_timeseries(timeseries, col):
 	timeseries[col] = timeseries[col].rolling(min_periods=1, window=timeseries.shape[0]).sum()
 	return(timeseries)
 
-
-
-def has_aglomeration(location, agglomeration_method):
-
-	cases_location = os.path.join(data_folder, location, 'agglomerated', agglomeration_method, 'cases.csv')
-
-	return(os.path.exists(cases_location))
-		
 
 
 def extract_polygon_cases_distance(location, agglomeration_method, polygon_id, start_day = 0, lag = 0, strech = 1, base_locations = None, verbose = False, smooth_days = 1):
@@ -302,14 +295,15 @@ def extract_all_timeseries_cases(locations, agglomeration_method, lag = 0, accum
 
 	for location in locations:
 
-
-		cases_location = os.path.join(data_folder, location, 'agglomerated',agglomeration_method,'cases.csv')
-		poly_location = os.path.join(data_folder, location, 'agglomerated',agglomeration_method,'polygons.csv')	
-
-		if not has_aglomeration(location, agglomeration_method):
+		equivalent_agglomeration_method = gf.get_agglomeration_equivalence(location, agglomeration_method)
+		
+		if equivalent_agglomeration_method is None:
 			if verbose:
-				print('No Agglomerated Cases for {}'.format(location))
+				print('No Agglomerated movement for {}'.format(location))
 			continue
+				
+		cases_location = os.path.join(data_folder, location, 'agglomerated',equivalent_agglomeration_method,'cases.csv')
+		poly_location = os.path.join(data_folder, location, 'agglomerated',equivalent_agglomeration_method,'polygons.csv')	
 
 		# Reads Cases
 		df_cases_all = pd.read_csv(cases_location, parse_dates = ['date_time'])
@@ -373,13 +367,15 @@ def extract_all_timeseries_movement(locations, agglomeration_method, movement_ty
 
 	for location in locations:
 
-		if not has_aglomeration(location, agglomeration_method):
+		equivalent_agglomeration_method = gf.get_agglomeration_equivalence(location, agglomeration_method)
+
+		if equivalent_agglomeration_method is None:
 			if verbose:
 				print('No Agglomerated movement for {}'.format(location))
 			continue
 				
-		mov_location = os.path.join(data_folder, location, 'agglomerated',agglomeration_method,'movement.csv')		
-		poly_location = os.path.join(data_folder, location, 'agglomerated',agglomeration_method,'polygons.csv')	
+		mov_location = os.path.join(data_folder, location, 'agglomerated',equivalent_agglomeration_method,'movement.csv')		
+		poly_location = os.path.join(data_folder, location, 'agglomerated',equivalent_agglomeration_method,'polygons.csv')	
 
 		# Reads Movement
 		df_mov_all = pd.read_csv(mov_location, parse_dates = ['date_time'])

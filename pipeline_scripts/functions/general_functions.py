@@ -3,13 +3,15 @@ import cryptography
 from cryptography.fernet import Fernet
 import uuid
 import pandas as pd
+import numpy as np
 import os
 import unidecode
-
+from datetime import datetime, timedelta
 
 # Module with general functions
 from global_config import config
 data_dir = config.get_property('data_dir')
+data_folder = os.path.join(data_dir, 'data_stages')
 
 
 
@@ -339,3 +341,88 @@ def smooth_curve(ser, days):
     resp = resp + (total - resp.sum())/resp.size
     
     return(resp)
+
+
+
+
+def has_aglomeration(location, agglomeration_method):
+
+    cases_location = os.path.join(data_folder, location, 'agglomerated', agglomeration_method, 'cases.csv')
+
+    return(os.path.exists(cases_location))
+
+def get_agglomeration_equivalence(location, agglomeration_method):
+    '''
+    Gets the equivalence agglomeration
+
+    '''
+
+    if has_aglomeration(location, agglomeration_method):
+        return(agglomeration_method)
+
+    if agglomeration_method == 'geometry' and has_aglomeration(location, 'radial'):
+        return('radial')
+
+    if agglomeration_method == 'radial' and has_aglomeration(location, 'geometry'):
+        return('geometry')
+
+    return(None)
+
+
+
+def get_graphs(agglomeration_method, location):
+    '''
+    Gets the graph for a given location
+    '''
+    
+    graphs_location = os.path.join(data_folder, location, 'constructed', agglomeration_method, 'daily_graphs/')
+    
+    if not os.path.exists(graphs_location):
+        raise ValueError('No graphs found for location: {}'.format(location))
+        
+    nodes = pd.read_csv(os.path.join(graphs_location, 'nodes.csv'), parse_dates = ['date_time'])
+    edges = pd.read_csv(os.path.join(graphs_location, 'edges.csv'), parse_dates = ['date_time'])
+    node_locations = pd.read_csv(os.path.join(graphs_location, 'node_locations.csv'))
+
+    
+    return(nodes, edges, node_locations)
+
+
+
+def extract_connected_neighbors(location, poly_id, agglomeration_method, num_days = 30):
+    '''
+    Extracts the connected neighbors of the last 30 days
+
+    '''
+
+    nodes, edges, node_locations = get_graphs(agglomeration_method, location)
+
+    nodes.node_id = nodes.node_id.astype(str)
+    edges.start_id = edges.start_id.astype(str)
+    edges.end_id = edges.end_id.astype(str)
+
+    # filters
+    nodes = nodes[nodes.date_time >= (nodes.date_time.max() - timedelta(days = num_days))].copy()
+    edges = edges[edges.date_time >= (edges.date_time.max() - timedelta(days = num_days))].copy()
+
+
+    edges = edges[(edges.start_id == poly_id) | (edges.end_id == poly_id)].copy()
+
+    final_edges = edges.groupby(['date_time','day','start_id','end_id']).mean().reset_index()
+
+    # Only the ones with positive movement
+    final_edges = final_edges[final_edges.movement > 0]
+
+    # extracts neighbors
+    neighbors = np.unique(np.concatenate((final_edges.start_id, final_edges.end_id)))
+
+    # removes itself
+    neighbors = neighbors[neighbors!= poly_id]
+
+    return(neighbors.tolist())
+
+
+
+
+
+

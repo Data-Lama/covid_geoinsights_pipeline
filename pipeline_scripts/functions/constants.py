@@ -14,6 +14,8 @@ agglomeration_methods = ['radial','community','geometry']
 figure_folder_name = 'report_figure_folder'
 table_folder_name = 'report_table_folder'
 
+# Progress file
+progress_file = 'excecution_progress.csv'
 
 # For prediction
 days_back = 5
