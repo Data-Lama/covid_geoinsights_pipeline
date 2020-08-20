@@ -9,25 +9,46 @@ import glob
 from datetime import datetime
 import re
 import constants as con
+import shutil
+
+
 
 #Directories
 from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
-report_dir = config.get_property('report_dir')
+reports_dir = config.get_property('report_dir')
 
 export_file = 'pipeline_scripts/configuration/export_files.csv'
-
 
 
 ident = '         '
 
 df_files = pd.read_csv(export_file)
 
+print(ident + 'Clears Reports folder')
+
+if os.path.exists(reports_dir):
+	shutil.rmtree(reports_dir)
+
+
+# Creates the folders for each report
+for report in df_files.report.unique():
+	tables = os.path.join(reports_dir, report, con.table_folder_name)
+	figures = os.path.join(reports_dir, report, con.figure_folder_name)
+
+	# Makes the folders
+	os.makedirs(tables)
+	os.makedirs(figures)
+
+
+
 print(ident + 'Copying {} files:'.format(df_files.shape[0]))
 
 not_found = 0
 for ind, row in df_files.iterrows():
+
+	current_report_dir = os.path.join(reports_dir, row['report'])
 
 	if row['folder'] == 'analysis':		
 		source = os.path.join(analysis_dir,row.source)
@@ -40,10 +61,10 @@ for ind, row in df_files.iterrows():
 
 
 	if row['type'] == 'figure':		
-		destination = os.path.join( report_dir, con.figure_folder_name, row.destination)
+		destination = os.path.join( current_report_dir, con.figure_folder_name, row.destination)
 
 	elif row['type'] == 'table':		
-		destination = os.path.join( report_dir, con.table_folder_name, row.destination)		
+		destination = os.path.join( current_report_dir, con.table_folder_name, row.destination)		
 
 	else:
 		raise ValueError('No support for type: {} of file'.format(row['type']))
@@ -113,7 +134,7 @@ for ind, row in df_files.iterrows():
 print(ident + 'Write TimeStamp')
 
 #Saves the Statistics
-with open(os.path.join(report_dir, 'README.txt'), 'w') as file:
+with open(os.path.join(reports_dir, 'README.txt'), 'w') as file:
 
 	file.write('Last Updated: {}'.format(datetime.now()) + '\n')
 
