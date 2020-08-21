@@ -23,7 +23,7 @@ ident = '         '
 args = commandArgs(trailingOnly=TRUE)
 
 # For Debug
-debug = FALSE
+debug = TRUE
 if(debug)
 {   
   cat("\n\n\n\n\n\n\n\n\n\n\n¡¡¡¡¡DEBUG IS ON!!!!\n\n\n\n\n\n\n\n\n")
@@ -138,14 +138,14 @@ if('attr_population' %in% colnames(polygons))
 {
     agg_poly_1 = polygons %>% 
     group_by(community_id) %>%
-    summarise(poly_name = exctract_name_by_population(poly_name, attr_population), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(poly_lon, poly_lat), poly_lon = extract_center_by_population(poly_lon, poly_lat, attr_population)[1], poly_lat = extract_center_by_population(poly_lon, poly_lat, attr_population)[2], .groups = "keep") %>%
+    summarise(poly_name = exctract_name_by_population(poly_name, attr_population), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(geometry), poly_lon = extract_center_by_population(poly_lon, poly_lat, attr_population)[1], poly_lat = extract_center_by_population(poly_lon, poly_lat, attr_population)[2], .groups = "keep") %>%
     ungroup()  
   
 }else
 {
   agg_poly_1 = polygons %>% 
   group_by(community_id) %>%
-  summarise(poly_name = exctract_name_by_cases(poly_name, num_cases), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(poly_lon, poly_lat), poly_lon = extract_center_by_cases(poly_lon, poly_lat, num_cases)[1], poly_lat = extract_center_by_cases(poly_lon, poly_lat, num_cases)[2], .groups = "keep") %>%
+  summarise(poly_name = exctract_name_by_cases(poly_name, num_cases), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(geometry), poly_lon = extract_center_by_cases(poly_lon, poly_lat, num_cases)[1], poly_lat = extract_center_by_cases(poly_lon, poly_lat, num_cases)[2], .groups = "keep") %>%
   ungroup()  
 }
 

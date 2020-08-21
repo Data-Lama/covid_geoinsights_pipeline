@@ -21,8 +21,8 @@ reporte_subnacional,Prediction barranquilla,analysis,figure,colombia/community/p
 reporte_subnacional,Socio-economic Statistics,analysis,table,colombia/community/socio-economic/*/socio-economic_data_*.csv,*
 reporte_norte_de_santander,Graph Map First Day,analysis,figure,colombia/community/graph_maps/norte_de_santander/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
 reporte_norte_de_santander,Graph Map Current Day,analysis,figure,colombia/community/graph_maps/norte_de_santander/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
-reporte_norte_de_santander,Polygon Movement range,analysis,figure,colombia/community/movement_plots/norte_de_santander/movement_range_selected_polygons_norte_de_santander.png,internal_movement_selected_polygons.png
-reporte_norte_de_santander,Movement FB,analysis,figure,colombia/community/movement_plots/norte_de_santander/mov_range_norte_de_santander.png,mov_pais.png
+reporte_norte_de_santander,Polygon Movement range,analysis,figure,colombia/community/movement_plots/norte_de_santander/movement_range_selected_polygons_norte_de_santander.png,movement_range_selected_polygons.png
+reporte_norte_de_santander,Movement FB,analysis,figure,colombia/community/movement_plots/norte_de_santander/mov_range_norte_de_santander.png,mov_range.png
 reporte_norte_de_santander,Prediction ,analysis,figure,colombia/community/prediction/polygon_unions/norte_de_santander/prediction_norte_de_santander.png,prediction.png
 reporte_norte_de_santander,Simulacion ,analysis,figure,colombia/community/prediction/polygon_unions/norte_de_santander/simulations_norte_de_santander.png,simulations.png
 reporte_norte_de_santander,Mapa Alerta General,analysis,figure,colombia/geometry/norte_de_santander/alerts/map_max_alert.png,map_max_alert.png
