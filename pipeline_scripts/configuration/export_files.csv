@@ -16,32 +16,15 @@ reporte_nacional,Estadisticas Prediccion,analysis,table,colombia/community/predi
 reporte_nacional,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/incidence_map.jpeg,incidence_map_geometry.jpeg
 reporte_nacional,Incidence Table,analysis,table,colombia/geometry/incidence_maps/incidences.csv,incidences_geometry.csv
 reporte_nacional,Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv
-reporte_subnacional,Neighbor Series barranquilla,analysis,figure,colombia/community/neighbors/barranquilla/neighbor_timeseries_barranquilla.png,neighbor_timeseries_barranquilla.png
-reporte_subnacional,Prediction barranquilla,analysis,figure,colombia/community/prediction/polygons/barranquilla/prediction_barranquilla.png,prediction_barranquilla.png
-reporte_subnacional,Neighbor Series cali,analysis,figure,colombia/community/neighbors/cali/neighbor_timeseries_cali.png,neighbor_timeseries_cali.png
-reporte_subnacional,Prediction cali,analysis,figure,colombia/community/prediction/polygons/cali/prediction_cali.png,prediction_cali.png
-reporte_subnacional,Neighbor Series cartagena,analysis,figure,colombia/community/neighbors/cartagena_de_indias/neighbor_timeseries_cartagena_de_indias.png,neighbor_timeseries_cartagena.png
-reporte_subnacional,Prediction cartagena,analysis,figure,colombia/community/prediction/polygons/cartagena_de_indias/prediction_cartagena_de_indias.png,prediction_cartagena.png
-reporte_subnacional,Neighbor Series medellin,analysis,figure,colombia/community/neighbors/medellin/neighbor_timeseries_medellin.png,neighbor_timeseries_medellin.png
-reporte_subnacional,Prediction medellin,analysis,figure,colombia/community/prediction/polygons/medellin/prediction_medellin.png,prediction_medellin.png
-reporte_subnacional,Neighbor Series Bogota,analysis,figure,colombia/community/neighbors/bogota_dc/neighbor_timeseries_bogota_dc.png,neighbor_timeseries_bogota.png
-reporte_subnacional,Prediction Bogota,analysis,figure,colombia/community/prediction/polygons/bogota_dc/prediction_bogota_dc.png,prediction_bogota.png
-reporte_subnacional,Neighbor Series Popayan,analysis,figure,colombia/community/neighbors/popayan/neighbor_timeseries_popayan.png,neighbor_timeseries_popayan.png
-reporte_subnacional,Prediction popayan,analysis,figure,colombia/community/prediction/polygons/popayan/prediction_popayan.png,prediction_popayan.png
-reporte_subnacional,Neighbor Series Ibague,analysis,figure,colombia/community/neighbors/ibague/neighbor_timeseries_ibague.png,neighbor_timeseries_ibague.png
-reporte_subnacional,Prediction Ibague,analysis,figure,colombia/community/prediction/polygons/ibague/prediction_ibague.png,prediction_ibague.png
-reporte_subnacional,Neighbor Series Santa Marta,analysis,figure,colombia/community/neighbors/santa_marta/neighbor_timeseries_santa_marta.png,neighbor_timeseries_santa_marta.png
-reporte_subnacional,Prediction Santa Marta,analysis,figure,colombia/community/prediction/polygons/santa_marta/prediction_santa_marta.png,prediction_santa_marta.png
-reporte_subnacional,Neighbor Series Villavicencio,analysis,figure,colombia/community/neighbors/villavicencio/neighbor_timeseries_villavicencio.png,neighbor_timeseries_villavicencio.png
-reporte_subnacional,Prediction Villavicencio,analysis,figure,colombia/community/prediction/polygons/villavicencio/prediction_villavicencio.png,prediction_villavicencio.png
-reporte_subnacional,Neighbor Series Cucuta,analysis,figure,colombia/community/neighbors/cucuta/neighbor_timeseries_cucuta.png,neighbor_timeseries_cucuta.png
-reporte_subnacional,Prediction Cucuta,analysis,figure,colombia/community/prediction/cucuta/prediction_cucuta.png,prediction_cucuta.png
+reporte_subnacional,Neighbor Series barranquilla,analysis,figure,colombia/community/neighbors/*/neighbor_timeseries_*.png,*
+reporte_subnacional,Prediction barranquilla,analysis,figure,colombia/community/prediction/polygons/*/prediction_*.png,*
+reporte_subnacional,Socio-economic Statistics,analysis,table,colombia/community/socio-economic/*/socio-economic_data_*.csv,*
 reporte_norte_de_santander,Graph Map First Day,analysis,figure,colombia/community/graph_maps/norte_de_santander/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
 reporte_norte_de_santander,Graph Map Current Day,analysis,figure,colombia/community/graph_maps/norte_de_santander/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
 reporte_norte_de_santander,Polygon Movement range,analysis,figure,colombia/community/movement_plots/norte_de_santander/movement_range_selected_polygons_norte_de_santander.png,internal_movement_selected_polygons.png
-reporte_norte_de_santander,Movement FB,analysis,figure,colombia/community/movement_plots/norte_de_santander/mov_range_colombia.png,mov_pais_Colombia.png
-reporte_norte_de_santander,Prediction ,analysis,figure,colombia/community/prediction/polygon_unions/norte_de_santander/prediction_colombia.png,prediction_colombia.png
-reporte_norte_de_santander,Simulacion ,analysis,figure,colombia/community/prediction/polygon_unions/norte_de_santander/simulations_colombia.png,simulations_colombia.png
+reporte_norte_de_santander,Movement FB,analysis,figure,colombia/community/movement_plots/norte_de_santander/mov_range_norte_de_santander.png,mov_pais.png
+reporte_norte_de_santander,Prediction ,analysis,figure,colombia/community/prediction/polygon_unions/norte_de_santander/prediction_norte_de_santander.png,prediction.png
+reporte_norte_de_santander,Simulacion ,analysis,figure,colombia/community/prediction/polygon_unions/norte_de_santander/simulations_norte_de_santander.png,simulations.png
 reporte_norte_de_santander,Mapa Alerta General,analysis,figure,colombia/geometry/norte_de_santander/alerts/map_max_alert.png,map_max_alert.png
 reporte_norte_de_santander,Mapa Cloroplético Historico,analysis,figure,colombia/geometry/polygon_info_window/norte_de_santander/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
 reporte_norte_de_santander,Mapa Cloroplético Reciente,analysis,figure,colombia/geometry/polygon_info_window/norte_de_santander/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
@@ -52,13 +35,3 @@ reporte_norte_de_santander,Estadisticas Prediccion,analysis,table,colombia/commu
 reporte_norte_de_santander,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/norte_de_santander/incidence_map.jpeg,incidence_map_geometry.jpeg
 reporte_norte_de_santander,Incidence Table,analysis,table,colombia/geometry/incidence_maps/norte_de_santander/incidences.csv,incidences_geometry.csv
 reporte_norte_de_santander,Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv
-,Socio-economic Statistics,analysis,table,colombia/community/socio-economic/bogota_dc/socio-economic_data_bogota_dc.csv,socio-economic_data_bogota_dc.csv
-,Socio-economic Statistics,analysis,table,colombia/community/socio-economic/cali/socio-economic_data_cali.csv,socio-economic_data_cali.csv
-,Socio-economic Statistics,analysis,table,colombia/community/socio-economic/barranquilla/socio-economic_data_barranquilla.csv,socio-economic_data_barranquilla.csv
-,Socio-economic Statistics,analysis,table,colombia/community/socio-economic/cartagena_de_indias/socio-economic_data_cartagena_de_indias.csv,socio-economic_data_cartagena_de_indias.csv
-,Socio-economic Statistics,analysis,table,colombia/community/socio-economic/ibague/socio-economic_data_ibague.csv,socio-economic_data_ibague.csv
-,Socio-economic Statistics,analysis,table,colombia/community/socio-economic/popayan/socio-economic_data_popayan.csv,socio-economic_data_popayan.csv
-,Socio-economic Statistics,analysis,table,colombia/community/socio-economic/villavicencio/socio-economic_data_villavicencio.csv,socio-economic_data_villavicencio.csv
-,Socio-economic Statistics,analysis,table,colombia/community/socio-economic/santa_marta/socio-economic_data_santa_marta.csv,socio-economic_data_santa_marta.csv
-,Socio-economic Statistics,analysis,table,colombia/community/socio-economic/cucuta/socio-economic_data_cucuta.csv,socio-economic_data_cucuta.csv
-,Socio-economic Statistics,analysis,table,colombia/community/socio-economic/bucaramanga/socio-economic_data_bucaramanga.csv,socio-economic_data_bucaramanga.csv
