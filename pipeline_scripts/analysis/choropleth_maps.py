@@ -173,7 +173,7 @@ choropleth_map_recent.replace([np.inf, -np.inf], np.nan, inplace=True)
 choropleth_map_recent.to_crs(epsg=3857, inplace=True)
 scheme = [0, 0.49, 1, 2, 5, 10]
 ax = choropleth_map_recent.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(30,18),
-                                    scheme='user_defined', classification_kwds={'bins':scheme}, legend=True, linewidth=0.5)
+                                    scheme='user_defined', classification_kwds={'bins':scheme}, legend=True, linewidth=0.5, edgecolor="grey")
 
 ax.set_axis_off()
 
@@ -182,7 +182,7 @@ if selected_polygons_boolean:
        choropleth_map_recent["label_x"] = choropleth_map_recent.apply(lambda p: p.label.x, axis=1)
        choropleth_map_recent["label_y"] = choropleth_map_recent.apply(lambda p: p.label.y, axis=1)
        for x, y, label in zip(choropleth_map_recent.label_x, choropleth_map_recent.label_y, choropleth_map_recent.Municipio):
-              ax.annotate(label, xy=(x, y), xytext=(3, 3), textcoords="offset points", fontsize=15)
+              ax.annotate(label, xy=(x, y), xytext=(3, 3), textcoords="offset points", fontsize=10)
 
 ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
 rivers_df.to_crs(epsg=3857, inplace=True)
@@ -199,7 +199,7 @@ choropleth_map_historic.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
 choropleth_map_historic.replace([np.inf, -np.inf], np.nan, inplace=True)
 choropleth_map_historic.to_crs(epsg=3857, inplace=True)
 ax = choropleth_map_historic.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(30,18),
-                                    scheme='user_defined', classification_kwds={'bins':scheme}, k=6, legend=True, linewidth=0.5)
+                                    scheme='user_defined', classification_kwds={'bins':scheme}, k=6, legend=True, linewidth=0.5, edgecolor="grey")
 ax.set_axis_off()
 
 if selected_polygons_boolean:
@@ -207,7 +207,7 @@ if selected_polygons_boolean:
        choropleth_map_historic["label_x"] = choropleth_map_historic.apply(lambda p: p.label.x, axis=1)
        choropleth_map_historic["label_y"] = choropleth_map_historic.apply(lambda p: p.label.y, axis=1)
        for x, y, label in zip(choropleth_map_historic.label_x, choropleth_map_historic.label_y, choropleth_map_historic.Municipio):
-              ax.annotate(label, xy=(x, y), xytext=(3, 3), textcoords="offset points", fontsize=15)
+              ax.annotate(label, xy=(x, y), xytext=(3, 3), textcoords="offset points", fontsize=10)
 
 ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
 rivers_df.to_crs(epsg=3857, inplace=True)

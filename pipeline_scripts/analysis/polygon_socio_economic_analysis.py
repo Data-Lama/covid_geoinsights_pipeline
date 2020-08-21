@@ -29,10 +29,10 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
     df_variables = pd.read_csv(variables)
 
     # check if many polygons are given
-    
+
     if type(polygon_id) is list:
-        print(ident + "Building table of socio-economic variables for {}. (Polygons {} of {})".format(polygon_name, polygon_id, location))
-        df_table = socio_economic_analysis_for_polygon_union(polygon_id, df_national, df_variables)
+        print(ident + "Building table of socio-economic variables for {}. (Polygons {} of {})".format(polygon_name, ", ".join(polygon_id), location))
+        df_table = socio_economic_analysis_for_polygon_union(polygon_id, df_national, df_variables, polygon_display_name)
         write_table(df_table, output_path)
         return os.path.join(location, agglomeration_method, 'socio-economic', polygon_name, "socio-economic_data_{}.csv".format(polygon_name))
     else:
@@ -73,9 +73,9 @@ def socio_economic_analysis_for_polygon(polygon_id, df_variables, df_national):
     return df_variables
 
 
-def socio_economic_analysis_for_polygon_union(polygon_ids, df_national, df_variables):
+def socio_economic_analysis_for_polygon_union(polygon_ids, df_national, df_variables, polygon_name):
     # build table
-    df_variables = df_variables[df_variables["node_id"].isin(polygon_ids)]
+    df_variables = df_variables[df_variables["node_id"].isin(polygon_ids)].copy()
     cols_to_drop = list(set(df_variables.columns) - set(["poblacion", "porcentaje_sobre_60", "ipm", "num_camas_UCI",
                                                     "porcentaje_subsidiado", "porcentaje_contributivo"]))
 
@@ -84,18 +84,14 @@ def socio_economic_analysis_for_polygon_union(polygon_ids, df_national, df_varia
     df_variables["porcentaje_sobre_60"] = df_variables["porcentaje_sobre_60"].multiply(100).multiply(df_variables["poblacion"])
     df_variables["porcentaje_subsidiado"] = df_variables["porcentaje_subsidiado"].multiply(100).multiply(df_variables["poblacion"])
     df_variables["porcentaje_contributivo"] = df_variables["porcentaje_contributivo"].multiply(100).multiply(df_variables["poblacion"])
-    print(df_variables.head())
+    df_variables["ipm"] = df_variables["ipm"].multiply(df_variables["poblacion"])
     df_variables =  df_variables.sum()
-    df_variables = df_variables.multiply(df_variables["poblacion"])
-    print(df_variables.head())
-    raise Exception("DONE")
-    # df_variables.astype({'num_camas_UCI': 'int32', 'poblacion':'int32'})
-    df_variables.reset_index(inplace=True)
-    df_variables = df_variables.transpose().reset_index()
-    df_variables.set_index("index", inplace=True)
+    df_variables[["porcentaje_sobre_60", "porcentaje_subsidiado", "porcentaje_contributivo", "ipm"]] = \
+        df_variables[["porcentaje_sobre_60", "porcentaje_subsidiado", "porcentaje_contributivo", "ipm"]].divide(df_variables["poblacion"])
+    
+    df_variables = pd.DataFrame(df_variables)
     df_national.set_index(0, inplace=True)
     df_variables = df_national.merge(df_variables, how="outer", left_index=True, right_index=True)
-    df_variables.drop("index", inplace=True)
     df_variables.rename(columns={1:"Nacional", 0:polygon_name}, inplace=True)
     df_variables.rename({"ipm":"Indice de Pobreza Multidimensional (2018)",
                         "num_camas_UCI":"Número camas UCI",
@@ -103,17 +99,31 @@ def socio_economic_analysis_for_polygon_union(polygon_ids, df_national, df_varia
                         "porcentaje_contributivo":"Porcentaje en Régimen Contributivo (EPS)",
                         "porcentaje_subsidiado":"Porcentaje en Régimen Subsidiado (EPS)",
                         "porcentaje_sobre_60":"Porcentaje Población Mayor a 60"}, inplace=True)
-    return NotImplemented
+
+
+    return df_variables
 
 
 if __name__ == "__main__":
 
-	# Reads the parameters from excecution
-	location  = sys.argv[1] # location name
-	agglomeration_method = sys.argv[2] # Aglomeration name
-	polygon_name = sys.argv[3] # polygon name
-	polygon_id  = sys.argv[4] # polygon id
-	polygon_display_name = sys.argv[5] # polygon display name
+    # Reads the parameters from excecution
+    location  = sys.argv[1] # location name
+    agglomeration_method = sys.argv[2] # Aglomeration name
+    polygon_name = sys.argv[3] # polygon name
+    polygon_display_name = sys.argv[4] # polygon display name
+    polygon_id  = sys.argv[5] # polygon id
 
-	# Excecution
-	main(location, agglomeration_method, polygon_name, polygon_id, polygon_display_name)
+    if len(sys.argv) <= 6:
+        selected_polygons_boolean = False
+    else :
+        selected_polygons_boolean = True
+        selected_polygons = []
+        i = 5
+        while i < len(sys.argv):
+            selected_polygons.append(sys.argv[i])
+            i += 1
+
+    if selected_polygons_boolean:
+        main(location, agglomeration_method, polygon_name, selected_polygons, polygon_display_name)
+    else:
+         main(location, agglomeration_method, polygon_name, polygon_id, polygon_display_name)

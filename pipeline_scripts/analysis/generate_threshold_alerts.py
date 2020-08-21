@@ -281,8 +281,15 @@ if not DONE:
 
         print(ident + '     Drawing {}_map'.format(i))
         color_key = i+"_color"
-        ax = df_alerts.plot(figsize=(15,9), linewidth=0.5, color=df_alerts[color_key], missing_kwds={'color': 'lightgrey'})
+        ax = df_alerts.plot(figsize=(15,9), linewidth=0.5, color=df_alerts[color_key], missing_kwds={'color': 'lightgrey'}, alpha=0.8)
         colors = [COLORS_[x] for x in df_alerts[color_key].unique()]
+
+        if selected_polygons_boolean:
+            df_alerts["label"] = df_alerts.apply(lambda x: x.geometry.representative_point(), axis=1)
+            df_alerts["label_x"] = df_alerts.apply(lambda p: p.label.x, axis=1)
+            df_alerts["label_y"] = df_alerts.apply(lambda p: p.label.y, axis=1)
+            for x, y, label in zip(df_alerts.label_x, df_alerts.label_y, df_alerts.Municipio_x):
+                    ax.annotate(label, xy=(x, y), xytext=(3, 3), textcoords="offset points", fontsize=5)
 
         ax.legend(labels=colors, loc='upper right')
         ax.set_axis_off()
