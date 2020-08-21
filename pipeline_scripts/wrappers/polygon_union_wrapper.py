@@ -21,7 +21,7 @@ analysis_dir = config.get_property('analysis_dir')
 4. choropleth_maps
 5. general_statistics
 6. incidence_map
-7. polygon_socio_economic_wrapper
+7. polygon_socio_economic_analysis
 8. movement_range_plots_script
 9. polygon_prediction_wrapper
 
@@ -50,6 +50,7 @@ while i < len(sys.argv):
 	i += 1
 
 selected_polygons_parameter = " ".join(selected_polygons)
+name_and_selected_polygons_parameter = selected_polygons_name + " " + selected_polygons_parameter
 
 location_name = location_folder.replace('_',' ').title()
 
@@ -93,7 +94,7 @@ parameters = "{} {} {} {} {}".format(location_folder,
                                     agglomeration_method, 
                                     "min_record",
                                     folder_name, 
-                                    selected_polygons_parameter)
+                                    name_and_selected_polygons_parameter)
 
 ef.excecute_script(analysis_scripts_location, "generate_threshold_alerts.py", "python", parameters)
 
@@ -103,7 +104,7 @@ print("{}Excecuting choropleth_maps.py for {}".format(ident, selected_polygons_n
 parameters = "{} {} {} {}".format(location_folder,  
                                 agglomeration_method,
                                 folder_name,
-                                selected_polygons_parameter)
+                                name_and_selected_polygons_parameter)
 
 ef.excecute_script(analysis_scripts_location, "choropleth_maps.py", "python", parameters)
 
@@ -118,6 +119,16 @@ parameters = "{} {} {} {} {}".format( location_name,
 
 ef.excecute_script(analysis_scripts_location, "incidence_map.R", "R", parameters)
 
+# polygon_socio_economic_analysis
+print()
+print("{}Excecuting polygon_socio_economic_analysis.py for {}".format(ident, selected_polygons_name))
+parameters = "{} {} {} {} {}".format( location_name,
+                                location_folder,  
+                                agglomeration_method,
+                                folder_name,
+                                selected_polygons_parameter)
+
+ef.excecute_script(analysis_scripts_location, "incidence_map.R", "R", parameters)
 
 # movement_range_plots_script
 print()

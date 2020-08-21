@@ -1,11 +1,14 @@
-import datetime
-import cryptography
-from cryptography.fernet import Fernet
-import uuid
-import pandas as pd
-import numpy as np
 import os
+import uuid
+import datetime
 import unidecode
+import numpy as np
+import pandas as pd
+import cryptography
+from shapely import wkt
+import geopandas as gpd
+import matplotlib.pyplot as plt
+from cryptography.fernet import Fernet
 from datetime import datetime, timedelta
 
 # Module with general functions
@@ -421,8 +424,18 @@ def extract_connected_neighbors(location, poly_id, agglomeration_method, num_day
 
     return(neighbors.tolist())
 
-
-
-
-
-
+'''
+returns a geoDataFrame of geograohic neighbors for a given poly_id
+'''
+def get_geographic_neighbors(poly_id, location, agglomeration_method):
+	polygons = os.path.join(data_folder, location, 'agglomerated', agglomeration_method, "polygons.csv")
+	df_polygons = pd.read_csv(polygons)
+	df_polygons['geometry'] = df_polygons['geometry'].apply(wkt.loads)
+	gdf_polygons = gpd.GeoDataFrame(df_polygons, geometry='geometry')
+	gdf_polygons.set_index("poly_id", inplace=True)
+	polygon = gdf_polygons.at[poly_id, "geometry"]
+	intersections = gdf_polygons[gdf_polygons.geometry.touches(polygon)]
+	intersections.reset_index(inplace=True)
+	neighbors = intersections["poly_id"]
+	
+	return neighbors.tolist()

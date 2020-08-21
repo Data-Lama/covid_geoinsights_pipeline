@@ -92,10 +92,10 @@ for country in countries:
                                     'destination':file_name}, ignore_index=True)
     # graph_indicators(files_to_graph)
 
-    # Add files to export_files.csv
-    df_export_files = df_export_files[df_export_files.name != "Socio-economic Statistics"]
-    df_export_files = df_export_files.append(df_files_to_export, ignore_index=True)
-    df_export_files.to_csv(export_file, index=False)
+    # # Add files to export_files.csv
+    # df_export_files = df_export_files[df_export_files.name != "Socio-economic Statistics"]
+    # df_export_files = df_export_files.append(df_files_to_export, ignore_index=True)
+    # df_export_files.to_csv(export_file, index=False)
 
 
 
