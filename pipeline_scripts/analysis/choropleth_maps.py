@@ -158,6 +158,7 @@ if selected_polygons_boolean:
        df_deltas_recent = df_deltas_recent[df_deltas_recent["poly_id"].isin(selected_polygons)].set_index("poly_id")
        df_deltas_historic = df_deltas_historic[df_deltas_historic["poly_id"].isin(selected_polygons)].set_index("poly_id")
        output_file_path = os.path.join(output_file_path, selected_polygon_name)
+       # get labels
 
        # Check if folder exists
        if not os.path.isdir(output_file_path):
@@ -175,6 +176,13 @@ ax = choropleth_map_recent.fillna(0).plot(column='delta_external_movement', cmap
                                     scheme='user_defined', classification_kwds={'bins':scheme}, legend=True, linewidth=0.5)
 
 ax.set_axis_off()
+
+if selected_polygons_boolean:
+       choropleth_map_recent["label"] = choropleth_map_recent.apply(lambda x: x.geometry.representative_point(), axis=1)
+       choropleth_map_recent["label_x"] = choropleth_map_recent.apply(lambda p: p.label.x, axis=1)
+       choropleth_map_recent["label_y"] = choropleth_map_recent.apply(lambda p: p.label.y, axis=1)
+       for x, y, label in zip(choropleth_map_recent.label_x, choropleth_map_recent.label_y, choropleth_map_recent.Municipio):
+              ax.annotate(label, xy=(x, y), xytext=(3, 3), textcoords="offset points", fontsize=15)
 
 ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
 rivers_df.to_crs(epsg=3857, inplace=True)
@@ -194,6 +202,13 @@ ax = choropleth_map_historic.fillna(0).plot(column='delta_external_movement', cm
                                     scheme='user_defined', classification_kwds={'bins':scheme}, k=6, legend=True, linewidth=0.5)
 ax.set_axis_off()
 
+if selected_polygons_boolean:
+       choropleth_map_historic["label"] = choropleth_map_historic.apply(lambda x: x.geometry.representative_point(), axis=1)
+       choropleth_map_historic["label_x"] = choropleth_map_historic.apply(lambda p: p.label.x, axis=1)
+       choropleth_map_historic["label_y"] = choropleth_map_historic.apply(lambda p: p.label.y, axis=1)
+       for x, y, label in zip(choropleth_map_historic.label_x, choropleth_map_historic.label_y, choropleth_map_historic.Municipio):
+              ax.annotate(label, xy=(x, y), xytext=(3, 3), textcoords="offset points", fontsize=15)
+
 ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
 rivers_df.to_crs(epsg=3857, inplace=True)
 rivers_df.plot(ax=ax, alpha=0.1)
@@ -211,10 +226,10 @@ df_highlights_recent = choropleth_map_recent[choropleth_map_recent['delta_extern
 df_highlights_historic = choropleth_map_historic[choropleth_map_historic['delta_external_movement'] > 1].fillna(0)
 
 # Get polygons on river
-choropleth_map_on_river = choropleth_map_recent[choropleth_map_recent['delta_external_movement'] > 0].fillna(0)
-choropleth_map_on_river['river'] = choropleth_map_on_river.apply(lambda x: is_polygon_on_river(x.poly_id), axis=1)
-choropleth_map_on_river.to_csv(os.path.join(output_file_path, 'detail_choropleth_recent_rivers.csv'), encoding = 'latin-1', 
-       index=False, float_format="%.3f", columns=['Departamen', 'Municipio', 'river', 'delta_external_movement'])
+# choropleth_map_on_river = choropleth_map_recent[choropleth_map_recent['delta_external_movement'] > 0].fillna(0)
+# choropleth_map_on_river['river'] = choropleth_map_on_river.apply(lambda x: is_polygon_on_river(x.poly_id), axis=1)
+# choropleth_map_on_river.to_csv(os.path.join(output_file_path, 'detail_choropleth_recent_rivers.csv'), encoding = 'latin-1', 
+#        index=False, float_format="%.3f", columns=['Departamen', 'Municipio', 'river', 'delta_external_movement'])
 
 
 # Merge with functional_units

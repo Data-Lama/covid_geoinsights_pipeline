@@ -67,42 +67,41 @@ selected_connected_neighbors_polygons_parameter = " ".join([poly_id] + movement_
 # By Geography
 geographic_neighbors = gf.get_geographic_neighbors(poly_id, location_folder, agglomeration_method)
 selected_geographic_neighbors_polygons_parameter = " ".join([poly_id] + geographic_neighbors)
-name_and_selected_geographic_neighbors_polygons_parameter = polygon_name " " + selected_geographic_neighbors_polygons_parameter
 
 
-# Execute graph_maps
-print()
-print("{}Excecuting graph_maps.R for {}".format(ident, polygon_name))
-parameters = "{} {} {} {} {}".format(location_name,
-                                location_folder,  
-                                agglomeration_method,
-                                folder_name,
-                                selected_connected_neighbors_polygons_parameter)
+# # Execute graph_maps
+# print()
+# print("{}Excecuting graph_maps.R for {}".format(ident, polygon_name))
+# parameters = "{} {} {} {} {}".format(location_name,
+#                                 location_folder,  
+#                                 agglomeration_method,
+#                                 folder_name,
+#                                 selected_connected_neighbors_polygons_parameter)
 
-ef.excecute_script(analysis_scripts_location, "graph_maps.R", "R", parameters)
+# ef.excecute_script(analysis_scripts_location, "graph_maps.R", "R", parameters)
 
-# Execute polygon_info_timewindow
-print()
-print("{}Excecuting polygon_info_timewindow.py for {}".format(ident, polygon_name))
-parameters = "{} {} {} {} {} {}".format(location_folder, 
-                                    agglomeration_method,
-                                    "5",
-                                    "days",
-                                    folder_name,
-                                    selected_geographic_neighbors_polygons_parameter)
+# # Execute polygon_info_timewindow
+# print()
+# print("{}Excecuting polygon_info_timewindow.py for {}".format(ident, polygon_name))
+# parameters = "{} {} {} {} {} {}".format(location_folder, 
+#                                     agglomeration_method,
+#                                     "5",
+#                                     "days",
+#                                     folder_name,
+#                                     selected_geographic_neighbors_polygons_parameter)
 
-ef.excecute_script(analysis_scripts_location, "polygon_info_timewindow.py", "python", parameters)
+# ef.excecute_script(analysis_scripts_location, "polygon_info_timewindow.py", "python", parameters)
 
-# Execute generate_threshold_alerts
-print()
-print("{}Excecuting generate_threshold_alerts.py for {}".format(ident, polygon_name))
-parameters = "{} {} {} {} {}".format(location_folder,  
-                                    agglomeration_method, 
-                                    "min_record",
-                                    folder_name, 
-                                    name_and_selected_geographic_neighbors_polygons_parameter)
+# # Execute generate_threshold_alerts
+# print()
+# print("{}Excecuting generate_threshold_alerts.py for {}".format(ident, polygon_name))
+# parameters = "{} {} {} {} {}".format(location_folder,  
+#                                     agglomeration_method, 
+#                                     "min_record",
+#                                     folder_name, 
+#                                     selected_geographic_neighbors_polygons_parameter)
 
-ef.excecute_script(analysis_scripts_location, "generate_threshold_alerts.py", "python", parameters)
+# ef.excecute_script(analysis_scripts_location, "generate_threshold_alerts.py", "python", parameters)
 
 # Excecute choropleth_maps
 print()
@@ -110,54 +109,54 @@ print("{}Excecuting choropleth_maps.py for {}".format(ident, polygon_name))
 parameters = "{} {} {} {}".format(location_folder,  
                                 agglomeration_method,
                                 folder_name,
-                                name_and_selected_geographic_neighbors_polygons_parameter)
+                                selected_geographic_neighbors_polygons_parameter)
 
 ef.excecute_script(analysis_scripts_location, "choropleth_maps.py", "python", parameters)
 
-# Execute incidence_map
-print()
-print("{}Excecuting incidence_map.py for {}".format(ident, polygon_name))
-parameters = "{} {} {} {} {}".format( location_name,
-                                location_folder,  
-                                agglomeration_method,
-                                folder_name,
-                                selected_geographic_neighbors_polygons_parameter)
+# # Execute incidence_map
+# print()
+# print("{}Excecuting incidence_map.py for {}".format(ident, polygon_name))
+# parameters = "{} {} {} {} {}".format( location_name,
+#                                 location_folder,  
+#                                 agglomeration_method,
+#                                 folder_name,
+#                                 selected_geographic_neighbors_polygons_parameter)
 
-ef.excecute_script(analysis_scripts_location, "incidence_map.R", "R", parameters)
+# ef.excecute_script(analysis_scripts_location, "incidence_map.R", "R", parameters)
 
-# polygon_socio_economic_analysis
-print()
-print("{}Excecuting polygon_socio_economic_analysis.py for {}".format(ident, selected_polygons_name))
-parameters = "{} {} {} {} {}".format( location_name,
-                                location_folder,  
-                                agglomeration_method,
-                                folder_name,
-                                selected_polygons_parameter)
+# # polygon_socio_economic_analysis
+# print()
+# print("{}Excecuting polygon_socio_economic_analysis.py for {}".format(ident, polygon_name))
+# parameters = "{} {} {} {} {}".format( location_name,
+#                                 location_folder,  
+#                                 agglomeration_method,
+#                                 folder_name,
+#                                 poly_id)
 
-ef.excecute_script(analysis_scripts_location, "incidence_map.R", "R", parameters)
+# ef.excecute_script(analysis_scripts_location, "incidence_map.R", "R", parameters)
 
-# movement_range_plots_script
-print()
-print("{}Excecuting movement_range_plots_script_polygons.py for {}".format(ident, polygon_name))
-parameters = "{} {} {} {} {}".format(location_folder,  
-                                agglomeration_method,
-                                polygon_name,
-                                folder_name,
-                                poly_id)
+# # movement_range_plots_script
+# print()
+# print("{}Excecuting movement_range_plots_script_polygons.py for {}".format(ident, polygon_name))
+# parameters = "{} {} {} {} {}".format(location_folder,  
+#                                 agglomeration_method,
+#                                 polygon_name,
+#                                 folder_name,
+#                                 poly_id)
 
-ef.excecute_script(analysis_scripts_location, "movement_range_plots_script_polygons.py", "python", parameters)
+# ef.excecute_script(analysis_scripts_location, "movement_range_plots_script_polygons.py", "python", parameters)
 
 
-# polygon union prediction wrapper
-print()
-print("{}Excecuting polygon_union_prediction_wrapper.py for {}".format(ident, polygon_name))
-parameters = "{} {} {} {} {} {} {}".format(location_folder,  
-                                agglomeration_method,
-                                coverage,
-                                num_neighbors,
-                                polygon_name,
-                                folder_name,
-                                poly_id)
+# # polygon union prediction wrapper
+# print()
+# print("{}Excecuting polygon_union_prediction_wrapper.py for {}".format(ident, polygon_name))
+# parameters = "{} {} {} {} {} {} {}".format(location_folder,  
+#                                 agglomeration_method,
+#                                 coverage,
+#                                 num_neighbors,
+#                                 polygon_name,
+#                                 folder_name,
+#                                 poly_id)
 
-ef.excecute_script(wrapper_scripts_location, "polygon_union_prediction_wrapper.py", "python", parameters)
+# ef.excecute_script(wrapper_scripts_location, "polygon_union_prediction_wrapper.py", "python", parameters)
 

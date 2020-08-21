@@ -43,6 +43,7 @@ WINDOW_SIZE = 7
 MAX_POINTS = WINDOW_SIZE
 NUM_CASES_THRESHOLD_RED = 1 #5 # This should be set to the desired slope of the epidemiological curve
 NUM_CASES_THRESHOLD_YELLOW = 0.5 #2  # This should be set to the desired slope of the epidemiological curve
+DONE = False
 
 TRANSLATE = {'internal_alert':'Alerta interna',
             'joint_internal_alert': 'Alerta interna',
@@ -236,55 +237,59 @@ df_alerts['first_case_color_alert'] = df_alerts.apply(lambda x: set_color(x.aler
 # If asked for specific polygons, get subset
 if selected_polygons_boolean:
     df_alerts = df_alerts[df_alerts["poly_id"].isin(selected_polygons)]
+    if df_alerts.empty:
+        print("{}{}No alerts found for the given polygon. Skipping".format(ident, ident))
+        DONE = True
     output_file_path = os.path.join(output_file_path, selected_polygon_name)
 else:
     output_file_path = os.path.join(output_file_path, "entire_location")
 
+if not DONE:
 
-# Check if folder exists
-if not os.path.isdir(output_file_path):
-    os.makedirs(output_file_path)
+    # Check if folder exists
+    if not os.path.isdir(output_file_path):
+        os.makedirs(output_file_path)
 
-# Write alerts table
-red_alerts = df_alerts.loc[(df_alerts['max_alert'] == 'ROJO')].copy()
-red_alerts = red_alerts.merge(df_age, how="outer", left_on="poly_id", right_on="node_id").dropna()
-red_alerts = red_alerts.merge(df_ipm, how="outer", left_on="poly_id", right_on="node_id").dropna()
-red_alerts.sort_values(by=['Departamento','Municipio'], inplace=True)
-red_alerts.rename(columns={'internal_alert': 'Alerta interna (movimiento)', 'community_name':'Unidad funcional',
-'external_alert':'Alerta externa (movimiento)', 'alert_first_case':'Alerta de primer caso detectado', 
-"alert_external_num_cases":"Alerta numero de casos en municipios vecinos", "alert_internal_num_cases":"Alerta numero de casos",
-"porcentaje_sobre_60":"Personas mayores a 60", "ipm":"IPM"}, inplace=True)
-red_alerts.to_csv(os.path.join(output_file_path, 'alerts.csv'), columns=['Departamento', 'Municipio', 'Unidad funcional',                                           
-                                        'Alerta interna (movimiento)',
-                                        'Alerta numero de casos',
-                                        'Alerta de primer caso detectado',
-                                        'Alerta externa (movimiento)', 
-                                        'Alerta numero de casos en municipios vecinos',
-                                        'Personas mayores a 60',
-                                        'IPM'], index=False, float_format='%.3f', sep=",")
+    # Write alerts table
+    red_alerts = df_alerts.loc[(df_alerts['max_alert'] == 'ROJO')].copy()
+    red_alerts = red_alerts.merge(df_age, how="outer", left_on="poly_id", right_on="node_id").dropna()
+    red_alerts = red_alerts.merge(df_ipm, how="outer", left_on="poly_id", right_on="node_id").dropna()
+    red_alerts.sort_values(by=['Departamento','Municipio'], inplace=True)
+    red_alerts.rename(columns={'internal_alert': 'Alerta interna (movimiento)', 'community_name':'Unidad funcional',
+    'external_alert':'Alerta externa (movimiento)', 'alert_first_case':'Alerta de primer caso detectado', 
+    "alert_external_num_cases":"Alerta numero de casos en municipios vecinos", "alert_internal_num_cases":"Alerta numero de casos",
+    "porcentaje_sobre_60":"Personas mayores a 60", "ipm":"IPM"}, inplace=True)
+    red_alerts.to_csv(os.path.join(output_file_path, 'alerts.csv'), columns=['Departamento', 'Municipio', 'Unidad funcional',                                           
+                                            'Alerta interna (movimiento)',
+                                            'Alerta numero de casos',
+                                            'Alerta de primer caso detectado',
+                                            'Alerta externa (movimiento)', 
+                                            'Alerta numero de casos en municipios vecinos',
+                                            'Personas mayores a 60',
+                                            'IPM'], index=False, float_format='%.3f', sep=",")
 
-# Map alerts
-df_alerts = geo_df.merge(df_alerts, left_on='Codigo_Dan', right_on='poly_id')
-cmap = ListedColormap([(1,0.8,0), (0.8, 0, 0), (0,0.4,0)], name='alerts')
-df_alerts.to_crs(epsg=3857, inplace=True)
+    # Map alerts
+    df_alerts = geo_df.merge(df_alerts, left_on='Codigo_Dan', right_on='poly_id')
+    cmap = ListedColormap([(1,0.8,0), (0.8, 0, 0), (0,0.4,0)], name='alerts')
+    df_alerts.to_crs(epsg=3857, inplace=True)
 
-print(ident+ "  Drawing alert maps.")
+    print(ident+ "  Drawing alert maps.")
 
 
-# Draw maps
-for i in ['internal_alert', 'external_alert', 'max_alert']:
+    # Draw maps
+    for i in ['internal_alert', 'external_alert', 'max_alert']:
 
-    print(ident + '     Drawing {}_map'.format(i))
-    color_key = i+"_color"
-    ax = df_alerts.plot(figsize=(15,9), linewidth=0.5, color=df_alerts[color_key], missing_kwds={'color': 'lightgrey'})
-    colors = [COLORS_[x] for x in df_alerts[color_key].unique()]
+        print(ident + '     Drawing {}_map'.format(i))
+        color_key = i+"_color"
+        ax = df_alerts.plot(figsize=(15,9), linewidth=0.5, color=df_alerts[color_key], missing_kwds={'color': 'lightgrey'})
+        colors = [COLORS_[x] for x in df_alerts[color_key].unique()]
 
-    ax.legend(labels=colors, loc='upper right')
-    ax.set_axis_off()
-    ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
-    plt.title(TRANSLATE[i])
-    # plt.show()
-    plt.savefig(os.path.join(output_file_path, 'map_{}.png'.format(i)), bbox_inches="tight")
+        ax.legend(labels=colors, loc='upper right')
+        ax.set_axis_off()
+        ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
+        plt.title(TRANSLATE[i])
+        # plt.show()
+        plt.savefig(os.path.join(output_file_path, 'map_{}.png'.format(i)), bbox_inches="tight")
 
 
 
