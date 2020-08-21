@@ -288,7 +288,7 @@ for agglomeration_method in agglomeration_methods:
 
 
 	g.axes[1,0].xaxis.set_ticks(ticks)
-	g.savefig(os.path.join(export_folder_location,'mov_range_{}.png'.format(location_folder)))
+	g.savefig(os.path.join(export_folder_location,'mov_range.png'))
 
 
 	print(ident + '   Plots Movement Range for Polygons {}'.format(location_name))	
@@ -314,7 +314,7 @@ for agglomeration_method in agglomeration_methods:
 	# Adds the horizontal line
 	ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)		
 
-	fig.savefig(os.path.join(export_folder_location,'movement_range_selected_polygons_{}.png'.format(location_folder)))
+	fig.savefig(os.path.join(export_folder_location,'movement_range_selected_polygons.png'))
 
 
 	
