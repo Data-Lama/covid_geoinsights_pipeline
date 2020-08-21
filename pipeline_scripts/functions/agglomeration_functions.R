@@ -1,4 +1,6 @@
 # Community Agglomeration Functions
+library('rgeos')
+
 
 km_constant = 110.567 # For extarcting distances
 
@@ -24,12 +26,20 @@ exctract_name = function(location, num_cases)
 
 
 # Function that create the geometry (colection of points)
-extract_geometry = function(lon, lat)
+extract_geometry = function(geometry)
 {
-  points = paste( sapply(seq_along(lon), function(i) paste(lon[i], lat[i])), collapse = ", ")
-  geom_string = paste("MULTIPOINT (", points, ")")
+
+  final_geo = readWKT(geometry[1])
+  if(length(final_geo) > 1)
+  {
+    for(i in 2:length(final_geo))
+    {
+      final_geo = gUnion(final_geo, readWKT(geometry[i]))
+    }
+    
+  }
   
-  return(geom_string)
+  return(writeWKT(final_geo))
 }
 
 # Function that create the geometry (colection of points)

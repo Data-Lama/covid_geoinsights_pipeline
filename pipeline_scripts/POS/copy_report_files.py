@@ -28,8 +28,8 @@ df_files = pd.read_csv(export_file)
 
 print(ident + 'Clears Reports folder')
 
-if os.path.exists(reports_dir):
-	shutil.rmtree(reports_dir)
+#if os.path.exists(reports_dir):
+#	shutil.rmtree(reports_dir)
 
 
 # Creates the folders for each report
@@ -38,8 +38,11 @@ for report in df_files.report.unique():
 	figures = os.path.join(reports_dir, report, con.figure_folder_name)
 
 	# Makes the folders
-	os.makedirs(tables)
-	os.makedirs(figures)
+	if not os.path.exists(tables):
+		os.makedirs(tables)
+
+	if not os.path.exists(figures):		
+		os.makedirs(figures)
 
 
 

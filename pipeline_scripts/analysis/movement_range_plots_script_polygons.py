@@ -231,7 +231,7 @@ while tick  < max_date:
 
 
 g.axes[1,0].xaxis.set_ticks(ticks)
-g.savefig(os.path.join(export_folder_location,'mov_range_{}.png'.format(selected_polygons_folder_name)))
+g.savefig(os.path.join(export_folder_location, f'mov_range_{selected_polygons_folder_name}.png'))
 
 
 print(ident + '   Plots Movement Range for Polygons {}'.format(selected_polygons_name))	
@@ -258,7 +258,7 @@ ax.legend().texts[0].set_text(f"Unidad {unit_type}")
 # Adds the horizontal line
 ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)		
 
-fig.savefig(os.path.join(export_folder_location,'movement_range_selected_polygons_{}.png'.format(selected_polygons_folder_name)))
+fig.savefig(os.path.join(export_folder_location, f'movement_range_selected_polygons_{selected_polygons_folder_name}.png'))
 
 
 
