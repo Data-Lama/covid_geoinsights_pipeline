@@ -4,6 +4,8 @@ import csv
 import pandas as pd
 import datetime
 
+import general_functions as gf
+
 # Direcotries
 from global_config import config
 data_dir = config.get_property('data_dir')
@@ -108,18 +110,6 @@ def get_polygons_no_new_cases(df, window_size):
     
     return set_previous_cases.intersection(set_no_new_cases)
 
-def new_cases(df_cases, window):
-    # Get the number of polygons that reported having their first case in the last 5 days
-    today = datetime.datetime.today()
-    x_days_ago = today - datetime.timedelta(days = window)
-    historic = df_cases[df_cases['date_time'] < x_days_ago]
-    historic_set = set(historic[historic["num_cases"] > 0]["poly_id"].unique())
-    current_set = set(df_cases[df_cases["num_cases"] > 0]["poly_id"].unique())
-    intersection = current_set.intersection(historic_set)
-
-    new_case_polygon = current_set - intersection
-    return new_case_polygon
-
 if selected_polygons_boolean:
     output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'stats', polygon_name)
     df_cases = df_cases[df_cases["poly_id"].isin(selected_polygons)].reset_index()
@@ -171,7 +161,7 @@ no_case_polygons_last_days = int((total_last_days.num_cases == 0).sum())
 
 
 stats = {
-    'num_first_case':len(new_cases(df_cases, WINDOW)),
+    'num_first_case':len(gf.new_cases(df_cases, WINDOW)),
     'no_case_polygons_last_days':len(no_new_case_polygon),
     'day_max_mov': max_inner_mov_day['date'].strftime(date_format),
     'day_min_mov': min_inner_mov_day['date'].strftime(date_format),

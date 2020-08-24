@@ -9,7 +9,6 @@ from shapely import wkt
 import geopandas as gpd
 import matplotlib.pyplot as plt
 from cryptography.fernet import Fernet
-from datetime import datetime, timedelta
 
 # Module with general functions
 from global_config import config
@@ -405,8 +404,8 @@ def extract_connected_neighbors(location, poly_id, agglomeration_method, num_day
     edges.end_id = edges.end_id.astype(str)
 
     # filters
-    nodes = nodes[nodes.date_time >= (nodes.date_time.max() - timedelta(days = num_days))].copy()
-    edges = edges[edges.date_time >= (edges.date_time.max() - timedelta(days = num_days))].copy()
+    nodes = nodes[nodes.date_time >= (nodes.date_time.max() - datetime.timedelta(days = num_days))].copy()
+    edges = edges[edges.date_time >= (edges.date_time.max() - datetime.timedelta(days = num_days))].copy()
 
 
     edges = edges[(edges.start_id == poly_id) | (edges.end_id == poly_id)].copy()
@@ -423,6 +422,18 @@ def extract_connected_neighbors(location, poly_id, agglomeration_method, num_day
     neighbors = neighbors[neighbors!= poly_id]
 
     return(neighbors.tolist())
+
+def new_cases(df_cases, window):
+    # Get the number of polygons that reported having their first case in the last 5 days
+    today = datetime.datetime.today()
+    x_days_ago = today - datetime.timedelta(days = window)
+    historic = df_cases[df_cases['date_time'] < x_days_ago]
+    historic_set = set(historic[historic["num_cases"] > 0]["poly_id"].unique())
+    current_set = set(df_cases[df_cases["num_cases"] > 0]["poly_id"].unique())
+    intersection = current_set.intersection(historic_set)
+
+    new_case_polygon = current_set - intersection
+    return new_case_polygon
 
 '''
 returns a geoDataFrame of geograohic neighbors for a given poly_id

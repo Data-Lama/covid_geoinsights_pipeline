@@ -13,8 +13,7 @@ from matplotlib.colors import ListedColormap
 import numpy as np
 
 from pipeline_scripts.functions.general_functions import get_mean_movement_stats_overtime, get_std_movement_stats_overtime
-
-from pipeline_scripts.analysis.general_statistics import new_cases
+from pipeline_scripts.functions import general_functions as gf
 
 # Direcotries
 from global_config import config
@@ -213,7 +212,7 @@ df_alerts_cases["alert_external_num_cases"] = df_alerts_cases.apply(lambda x: se
 df_alerts_cases.drop(columns=["delta_num_cases", "delta_external_num_cases"], inplace=True)
 
 # Internal alerts for num_cases based on first reported case
-new_cases = new_cases(df_cases, WINDOW_SIZE)
+new_cases = gf.new_cases(df_cases, WINDOW_SIZE)
 df_alerts['alert_first_case'] = df_alerts.apply(lambda x: set_cases_alert_firstcase(new_cases, x.poly_id), axis=1)
 df_alerts.drop(columns=["points_inner_movement", "points_external_movement"], inplace=True)
 
