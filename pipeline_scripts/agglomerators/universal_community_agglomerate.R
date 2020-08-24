@@ -23,12 +23,12 @@ ident = '         '
 args = commandArgs(trailingOnly=TRUE)
 
 # For Debug
-debug = TRUE
+debug = FALSE
 if(debug)
 {   
   cat("\n\n\n\n\n\n\n\n\n\n\n¡¡¡¡¡DEBUG IS ON!!!!\n\n\n\n\n\n\n\n\n")
   setwd("~/Dropbox/Projects/covid_fb_pipeline/covid_geoinsights_pipeline")
-  args = c('Colombia','colombia')
+  args = c('Peru','peru')
 }
 
 
@@ -68,8 +68,8 @@ dir.create(export_folder)
 
 # Loads movement
 cat(paste(ident, '   Loads Movement','\n', sep = ""))
-movement = read.csv(file.path(agglomerated_folder, 'movement.csv'))
-polygons = read.csv(file.path(agglomerated_folder, 'polygons.csv'))
+movement = read.csv(file.path(agglomerated_folder, 'movement.csv'),  stringsAsFactors = FALSE)
+polygons = read.csv(file.path(agglomerated_folder, 'polygons.csv'),  stringsAsFactors = FALSE)
 cases = read.csv(file.path(agglomerated_folder, 'cases.csv'), stringsAsFactors = FALSE)
 
 # Extracts the cases columns
@@ -149,6 +149,7 @@ if('attr_population' %in% colnames(polygons))
   ungroup()  
 }
 
+
 # Creates the location to community map
 polygon_community_map = agg_poly_1 %>% 
                         select(community_id, poly_name) %>%
@@ -207,14 +208,23 @@ cat(paste(ident, '   Agglomerates Population','\n', sep = ""))
 # Loads the cases data to assign the comunity ids and name them
 pop = read.csv(file.path(agglomerated_folder, 'population.csv'), stringsAsFactors = FALSE)
 
-agg_pop = pop %>%
-          inner_join(polygons %>% select(poly_id, community_id), by = c('poly_id' = 'poly_id')) %>%
-          mutate(poly_id = community_id) %>%
-          select(date_time, poly_id, population) %>%
-          group_by(date_time, poly_id) %>%
-          summarise(population = sum(population), .groups = "keep") %>%
-          ungroup() %>%
-          arrange(date_time)
+
+if(nrow(pop) > 0)
+{
+  
+  agg_pop = pop %>%
+    inner_join(polygons %>% select(poly_id, community_id), by = c('poly_id' = 'poly_id')) %>%
+    mutate(poly_id = community_id) %>%
+    select(date_time, poly_id, population) %>%
+    group_by(date_time, poly_id) %>%
+    summarise(population = sum(population), .groups = "keep") %>%
+    ungroup() %>%
+    arrange(date_time)
+}else
+{
+  agg_pop = pop
+}
+
 
 
 
