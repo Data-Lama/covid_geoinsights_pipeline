@@ -16,7 +16,7 @@ data_dir = get_property('data_dir')
 analysis_dir = get_property('analysis_dir')
 
 
-
+add_labels = FALSE
 
 # Working Directory
 
@@ -285,9 +285,6 @@ for(day in start_day:end_day)
   
   # Only plots the one with at least one case
   current_graph = current_graph[current_graph$num_cases > 0, ]
-
-  # Split name
-  print(names(current_graph))
 
   
   p =  ggmap(map)
