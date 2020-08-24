@@ -113,6 +113,16 @@ parameters = "{} {} {} {}".format(location_folder,
 
 ef.excecute_script(analysis_scripts_location, "choropleth_maps.py", "python", parameters)
 
+# Excecute general_stats
+print()
+print("{}Excecuting general_statistics.py for {}".format(ident, polygon_name))
+parameters = "{} {} {} {}".format(location_folder,  
+                                agglomeration_method,
+                                polygon_name,
+                                poly_id)
+
+ef.excecute_script(analysis_scripts_location, "general_statistics.py", "python", parameters)
+
 # Execute incidence_map
 print()
 print("{}Excecuting incidence_map.py for {}".format(ident, polygon_name))

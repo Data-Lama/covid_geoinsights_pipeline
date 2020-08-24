@@ -107,6 +107,15 @@ parameters = "{} {} {} {}".format(location_folder,
 
 ef.excecute_script(analysis_scripts_location, "choropleth_maps.py", "python", parameters)
 
+# Excecute general_stats
+print()
+print("{}Excecuting general_statistics.py for {}".format(ident, selected_polygons_name))
+parameters = "{} {} {}".format(location_folder,  
+                                agglomeration_method,
+                                selected_polygons_parameter)
+
+ef.excecute_script(analysis_scripts_location, "general_statistics.py", "python", parameters)
+
 # Execute incidence_map
 print()
 print("{}Excecuting incidence_map.py for {}".format(ident, selected_polygons_name))
@@ -127,7 +136,7 @@ parameters = "{} {} {} {} {}".format(location_folder,
                                 folder_name,
                                 selected_polygons_name,
                                 selected_polygons_parameter)
-                                
+
 ef.excecute_script(analysis_scripts_location, "polygon_socio_economic_analysis.py", "python", parameters)
 
 # movement_range_plots_script
