@@ -44,9 +44,8 @@ if(is.na(selected_polygons_name))
   selected_polygons = c()
   
 }else{
-  
+  add_labels = TRUE
   selected_polygons = args[5:length(args)]
-  
   selected_polygons = unique(selected_polygons)
   
   if(length(selected_polygons) == 0)
@@ -161,10 +160,17 @@ map = suppressMessages(get_map(c(left = left, bottom = bottom, right = right, to
 
 df_plot = polygons[order(polygons$incidence),]
 
+# Split poly_name in two for labling
+df_plot <- df_plot %>% tidyr::separate(poly_name, 
+                      c("municipio"), extra='drop')
+
 p =  ggmap(map)
 p = p + geom_point(data = df_plot, aes(x = poly_lon, y = poly_lat, color = incidence, size = incidence, alpha = incidence, shape = group ))
 p = p + guides(size=FALSE, alpha = FALSE)
 p = p + scale_shape(breaks = labels)
+if(add_labels){
+    p = p + geom_text(data = df_plot, aes(label = municipio, x = poly_lon + 0.02, y = poly_lat - 0.01), inherit.aes = FALSE)
+}
 p = p + scale_alpha_continuous(range = c(0.4, 1))
 p = p + scale_color_gradient(low = "darkblue", high = "red")
 p = p + labs(color = paste0("Incidencia\n(Casos por ",per_capita ,"\nPersonas)"), shape = 'Población\n(Miles)')

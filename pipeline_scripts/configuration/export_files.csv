@@ -6,10 +6,11 @@ reporte_nacional,Movement FB Colombia,analysis,figure,colombia/community/movemen
 reporte_nacional,Prediction Colombia,analysis,figure,colombia/community/prediction/polygon_unions/entire_location/prediction_colombia.png,prediction_colombia.png
 reporte_nacional,Simulacion Colombia,analysis,figure,colombia/community/prediction/polygon_unions/entire_location/simulations_colombia.png,simulations_colombia.png
 reporte_nacional,Tabla Hitos,analysis,table,colombia/community/movement_plots/entire_location/milestones.csv,milestones.csv
-reporte_nacional,Mapa Alerta General,analysis,figure,colombia/geometry/alerts/map_max_alert.png,map_max_alert.png
-reporte_nacional,Mapa Cloroplético Historico,analysis,figure,colombia/geometry/polygon_info_window/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
-reporte_nacional,Mapa Cloroplético Reciente,analysis,figure,colombia/geometry/polygon_info_window/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
-reporte_nacional,Alertas Rojas,analysis,table,colombia/geometry/alerts/alerts.csv,alerts.csv
+reporte_nacional,Mapa Alerta General,analysis,figure,colombia/geometry/alerts/entire_location/map_max_alert.png,map_max_alert.png
+reporte_nacional,Mapa Cloroplético Historico,analysis,figure,colombia/geometry/polygon_info_window/entire_location/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
+reporte_nacional,Mapa Cloroplético Reciente,analysis,figure,colombia/geometry/polygon_info_window/entire_location/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
+reporte_nacional,Mapa Cloroplético Reciente,analysis,table,colombia/geometry/polygon_info_window/entire_location/detail_choropleth_recent.csv,detail_choropleth_recent.csv
+reporte_nacional,Alertas Rojas,analysis,table,colombia/geometry/alerts/entire_location/alerts.csv,alerts.csv
 reporte_nacional,Estadisticas Municipio,analysis,table,colombia/geometry/stats/general_stats.csv,geometry_statistics.csv
 reporte_nacional,Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/general_stats.csv,community_statistics.csv
 reporte_nacional,Estadisticas Prediccion,analysis,table,colombia/community/prediction/polygon_unions/entire_location/statistics.csv,prediction_statistics.csv
@@ -28,6 +29,7 @@ reporte_norte_de_santander,Simulacion ,analysis,figure,colombia/community/predic
 reporte_norte_de_santander,Mapa Alerta General,analysis,figure,colombia/geometry/alerts/norte_de_santander/map_max_alert.png,map_max_alert.png
 reporte_norte_de_santander,Mapa Cloroplético Historico,analysis,figure,colombia/geometry/polygon_info_window/norte_de_santander/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
 reporte_norte_de_santander,Mapa Cloroplético Reciente,analysis,figure,colombia/geometry/polygon_info_window/norte_de_santander/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
+reporte_norte_de_santander,Mapa Cloroplético Reciente,analysis,table,colombia/geometry/polygon_info_window/norte_de_santander/detail_choropleth_recent.csv,detail_choropleth_recent.csv
 reporte_norte_de_santander,Alertas Rojas,analysis,table,colombia/geometry/alerts/norte_de_santander/alerts.csv,alerts.csv
 reporte_norte_de_santander,Estadisticas Municipio,analysis,table,colombia/geometry/stats/norte_de_santander/general_stats.csv,geometry_statistics.csv
 reporte_norte_de_santander,Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/norte_de_santander/general_stats.csv,community_statistics.csv
@@ -44,6 +46,7 @@ reporte_popayan,Simulacion ,analysis,figure,colombia/community/prediction/polygo
 reporte_popayan,Mapa Alerta General,analysis,figure,colombia/geometry/alerts/popayan/map_max_alert.png,map_max_alert.png
 reporte_popayan,Mapa Cloroplético Historico,analysis,figure,colombia/geometry/polygon_info_window/popayan/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
 reporte_popayan,Mapa Cloroplético Reciente,analysis,figure,colombia/geometry/polygon_info_window/popayan/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
+reporte_norte_de_santander,Mapa Cloroplético Reciente,analysis,table,colombia/geometry/polygon_info_window/popayan/detail_choropleth_recent.csv,detail_choropleth_recent.csv
 reporte_popayan,Alertas Rojas,analysis,table,colombia/geometry/alerts/popayan/alerts.csv,alerts.csv
 reporte_popayan,Estadisticas Municipio,analysis,table,colombia/geometry/stats/popayan/general_stats.csv,geometry_statistics.csv
 reporte_popayan,Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/popayan/general_stats.csv,community_statistics.csv

@@ -14,6 +14,7 @@ from pipeline_scripts.functions.general_functions import load_README
 
 # Constants
 WINDOW_SIZE = 7 # in days
+edgecolor = None
 
 # Direcotries
 from global_config import config
@@ -153,6 +154,7 @@ df_deltas_recent = df_deltas_recent.replace([np.inf, -np.inf], np.nan).dropna(ax
 
 # If asked for specific polygons, get subset
 if selected_polygons_boolean:
+       edgecolor = "grey"
        df_deltas_historic.reset_index(inplace=True)
        df_deltas_recent.reset_index(inplace=True)
        df_deltas_recent = df_deltas_recent[df_deltas_recent["poly_id"].isin(selected_polygons)].set_index("poly_id")
@@ -163,7 +165,8 @@ if selected_polygons_boolean:
        # Check if folder exists
        if not os.path.isdir(output_file_path):
               os.makedirs(output_file_path)
-
+else :
+     output_file_path = os.path.join(output_file_path, "entire_location")  
 print(ident+'   Building recent map (15 day window)')
 
 # Get choropleth map 15-day window 
@@ -173,7 +176,7 @@ choropleth_map_recent.replace([np.inf, -np.inf], np.nan, inplace=True)
 choropleth_map_recent.to_crs(epsg=3857, inplace=True)
 scheme = [0, 0.49, 1, 2, 5, 10]
 ax = choropleth_map_recent.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(30,18),
-                                    scheme='user_defined', classification_kwds={'bins':scheme}, legend=True, linewidth=0.5, edgecolor="grey")
+                                    scheme='user_defined', classification_kwds={'bins':scheme}, legend=True, linewidth=0.5, edgecolor=edgecolor)
 
 ax.set_axis_off()
 
@@ -199,7 +202,7 @@ choropleth_map_historic.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
 choropleth_map_historic.replace([np.inf, -np.inf], np.nan, inplace=True)
 choropleth_map_historic.to_crs(epsg=3857, inplace=True)
 ax = choropleth_map_historic.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(30,18),
-                                    scheme='user_defined', classification_kwds={'bins':scheme}, k=6, legend=True, linewidth=0.5, edgecolor="grey")
+                                    scheme='user_defined', classification_kwds={'bins':scheme}, k=6, legend=True, linewidth=0.5, edgecolor=edgecolor)
 ax.set_axis_off()
 
 if selected_polygons_boolean:

@@ -118,7 +118,7 @@ print()
 print("{}Excecuting general_statistics.py for {}".format(ident, polygon_name))
 parameters = "{} {} {} {}".format(location_folder,  
                                 agglomeration_method,
-                                polygon_name,
+                                folder_name,
                                 poly_id)
 
 ef.excecute_script(analysis_scripts_location, "general_statistics.py", "python", parameters)

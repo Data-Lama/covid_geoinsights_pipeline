@@ -46,7 +46,7 @@ selected_polygons = c()
 }else{
 
 selected_polygons = args[5:length(args)]
-
+add_labels = TRUE
 selected_polygons = unique(selected_polygons)
 
 if(length(selected_polygons) == 0)
@@ -115,6 +115,10 @@ if(length(selected_polygons) > 0)
   locations = locations[locations$node_id %in% selected_polygons, ]
 }
 
+# Split node_name in two for labling
+locations <- locations %>% tidyr::separate(node_name, 
+                       c("municipio", "dept"))
+
 # Extracts the lattitude and longitud from the location datatset
 
 nodes = merge(nodes, locations, by ='node_id')
@@ -139,7 +143,6 @@ internal_max = max(nodes$inner_movement[!is.na(nodes$inner_movement)])
 # External Movement
 external_min = min(edges$movement)
 external_max = max(edges$movement)
-
 
 
 # Extracts the map
@@ -198,13 +201,18 @@ for(day in start_day:end_day)
     group_by(lon.x, lat.x, lon.y, lat.y) %>% 
     summarise(movement = mean(movement), .groups = "keep") %>%
     ungroup()
-  
+
+
   # Only plots the one with at least one case
   current_graph = current_graph[current_graph$num_cases > 0, ]
   
+
   p =  ggmap(map)
   p = p + geom_segment(data = current_edges, aes(x = lon.x, y = lat.x, xend = lon.y, yend = lat.y, alpha = movement), color = 'yellow', size = 1.5)
-  p = p + geom_point(data = current_graph, aes(x = lon, y = lat, size = inner_movement, color = num_cases))    
+  p = p + geom_point(data = current_graph, aes(x = lon, y = lat, size = inner_movement, color = num_cases))
+  if(add_labels){
+    p = p + geom_text(data = locations, aes(label = municipio))
+  }    
   p = p + scale_color_gradient(low = "darkblue", high = "red", limits=c(cases_min, cases_max))
   p = p + scale_size(limits=c(internal_min, internal_max))
   p = p + scale_alpha(limits=c(external_min, external_max))
@@ -277,10 +285,17 @@ for(day in start_day:end_day)
   
   # Only plots the one with at least one case
   current_graph = current_graph[current_graph$num_cases > 0, ]
+
+  # Split name
+  print(names(current_graph))
+
   
   p =  ggmap(map)
   p = p + geom_segment(data = current_edges, aes(x = lon.x, y = lat.x, xend = lon.y, yend = lat.y, alpha = movement), color = 'yellow', size = 1.5)
-  p = p + geom_point(data = current_graph, aes(x = lon, y = lat, size = inner_movement, color = num_cases))    
+  p = p + geom_point(data = current_graph, aes(x = lon, y = lat, size = inner_movement, color = num_cases))
+  if(add_labels){
+    p = p + geom_text(data = locations, aes(label = municipio))
+  }      
   p = p + scale_color_gradient(low = "darkblue", high = "red", limits=c(cases_min, cases_max))
   p = p + scale_size(limits=c(internal_min, internal_max))
   p = p + scale_alpha(limits=c(external_min, external_max))

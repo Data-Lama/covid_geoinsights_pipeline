@@ -193,6 +193,151 @@ def get_neighbors_poly(poly_id, date_time, df_movement):
             neighbors = pd.unique(df_neighbors[['start_poly_id', 'end_poly_id']].values.ravel('K'))
             return neighbors[neighbors != poly_id]
 
+
+def smooth_curve(ser, days):
+    '''
+    Method that smoothes a curve given the days and preserves the integral
+    '''
+    
+    total = ser.sum()
+    
+    # Smoothes
+    resp =  ser.rolling(days,  min_periods=1).mean()
+    resp = resp + (total - resp.sum())/resp.size
+    
+    return(resp)
+
+
+
+
+def has_aglomeration(location, agglomeration_method):
+
+    cases_location = os.path.join(data_folder, location, 'agglomerated', agglomeration_method, 'cases.csv')
+
+    return(os.path.exists(cases_location))
+
+def get_agglomeration_equivalence(location, agglomeration_method):
+    '''
+    Gets the equivalence agglomeration
+
+    '''
+
+    if has_aglomeration(location, agglomeration_method):
+        return(agglomeration_method)
+
+    if agglomeration_method == 'geometry' and has_aglomeration(location, 'radial'):
+        return('radial')
+
+    if agglomeration_method == 'radial' and has_aglomeration(location, 'geometry'):
+        return('geometry')
+
+    return(None)
+
+
+
+def get_graphs(agglomeration_method, location):
+    '''
+    Gets the graph for a given location
+    '''
+    
+    graphs_location = os.path.join(data_folder, location, 'constructed', agglomeration_method, 'daily_graphs/')
+    
+    if not os.path.exists(graphs_location):
+        raise ValueError('No graphs found for location: {}'.format(location))
+        
+    nodes = pd.read_csv(os.path.join(graphs_location, 'nodes.csv'), parse_dates = ['date_time'])
+    edges = pd.read_csv(os.path.join(graphs_location, 'edges.csv'), parse_dates = ['date_time'])
+    node_locations = pd.read_csv(os.path.join(graphs_location, 'node_locations.csv'))
+
+    
+    return(nodes, edges, node_locations)
+
+
+
+def extract_connected_neighbors(location, poly_id, agglomeration_method, num_days = 30):
+    '''
+    Extracts the connected neighbors of the last 30 days
+
+    '''
+    nodes, edges, node_locations = get_graphs(agglomeration_method, location)
+
+    nodes.node_id = nodes.node_id.astype(str)
+    edges.start_id = edges.start_id.astype(str)
+    edges.end_id = edges.end_id.astype(str)
+
+    # filters
+    nodes = nodes[nodes.date_time >= (nodes.date_time.max() - datetime.timedelta(days = num_days))].copy()
+    edges = edges[edges.date_time >= (edges.date_time.max() - datetime.timedelta(days = num_days))].copy()
+    edges = edges[(edges.start_id == poly_id) | (edges.end_id == poly_id)].copy()
+    final_edges = edges.groupby(['date_time','day','start_id','end_id']).mean().reset_index()
+
+    # Only the ones with positive movement
+    final_edges = final_edges[final_edges.movement > 0]
+
+    # extracts neighbors
+    neighbors = np.unique(np.concatenate((final_edges.start_id, final_edges.end_id)))
+
+    # removes itself
+    neighbors = neighbors[neighbors!= poly_id]
+
+    return(neighbors.tolist())
+
+'''
+returns a geoDataFrame of geograohic neighbors for a given poly_id
+'''
+def get_geographic_neighbors(poly_id, location, agglomeration_method):
+	poly_id = int(poly_id)
+	polygons = os.path.join(data_folder, location, 'agglomerated', agglomeration_method, "polygons.csv")
+	df_polygons = pd.read_csv(polygons)
+	df_polygons['geometry'] = df_polygons['geometry'].apply(wkt.loads)
+	gdf_polygons = gpd.GeoDataFrame(df_polygons, geometry='geometry')
+	gdf_polygons.set_index("poly_id", inplace=True)
+	polygon = gdf_polygons.at[poly_id, "geometry"]
+	intersections = gdf_polygons[gdf_polygons.geometry.touches(polygon)]
+	intersections.reset_index(inplace=True)
+	neighbors = intersections["poly_id"].astype("str")
+	
+	return neighbors.tolist()
+
+#############################################################################################
+############################## General Statistics functions #################################
+#############################################################################################
+
+def new_cases(df_cases, window):
+    # Get the number of polygons that reported having their first case in the last 5 days
+    today = datetime.datetime.today()
+    x_days_ago = today - datetime.timedelta(days = window)
+    historic = df_cases[df_cases['date_time'] < x_days_ago]
+    historic_set = set(historic[historic["num_cases"] > 0]["poly_id"].unique())
+    current_set = set(df_cases[df_cases["num_cases"] > 0]["poly_id"].unique())
+    intersection = current_set.intersection(historic_set)
+
+    new_case_polygon = current_set - intersection
+    return new_case_polygon
+
+def get_max_min(variable, df):
+    max_index = df[variable].idxmax()
+    min_index = df[variable].idxmin()
+    max_info = {'poly_id':df.iloc[max_index]['poly_id'],
+                'date':df.iloc[max_index]['date_time'],
+                variable:df.iloc[max_index][variable]}
+    min_info = {'poly_id':df.iloc[min_index]['poly_id'],
+            'date':df.iloc[min_index]['date_time'],
+            variable:df.iloc[min_index][variable]}
+
+    return (max_info, min_info)
+
+def get_day_max_min(variable, df):
+    df_byday = df.groupby('date_time').sum()
+    df_byday.reset_index(inplace=True)
+    max_index = df_byday[variable].idxmax()
+    min_index = df_byday[variable].idxmin()
+    max_info = {'date':df_byday.iloc[max_index]['date_time'],
+                variable:df_byday.iloc[max_index][variable]}
+    min_info = {'date':df_byday.iloc[min_index]['date_time'],
+            variable:df_byday.iloc[min_index][variable]}
+    return (max_info, min_info)
+
 def get_neighbor_cases_average(neighbors, date_time, df_nodes):
     total = 0
     for node in neighbors:
@@ -238,9 +383,6 @@ def get_mean_internal_movement(df_nodes):
 
 # returns dataframe with the standard deviation movement
 def get_std_internal_movement(df_nodes):
-	# print(node_id)
-	# df = df_nodes.groupby('node_id')['inner_movement'].std()
-	# print(df.at[node_id])
 	return df_nodes.groupby('node_id')['inner_movement'].std()
 
 # returns dataframe with the average movement of the lowest 10 datapoints
@@ -329,125 +471,3 @@ def get_std_movement_stats_overtime(df_movement):
 # returns dataframe with the standard deviation movement
 def get_std_external_movement(df_nodes):
 	return df_nodes.groupby('node_id').std()
-
-
-def smooth_curve(ser, days):
-    '''
-    Method that smoothes a curve given the days and preserves the integral
-    '''
-    
-    total = ser.sum()
-    
-    # Smoothes
-    resp =  ser.rolling(days,  min_periods=1).mean()
-    resp = resp + (total - resp.sum())/resp.size
-    
-    return(resp)
-
-
-
-
-def has_aglomeration(location, agglomeration_method):
-
-    cases_location = os.path.join(data_folder, location, 'agglomerated', agglomeration_method, 'cases.csv')
-
-    return(os.path.exists(cases_location))
-
-def get_agglomeration_equivalence(location, agglomeration_method):
-    '''
-    Gets the equivalence agglomeration
-
-    '''
-
-    if has_aglomeration(location, agglomeration_method):
-        return(agglomeration_method)
-
-    if agglomeration_method == 'geometry' and has_aglomeration(location, 'radial'):
-        return('radial')
-
-    if agglomeration_method == 'radial' and has_aglomeration(location, 'geometry'):
-        return('geometry')
-
-    return(None)
-
-
-
-def get_graphs(agglomeration_method, location):
-    '''
-    Gets the graph for a given location
-    '''
-    
-    graphs_location = os.path.join(data_folder, location, 'constructed', agglomeration_method, 'daily_graphs/')
-    
-    if not os.path.exists(graphs_location):
-        raise ValueError('No graphs found for location: {}'.format(location))
-        
-    nodes = pd.read_csv(os.path.join(graphs_location, 'nodes.csv'), parse_dates = ['date_time'])
-    edges = pd.read_csv(os.path.join(graphs_location, 'edges.csv'), parse_dates = ['date_time'])
-    node_locations = pd.read_csv(os.path.join(graphs_location, 'node_locations.csv'))
-
-    
-    return(nodes, edges, node_locations)
-
-
-
-def extract_connected_neighbors(location, poly_id, agglomeration_method, num_days = 30):
-    '''
-    Extracts the connected neighbors of the last 30 days
-
-    '''
-
-    nodes, edges, node_locations = get_graphs(agglomeration_method, location)
-
-    nodes.node_id = nodes.node_id.astype(str)
-    edges.start_id = edges.start_id.astype(str)
-    edges.end_id = edges.end_id.astype(str)
-
-    # filters
-    nodes = nodes[nodes.date_time >= (nodes.date_time.max() - datetime.timedelta(days = num_days))].copy()
-    edges = edges[edges.date_time >= (edges.date_time.max() - datetime.timedelta(days = num_days))].copy()
-
-
-    edges = edges[(edges.start_id == poly_id) | (edges.end_id == poly_id)].copy()
-
-    final_edges = edges.groupby(['date_time','day','start_id','end_id']).mean().reset_index()
-
-    # Only the ones with positive movement
-    final_edges = final_edges[final_edges.movement > 0]
-
-    # extracts neighbors
-    neighbors = np.unique(np.concatenate((final_edges.start_id, final_edges.end_id)))
-
-    # removes itself
-    neighbors = neighbors[neighbors!= poly_id]
-
-    return(neighbors.tolist())
-
-def new_cases(df_cases, window):
-    # Get the number of polygons that reported having their first case in the last 5 days
-    today = datetime.datetime.today()
-    x_days_ago = today - datetime.timedelta(days = window)
-    historic = df_cases[df_cases['date_time'] < x_days_ago]
-    historic_set = set(historic[historic["num_cases"] > 0]["poly_id"].unique())
-    current_set = set(df_cases[df_cases["num_cases"] > 0]["poly_id"].unique())
-    intersection = current_set.intersection(historic_set)
-
-    new_case_polygon = current_set - intersection
-    return new_case_polygon
-
-'''
-returns a geoDataFrame of geograohic neighbors for a given poly_id
-'''
-def get_geographic_neighbors(poly_id, location, agglomeration_method):
-	poly_id = int(poly_id)
-	polygons = os.path.join(data_folder, location, 'agglomerated', agglomeration_method, "polygons.csv")
-	df_polygons = pd.read_csv(polygons)
-	df_polygons['geometry'] = df_polygons['geometry'].apply(wkt.loads)
-	gdf_polygons = gpd.GeoDataFrame(df_polygons, geometry='geometry')
-	gdf_polygons.set_index("poly_id", inplace=True)
-	polygon = gdf_polygons.at[poly_id, "geometry"]
-	intersections = gdf_polygons[gdf_polygons.geometry.touches(polygon)]
-	intersections.reset_index(inplace=True)
-	neighbors = intersections["poly_id"].astype("str")
-	
-	return neighbors.tolist()

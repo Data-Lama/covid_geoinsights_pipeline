@@ -46,29 +46,6 @@ try:
 except:
     df_cases = pd.read_csv(cases, low_memory=False, encoding = 'latin-1', parse_dates=['date_time'])
 
-def get_max_min(variable, df):
-    max_index = df[variable].idxmax()
-    min_index = df[variable].idxmin()
-    max_info = {'poly_id':df.iloc[max_index]['poly_id'],
-                'date':df.iloc[max_index]['date_time'],
-                variable:df.iloc[max_index][variable]}
-    min_info = {'poly_id':df.iloc[min_index]['poly_id'],
-            'date':df.iloc[min_index]['date_time'],
-            variable:df.iloc[min_index][variable]}
-
-    return (max_info, min_info)
-
-def get_day_max_min(variable, df):
-    df_byday = df.groupby('date_time').sum()
-    df_byday.reset_index(inplace=True)
-    max_index = df_byday[variable].idxmax()
-    min_index = df_byday[variable].idxmin()
-    max_info = {'date':df_byday.iloc[max_index]['date_time'],
-                variable:df_byday.iloc[max_index][variable]}
-    min_info = {'date':df_byday.iloc[min_index]['date_time'],
-            variable:df_byday.iloc[min_index][variable]}
-    return (max_info, min_info)
-
 def get_nodes_with_cases(df):
     total = df.groupby('poly_id').sum()
     nodes_with_cases = total[total['num_cases'] > 0]
@@ -135,20 +112,20 @@ df_external_movement_tot.rename(columns={"start_poly_id":"poly_id"}, inplace=Tru
 df_external_movement_tot.reset_index(inplace=True)
 
 # Get the information of the max and min historical points 
-max_inner_mov = get_max_min('movement', df_inner_movement)[0]
-min_inner_mov = get_max_min('movement', df_inner_movement)[1]
-max_external_mov = get_max_min('movement', df_external_movement_tot)[0]
-min_external_mov = get_max_min('movement', df_external_movement_tot)[1]
-max_num_cases = get_max_min('num_cases', df_cases)[0]
-min_num_cases = get_max_min('num_cases', df_cases)[1]
+max_inner_mov = gf.get_max_min('movement', df_inner_movement)[0]
+min_inner_mov = gf.get_max_min('movement', df_inner_movement)[1]
+max_external_mov = gf.get_max_min('movement', df_external_movement_tot)[0]
+min_external_mov = gf.get_max_min('movement', df_external_movement_tot)[1]
+max_num_cases = gf.get_max_min('num_cases', df_cases)[0]
+min_num_cases = gf.get_max_min('num_cases', df_cases)[1]
 
 # Get the information of the day with max + min
-max_inner_mov_day = get_day_max_min('movement', df_inner_movement)[0]
-min_inner_mov_day = get_day_max_min('movement', df_inner_movement)[1]
-max_external_mov_day = get_day_max_min('movement', df_external_movement_tot)[0]
-min_external_mov_day = get_day_max_min('movement', df_external_movement_tot)[1]
-max_num_cases_day = get_day_max_min('num_cases', df_cases)[0]
-min_num_cases_day = get_day_max_min('num_cases', df_cases)[1]
+max_inner_mov_day = gf.get_day_max_min('movement', df_inner_movement)[0]
+min_inner_mov_day = gf.get_day_max_min('movement', df_inner_movement)[1]
+max_external_mov_day = gf.get_day_max_min('movement', df_external_movement_tot)[0]
+min_external_mov_day = gf.get_day_max_min('movement', df_external_movement_tot)[1]
+max_num_cases_day = gf.get_day_max_min('num_cases', df_cases)[0]
+min_num_cases_day = gf.get_day_max_min('num_cases', df_cases)[1]
 
 no_new_case_polygon = get_polygons_no_new_cases(df_cases, WINDOW)
 
