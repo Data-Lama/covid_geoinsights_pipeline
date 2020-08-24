@@ -25,7 +25,7 @@ reporte_norte_de_santander,Polygon Movement range,analysis,figure,colombia/commu
 reporte_norte_de_santander,Movement FB,analysis,figure,colombia/community/movement_plots/norte_de_santander/mov_range_norte_de_santander.png,mov_range.png
 reporte_norte_de_santander,Prediction ,analysis,figure,colombia/community/prediction/polygon_unions/norte_de_santander/prediction_norte_de_santander.png,prediction.png
 reporte_norte_de_santander,Simulacion ,analysis,figure,colombia/community/prediction/polygon_unions/norte_de_santander/simulations_norte_de_santander.png,simulations.png
-reporte_norte_de_santander,Mapa Alerta General,analysis,figure,colombia/geometry/norte_de_santander/alerts/map_max_alert.png,map_max_alert.png
+reporte_norte_de_santander,Mapa Alerta General,analysis,figure,colombia/geometry/alerts/norte_de_santander/map_max_alert.png,map_max_alert.png
 reporte_norte_de_santander,Mapa Cloroplético Historico,analysis,figure,colombia/geometry/polygon_info_window/norte_de_santander/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
 reporte_norte_de_santander,Mapa Cloroplético Reciente,analysis,figure,colombia/geometry/polygon_info_window/norte_de_santander/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
 reporte_norte_de_santander,Alertas Rojas,analysis,table,colombia/geometry/alerts/norte_de_santander/alerts.csv,alerts.csv
@@ -34,4 +34,20 @@ reporte_norte_de_santander,Estadisticas Unidad Funcional,analysis,table,colombia
 reporte_norte_de_santander,Estadisticas Prediccion,analysis,table,colombia/community/prediction/polygon_unions/norte_de_santander/statistics.csv,prediction_statistics.csv
 reporte_norte_de_santander,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/norte_de_santander/incidence_map.jpeg,incidence_map_geometry.jpeg
 reporte_norte_de_santander,Incidence Table,analysis,table,colombia/geometry/incidence_maps/norte_de_santander/incidences.csv,incidences_geometry.csv
-reporte_norte_de_santander,Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv
+reporte_popayan,Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv
+reporte_popayan,Graph Map First Day,analysis,figure,colombia/community/graph_maps/popayan/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
+reporte_popayan,Graph Map Current Day,analysis,figure,colombia/community/graph_maps/popayan/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
+reporte_popayan,Polygon Movement range,analysis,figure,colombia/community/movement_plots/popayan/movement_range_selected_polygons_popayan.png,movement_range_selected_polygons.png
+reporte_popayan,Movement FB,analysis,figure,colombia/community/movement_plots/popayan/mov_range_popayan.png,mov_range.png
+reporte_popayan,Prediction ,analysis,figure,colombia/community/prediction/polygon_unions/popayan/prediction_popayan.png,prediction.png
+reporte_popayan,Simulacion ,analysis,figure,colombia/community/prediction/polygon_unions/popayan/simulations_popayan.png,simulations.png
+reporte_popayan,Mapa Alerta General,analysis,figure,colombia/geometry/alerts/popayan/map_max_alert.png,map_max_alert.png
+reporte_popayan,Mapa Cloroplético Historico,analysis,figure,colombia/geometry/polygon_info_window/popayan/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
+reporte_popayan,Mapa Cloroplético Reciente,analysis,figure,colombia/geometry/polygon_info_window/popayan/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
+reporte_popayan,Alertas Rojas,analysis,table,colombia/geometry/alerts/popayan/alerts.csv,alerts.csv
+reporte_popayan,Estadisticas Municipio,analysis,table,colombia/geometry/stats/popayan/general_stats.csv,geometry_statistics.csv
+reporte_popayan,Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/popayan/general_stats.csv,community_statistics.csv
+reporte_popayan,Estadisticas Prediccion,analysis,table,colombia/community/prediction/polygon_unions/popayan/statistics.csv,prediction_statistics.csv
+reporte_popayan,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/popayan/incidence_map.jpeg,incidence_map_geometry.jpeg
+reporte_popayan,Incidence Table,analysis,table,colombia/geometry/incidence_maps/popayan/incidences.csv,incidences_geometry.csv
+reporte_popayan,Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv

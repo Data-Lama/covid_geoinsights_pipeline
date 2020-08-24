@@ -37,7 +37,7 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
         return os.path.join(location, agglomeration_method, 'socio-economic', polygon_name, "socio-economic_data_{}.csv".format(polygon_name))
     else:
         print(ident + "Building table of socio-economic variables for {}. (Polygon {} of {})".format(polygon_name, polygon_id, location))
-        df_table = socio_economic_analysis_for_polygon(polygon_id, df_variables, df_national)
+        df_table = socio_economic_analysis_for_polygon(polygon_id, df_variables, df_national, polygon_name)
         write_table(df_table, output_path)
         return os.path.join(location, agglomeration_method, 'socio-economic', polygon_name, "socio-economic_data_{}.csv".format(polygon_name))
     
@@ -45,9 +45,9 @@ def main(location, agglomeration_method, polygon_name, polygon_id, polygon_displ
 def write_table(df_table, output_path):
     df_table.to_csv(output_path, float_format='%.1f')
 
-def socio_economic_analysis_for_polygon(polygon_id, df_variables, df_national):
+def socio_economic_analysis_for_polygon(polygon_id, df_variables, df_national, polygon_name):
     # build table
-    df_variables = df_variables[df_variables["node_id"] == int(polygon_id)]
+    df_variables = df_variables[df_variables["node_id"] == int(polygon_id)].copy()
     cols_to_drop = list(set(df_variables.columns) - set(["poblacion", "porcentaje_sobre_60", "ipm", "num_camas_UCI",
                                                     "porcentaje_subsidiado", "porcentaje_contributivo"]))
 

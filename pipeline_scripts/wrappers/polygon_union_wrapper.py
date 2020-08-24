@@ -121,14 +121,13 @@ ef.excecute_script(analysis_scripts_location, "incidence_map.R", "R", parameters
 # polygon_socio_economic_analysis
 print()
 print("{}Excecuting polygon_socio_economic_analysis.py for {}".format(ident, selected_polygons_name))
-print(selected_polygons_parameter)
+
 parameters = "{} {} {} {} {}".format(location_folder,  
                                 agglomeration_method,
                                 folder_name,
                                 selected_polygons_name,
-                                selected_polygons_parameter
-                                )
-
+                                selected_polygons_parameter)
+                                
 ef.excecute_script(analysis_scripts_location, "polygon_socio_economic_analysis.py", "python", parameters)
 
 # movement_range_plots_script

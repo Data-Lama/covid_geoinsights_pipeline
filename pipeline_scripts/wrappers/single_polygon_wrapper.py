@@ -127,10 +127,11 @@ ef.excecute_script(analysis_scripts_location, "incidence_map.R", "R", parameters
 # polygon_socio_economic_analysis
 print()
 print("{}Excecuting polygon_socio_economic_analysis.py for {}".format(ident, polygon_name))
-parameters = "{} {} {} {} {}".format( location_name,
-                                location_folder,  
+
+parameters = "{} {} {} {} {}".format(location_folder,  
                                 agglomeration_method,
                                 folder_name,
+                                polygon_name,
                                 poly_id)
 
 ef.excecute_script(analysis_scripts_location, "polygon_socio_economic_analysis.py", "python", parameters)
