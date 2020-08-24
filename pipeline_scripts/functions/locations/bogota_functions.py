@@ -35,10 +35,11 @@ class Unifier(GenericUnifier):
 		
 		# Reads cases
 		cases = gf.decrypt_df(os.path.join(self.raw_folder,'cases', self.get('cases_file_name')), config.get_property('key_string') )
-		cases['Fecha de Inicio de Síntomas'] = cases['Fecha de Inicio de Síntomas'].apply(lambda x: pd.to_datetime(x, errors="coerce"))
+
+		cases['FechaInicioSintomas'] = cases['FechaInicioSintomas'].apply(lambda x: pd.to_datetime(x, errors="coerce"))
 
 		#cases = pd.read_excel(os.path.join(self.raw_folder,'cases', self.get('cases_file_name')), parse_dates = ['Fecha de Inicio de Síntomas'], date_parser = lambda x: pd.to_datetime(x, errors="coerce"))
-		cases = cases[['Fecha de Inicio de Síntomas','Recuperado','UPZ_Geo', 'NOMUPZ', 'X','Y', 'Ubicación']].rename(columns = {'Fecha de Inicio de Síntomas':'date_time', 'UPZ_Geo':'geo_id','NOMUPZ':'location','X':'lon','Y':'lat'})
+		cases = cases[['FechaInicioSintomas','Recuperado','UPZGeo', 'NOMUPZ_1', 'X','Y', 'Ubicacion']].rename(columns = {'FechaInicioSintomas':'date_time', 'UPZGeo':'geo_id','NOMUPZ_1':'location','X':'lon','Y':'lat'})
 
 		# Cleans the state
 		cases.Recuperado.fillna('Infectado', inplace = True)
@@ -54,11 +55,11 @@ class Unifier(GenericUnifier):
 		cases.loc[cases.Recuperado == 'Fallecido','num_diseased'] = 1
 
 		# Add in Hospital
-		cases.loc[(cases.Recuperado == 'Infectado') & (cases['Ubicación'].isin(['Hospital UCI', 'Hospital'])),'num_infected_in_hospital'] = 1
-		cases.loc[(cases.Recuperado == 'Infectado') & (~cases['Ubicación'].isin(['Hospital UCI', 'Hospital'])),'num_infected_in_house'] = 1
+		cases.loc[(cases.Recuperado == 'Infectado') & (cases['Ubicacion'].isin(['Hospital UCI', 'Hospital'])),'num_infected_in_hospital'] = 1
+		cases.loc[(cases.Recuperado == 'Infectado') & (~cases['Ubicacion'].isin(['Hospital UCI', 'Hospital'])),'num_infected_in_house'] = 1
 
 		# Removes temporary columns
-		cases = cases.fillna(0).drop(['Recuperado','Ubicación'], axis = 1)
+		cases = cases.fillna(0).drop(['Recuperado','Ubicacion'], axis = 1)
 		
 		# Convert to numeric
 		cases.lon = cases.lon.apply(lambda l: float(str(l).replace(',','.')))

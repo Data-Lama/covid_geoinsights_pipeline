@@ -110,7 +110,7 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
         - movement_change: Relative movement change
     '''
 
-    print("Constructing movement range by polygon.")
+    print(ident + "      Constructing movement range by polygon.")
     print("{}Adjusting crs to equal area projection".format(ident))
 
     # modify df_polygons
@@ -128,25 +128,25 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
     if ("attr_population" in gdf_polygons.columns) and ("attr_area" in gdf_polygons.columns):
         
         # Add population_density to external ids
-        print("{}Area and population attributes detected. Calculating population density".format(ident))
+        print("{}      Area and population attributes detected. Calculating population density".format(ident))
         start = time.time()
         gdf_external_ids["population_density"] = gdf_external_ids.apply(lambda x: get_population_density(x.geometry, gdf_polygons), axis=1).dropna()
         end = time.time()
-        print("{}{}({}seconds to build population density)".format(ident, ident, end-start))
+        print("   {}{}({}seconds to build population density)".format(ident, ident, end-start))
 
         # Calculate intersecitons between polygons and external polygons
-        print("{}{}Calculating intersections for polygons".format(ident, ident))
+        print("   {}{}Calculating intersections for polygons".format(ident, ident))
         start = time.time()
         gdf_polygons["intersections"] = gdf_polygons.apply(lambda x: get_intersection_areas_pop_density(x.geometry, gdf_external_ids), axis=1)
         end = time.time()
-        print("{}{}({} seconds to build intersections)".format(ident,ident, end-start))
+        print("   {}{}({} seconds to build intersections)".format(ident,ident, end-start))
 
 
         # Use intersections to calculate movement range
         df_movement_range_by_polygon = pd.DataFrame(columns=["date_time", "poly_id", "movement_change"])
         for d in df_movement_range["ds"].unique():
             gdf_movement_range_sm = df_movement_range[df_movement_range["ds"] == d].copy()
-            print("{}{}Calculating movement range for {}".format(ident, ident, d))
+            #print("{}{}Calculating movement range for {}".format(ident, ident, d))
             gdf_polygons["movement_change"] = \
                 gdf_polygons.apply(lambda x: calculate_movement(x["intersections"], gdf_movement_range_sm), axis=1)
             gdf_polygons["date_time"] = d
@@ -157,17 +157,17 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
         print("{}Only area attribute detected. Processing by area.".format(ident))
 
         # Calculate intersecitons between polygons and external polygons
-        print("{}{}Calculating intersections for polygons".format(ident, ident))
+        print("      {}{}Calculating intersections for polygons".format(ident, ident))
         start = time.time()
         gdf_polygons["intersections"] = gdf_polygons.apply(lambda x: get_intersection_areas(x.geometry, gdf_external_ids), axis=1)
         end = time.time()
-        print("{}{}({} seconds to build intersections)".format(ident,ident, end-start))
+        print("      {}{}({} seconds to build intersections)".format(ident,ident, end-start))
 
         # Use intersections to calculate movement range
         df_movement_range_by_polygon = pd.DataFrame(columns=["date_time", "poly_id", "movement_change"])
         for d in df_movement_range["ds"].unique():
             gdf_movement_range_sm = df_movement_range[df_movement_range["ds"] == d].copy()
-            print("{}{}Calculating movement range for {}".format(ident, ident, d))
+            #print("{}{}Calculating movement range for {}".format(ident, ident, d))
             gdf_polygons["movement_change"] = \
                 gdf_polygons.apply(lambda x: calculate_movement(x["intersections"], gdf_movement_range_sm), axis=1)
             gdf_polygons["date_time"] = d

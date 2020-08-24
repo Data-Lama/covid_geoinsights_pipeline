@@ -1,5 +1,5 @@
 # Community Agglomeration Functions
-library('rgeos')
+suppressMessages(library('rgeos'))
 
 
 km_constant = 110.567 # For extarcting distances
@@ -30,9 +30,9 @@ extract_geometry = function(geometry)
 {
 
   final_geo = readWKT(geometry[1])
-  if(length(final_geo) > 1)
+  if(length(geometry) > 1)
   {
-    for(i in 2:length(final_geo))
+    for(i in 2:length(geometry))
     {
       final_geo = gUnion(final_geo, readWKT(geometry[i]))
     }

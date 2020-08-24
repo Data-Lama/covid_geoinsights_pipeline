@@ -4,6 +4,7 @@ import sys
 import unidecode
 import pandas as pd
 from datetime import datetime, timedelta
+import numpy as np
 
 # Direcotries
 from global_config import config
@@ -21,6 +22,8 @@ import general_functions as gf
 k = 20
 
 gap_hours = 20
+
+ident = '         '
 
 # Import selected polygons
 selected_polygons = pd.read_csv('pipeline_scripts/configuration/selected_polygons.csv')
@@ -44,7 +47,7 @@ for i in selected_polygons.index:
 
     # Checks if prediction has been excecuted recently
      # Checks if prediction already exists
-    current_prediction_folder = os.path.join(analysis_dir, location_name, agglomeration, 'prediction/polygons' poly_folder_name)
+    current_prediction_folder = os.path.join(analysis_dir, location_name, agglomeration, 'prediction/polygons', poly_folder_name)
 
     if os.path.exists(current_prediction_folder):
         statistics_location = os.path.join(current_prediction_folder, 'prediction_statistics.csv')
@@ -58,7 +61,7 @@ for i in selected_polygons.index:
             hours = (pd.to_datetime(datetime.now()) - excecution_date).total_seconds()/3600
 
             if  hours < gap_hours:
-                print(ident + f'         Prediction data found ({np.round(hours,1)} hours ago. Skipping)')
+                print(ident + f'         Prediction data found for {poly_name} {np.round(hours,1)} hours ago. Skipping)')
                 continue
 
 
