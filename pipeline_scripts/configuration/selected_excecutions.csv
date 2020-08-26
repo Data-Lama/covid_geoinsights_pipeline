@@ -90,11 +90,11 @@ Colombia,colombia,POS,wrappers,2,NO,polygon_union_wrapper,python,colombia commun
 Colombia,colombia,POS,wrappers,2,NO,single_polygon_wrapper,python,colombia geometry Palmira palmira 76520
 Colombia,colombia,POS,wrappers,2,NO,single_polygon_wrapper,python,colombia geometry Popayán popayan 19001
 Colombia,colombia,POS,wrappers,2,NO,single_polygon_wrapper,python,colombia community Popayán popayan 19001
-Colombia,colombia,POS,wrappers,3,YES,polygon_union_prediction_wrapper,python,colombia community 0.8 20 Colombia
+Colombia,colombia,POS,wrappers,3,NO,polygon_union_prediction_wrapper,python,colombia community 0.8 20 Colombia
 Colombia,colombia,POS,analysis,1,NO,polygon_info_timewindow,python,colombia geometry 5 days
 Colombia,colombia,POS,analysis,1,NO,generate_threshold_alerts,python,colombia geometry min_record
 Colombia,colombia,POS,analysis,1,NO,choropleth_maps,python,colombia geometry
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia geometry
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia community
 Colombia,colombia,POS,analysis,1,NO,incidence_map,r,Colombia colombia geometry
-All,,POS,POS,6,NO,copy_report_files.py,python,
+All,,POS,POS,6,YES,copy_report_files.py,python,
