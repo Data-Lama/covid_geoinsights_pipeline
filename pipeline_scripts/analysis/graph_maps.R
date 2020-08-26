@@ -117,7 +117,7 @@ if(length(selected_polygons) > 0)
 
 # Split node_name in two for labling
 locations <- locations %>% tidyr::separate(node_name, 
-                       c("municipio", "dept"))
+                       c("municipio", "dept"), sep="-")
 
 # Extracts the lattitude and longitud from the location datatset
 

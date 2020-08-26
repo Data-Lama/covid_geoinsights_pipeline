@@ -76,31 +76,55 @@ class Unifier(GenericUnifier):
 
 	def build_polygons(self):
 
-		# Polygons
-		polygons = geopandas.read_file(os.path.join(self.raw_folder, 'geo', self.get('shape_file_name')))
-		# Polygon Info
-		polygons_info = pd.read_csv(os.path.join(self.raw_folder, 'geo', self.get('geo_file_name')))
-		polygons_info['CODIGO FINAL'] = polygons_info['CODIGO FINAL'].astype(str)
-		
-		# Sorts and drops
-		polygons_info = polygons_info[['CODIGO FINAL','TOTAL']].groupby('CODIGO FINAL').sum().reset_index()
-		polygons = polygons.sort_values('Shape_Area', ascending = False).drop_duplicates(subset = ['SECC'], keep = 'first')
-		
-		# Merges 
-		polygons = polygons.merge(polygons_info, left_on = 'SECC', right_on = 'CODIGO FINAL')
-		polygons['poly_name'] = polygons.OBJECTID.apply(lambda i: 'Sector {}'.format(i))
+		# MOCK
+		definition = 'manzana'
 
-		# Selects columns and renames
-		polygons = polygons[['SECC','poly_name', 'TOTAL','Shape_Area','geometry']].rename(columns = {'SECC':'poly_id','TOTAL':'attr_population','Shape_Area':'attr_area'})
+		if definition == 'manzana':
+			# Polygons
+			polygons = geopandas.read_file(os.path.join(self.raw_folder, 'geo', self.get('shape_manzana_file_name')))
+
+			# Sorts and drops
+			polygons = polygons.sort_values('Shape_Area', ascending = False).drop_duplicates(subset = ['MANCODIGO'], keep = 'first')
+			
+			# Merges 
+			# polygons['poly_name'] = polygons.OBJECTID.apply(lambda i: 'Sector {}'.format(i))
+
+			# Selects columns and renames
+			polygons = polygons[['MANCODIGO','Shape_Area','geometry']].rename(columns = {'MANCODIGO':'poly_id','Shape_Area':'attr_area'})
 
 
-		# Extracts the center
-		polygons['poly_lon'] = polygons.geometry.centroid.to_crs('epsg:4326').x
-		polygons['poly_lat'] = polygons.geometry.centroid.to_crs('epsg:4326').y
+			# Extracts the center
+			polygons['poly_lon'] = polygons.geometry.centroid.to_crs('epsg:4326').x
+			polygons['poly_lat'] = polygons.geometry.centroid.to_crs('epsg:4326').y
 
-		# Adjusts geometry  to latiude and longitud
-		polygons = polygons.to_crs('epsg:4326')
-		
+			# Adjusts geometry  to latiude and longitud
+			polygons = polygons.to_crs('epsg:4326')
+			
+		elif definition == 'sector':
+			# Polygons
+			polygons = geopandas.read_file(os.path.join(self.raw_folder, 'geo', self.get('shape_sector_file_name')))
+			# Polygon Info
+			polygons_info = pd.read_csv(os.path.join(self.raw_folder, 'geo', self.get('geo_file_name')))
+			polygons_info['CODIGO FINAL'] = polygons_info['CODIGO FINAL'].astype(str)
+			
+			# Sorts and drops
+			polygons_info = polygons_info[['CODIGO FINAL','TOTAL']].groupby('CODIGO FINAL').sum().reset_index()
+			polygons = polygons.sort_values('Shape_Area', ascending = False).drop_duplicates(subset = ['SECC'], keep = 'first')
+			
+			# Merges 
+			polygons = polygons.merge(polygons_info, left_on = 'SECC', right_on = 'CODIGO FINAL')
+			polygons['poly_name'] = polygons.OBJECTID.apply(lambda i: 'Sector {}'.format(i))
+
+			# Selects columns and renames
+			polygons = polygons[['SECC','poly_name', 'TOTAL','Shape_Area','geometry']].rename(columns = {'SECC':'poly_id','TOTAL':'attr_population','Shape_Area':'attr_area'})
+
+
+			# Extracts the center
+			polygons['poly_lon'] = polygons.geometry.centroid.to_crs('epsg:4326').x
+			polygons['poly_lat'] = polygons.geometry.centroid.to_crs('epsg:4326').y
+
+			# Adjusts geometry  to latiude and longitud
+			polygons = polygons.to_crs('epsg:4326')
+
 		return(polygons)
-
 

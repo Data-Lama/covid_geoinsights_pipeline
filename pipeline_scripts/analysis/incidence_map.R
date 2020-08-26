@@ -162,7 +162,7 @@ df_plot = polygons[order(polygons$incidence),]
 
 # Split poly_name in two for labling
 df_plot <- df_plot %>% tidyr::separate(poly_name, 
-                      c("municipio"), extra='drop')
+                      c("municipio"), extra='drop', sep="-")
 
 p =  ggmap(map)
 p = p + geom_point(data = df_plot, aes(x = poly_lon, y = poly_lat, color = incidence, size = incidence, alpha = incidence, shape = group ))
