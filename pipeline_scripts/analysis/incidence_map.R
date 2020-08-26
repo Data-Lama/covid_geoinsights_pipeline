@@ -42,12 +42,14 @@ if(is.na(selected_polygons_name))
 {
   selected_polygons_name = "entire_location"
   selected_polygons = c()
-  
+  map_type = "terrain"
+
 }else{
-  add_labels = TRUE
+  add_labels = FALSE
   selected_polygons = args[5:length(args)]
   selected_polygons = unique(selected_polygons)
-  
+  map_type = "terrain-background"
+
   if(length(selected_polygons) == 0)
   {
     stop("If a selected polygons name is given, then at least one polygon id must be given")
@@ -156,6 +158,7 @@ right = right + margin
 
 
 cat(paste(ident, '   Downloading Map', '\n', sep = ""))
+# map = suppressMessages(get_stamenmap(c(left = left, bottom = bottom, right = right, top = top), maptype = map_type, color = 'bw'))
 map = suppressMessages(get_map(c(left = left, bottom = bottom, right = right, top = top), maptype = 'satellite', color = 'bw'))
 
 df_plot = polygons[order(polygons$incidence),]

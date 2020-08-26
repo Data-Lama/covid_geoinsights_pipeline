@@ -25,7 +25,7 @@ location_name  =  sys.argv[1] # location name
 location_folder =  sys.argv[2] # polygon name
 criteria_parameter = sys.argv[3] # min_record or min_date
 
-if len(sys.argv) <= 4:
+if len(sys.argv) <= 3:
 	selected_polygons_boolean = False
 else :
     selected_polygons_boolean = True
@@ -244,13 +244,17 @@ else:
     output_file_path = os.path.join(output_file_path, "entire_location")
 
 if not DONE:
-
+    
     # Check if folder exists
     if not os.path.isdir(output_file_path):
         os.makedirs(output_file_path)
 
+    if selected_polygons_boolean:
+        red_alerts = df_alerts
+    else: 
+        red_alerts = df_alerts.loc[(df_alerts['max_alert'] == 'ROJO')].copy()
     # Write alerts table
-    red_alerts = df_alerts.loc[(df_alerts['max_alert'] == 'ROJO')].copy()
+    
     red_alerts = red_alerts.merge(df_age, how="outer", left_on="poly_id", right_on="node_id").dropna()
     red_alerts = red_alerts.merge(df_ipm, how="outer", left_on="poly_id", right_on="node_id").dropna()
     red_alerts.sort_values(by=['Departamento','Municipio'], inplace=True)
