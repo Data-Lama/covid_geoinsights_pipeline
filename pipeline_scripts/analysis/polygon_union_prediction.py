@@ -104,7 +104,9 @@ def main(location_folder, agglomeration_method, selected_polygons_name, selected
 
                 excecution_date = pd.to_datetime(df_stat.loc['date_time','value'])
 
-                if (pd.to_datetime(datetime.now()) - excecution_date).total_seconds()/3600 < gap_hours:
+                hours_ago = (pd.to_datetime(datetime.now()) - excecution_date).total_seconds()/3600
+
+                if  hours_ago < gap_hours:
 
                     data_set = pd.read_csv(data_set_location, parse_dates = ['target_date'])
                     dfs.append(data_set)
@@ -113,7 +115,7 @@ def main(location_folder, agglomeration_method, selected_polygons_name, selected
                     dfs_simulations.append(data_set_simulations)
 
                 else:
-                    print(ident + f'   Location: {folder} was found but excecuted to long ago: {np.round(excecution_date,1)}. Skipping')
+                    print(ident + f'   Location: {folder} was found but excecuted to long ago: {np.round(hours_ago,1)} hours. Skipping')
                 
 
     if len(dfs) == 0:
