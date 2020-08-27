@@ -136,6 +136,7 @@ polygons = polygons[order(-1*polygons$incidence),]
 
 poly_export = polygons[1:10,c('poly_name', 'incidence', 'attr_population')]
 poly_export$incidence = round(poly_export$incidence)
+poly_export = drop_na(poly_export)
 # Saves
 write.csv(poly_export, file = file.path( export_folder,"incidences.csv"), quote = FALSE, row.names = FALSE)
 

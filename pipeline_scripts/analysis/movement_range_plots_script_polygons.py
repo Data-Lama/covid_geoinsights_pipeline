@@ -195,43 +195,6 @@ df_cases_plot = df_cases[['date_time','value','type','Tipo']].copy()
 
 
 df = pd.concat((df_mov_plot, df_cases_plot), ignore_index = True)
-# Plots movement all
-print(ident + '   Plots movement for {} (All)'.format(selected_polygons_name))
-
-# Global Movmeent Plot
-df_plot = df
-
-g = sns.relplot(x="date_time", y="value",row="type", hue = 'Tipo',
-            height=height, aspect=aspect, facet_kws=dict(sharey=False),
-            kind="line", data=df_plot)
-
-
-# Axis
-g.set_axis_labels("Fecha", "")
-g.axes[0,0].set_ylabel('Proporción (0-1)')
-g.axes[1,0].set_ylabel('Número Casos')
-
-# Titles
-g.axes[0,0].set_title(f'Cambio Porcentual en el Movimiento en {selected_polygons_name}')
-g.axes[1,0].set_title(f'Casos Diarios en {selected_polygons_name}')
-
-
-# Adds the horizontal line
-g.axes[0,0].axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
-
-min_dat, max_date = g.axes[0,0].get_xlim()
-
-tick = np.round(min_dat) + 4
-ticks = []
-jump = 15
-while tick  < max_date:
-	ticks.append(tick)
-	tick += jump
-
-
-
-g.axes[1,0].xaxis.set_ticks(ticks)
-g.savefig(os.path.join(export_folder_location, f'mov_range_{selected_polygons_folder_name}.png'))
 
 
 print(ident + '   Plots Movement Range for Polygons {}'.format(selected_polygons_name))	
