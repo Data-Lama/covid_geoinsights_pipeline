@@ -77,7 +77,7 @@ class Unifier(GenericUnifier):
 	def build_polygons(self):
 
 		# MOCK
-		definition = 'manzana'
+		definition = 'sector'
 
 		if definition == 'manzana':
 			# Polygons
