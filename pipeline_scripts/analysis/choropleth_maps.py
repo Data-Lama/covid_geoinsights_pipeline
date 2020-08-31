@@ -153,6 +153,9 @@ df_deltas_recent = calculate_delta(df_municipalites_t1, df_municipalites_t2)
 df_deltas_recent = df_deltas_recent.replace([np.inf, -np.inf], np.nan).dropna(axis=0)                                                                    
 
 # If asked for specific polygons, get subset
+scheme = "user_defined"
+bins = {'bins':[0, 0.49, 1, 2, 5, 10]} 
+
 if selected_polygons_boolean:
        edgecolor = "grey"
        df_deltas_historic.reset_index(inplace=True)
@@ -160,7 +163,8 @@ if selected_polygons_boolean:
        df_deltas_recent = df_deltas_recent[df_deltas_recent["poly_id"].isin(selected_polygons)].set_index("poly_id")
        df_deltas_historic = df_deltas_historic[df_deltas_historic["poly_id"].isin(selected_polygons)].set_index("poly_id")
        output_file_path = os.path.join(output_file_path, selected_polygon_name)
-       scheme = "fisher_jenks"
+       # scheme = "fisher_jenks"
+       # bins = None
        # get labels
 
        # Check if folder exists
@@ -168,8 +172,6 @@ if selected_polygons_boolean:
               os.makedirs(output_file_path)
 else :
      output_file_path = os.path.join(output_file_path, "entire_location") 
-     scheme = "user_defined"
-     bins = [0, 0.49, 1, 2, 5, 10] 
 print(ident+'   Building recent map (15 day window)')
 
 # Get choropleth map 15-day window 
@@ -179,7 +181,7 @@ choropleth_map_recent.replace([np.inf, -np.inf], np.nan, inplace=True)
 choropleth_map_recent.to_crs(epsg=3857, inplace=True)
 
 ax = choropleth_map_recent.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(30,18),
-                                    scheme=scheme, classification_kwds={'bins':bins}, legend=True, linewidth=0.5, edgecolor=edgecolor)
+                                    scheme=scheme, classification_kwds=bins, legend=True, linewidth=0.5, edgecolor=edgecolor)
 
 ax.set_axis_off()
 
@@ -205,7 +207,7 @@ choropleth_map_historic.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
 choropleth_map_historic.replace([np.inf, -np.inf], np.nan, inplace=True)
 choropleth_map_historic.to_crs(epsg=3857, inplace=True)
 ax = choropleth_map_historic.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(30,18),
-                                    scheme='user_defined', classification_kwds={'bins':scheme}, k=6, legend=True, linewidth=0.5, edgecolor=edgecolor)
+                                    scheme=scheme, classification_kwds=bins, legend=True, linewidth=0.5, edgecolor=edgecolor)
 ax.set_axis_off()
 
 if selected_polygons_boolean:
