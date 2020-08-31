@@ -151,6 +151,18 @@ parameters = "{} {} {} {} {}".format(location_folder,
 ef.excecute_script(analysis_scripts_location, "movement_range_plots_script_polygons.py", "python", parameters)
 
 
+# movement_range_and_cases_plots
+print()
+print("{}Excecuting movement_range_and_cases_script_polygons.py.py for {}".format(ident, selected_polygons_name))
+parameters = "{} {} {} {} {}".format(location_folder,  
+                                agglomeration_method,
+                                selected_polygons_name,
+                                folder_name,
+                                selected_polygons_parameter)
+
+ef.excecute_script(analysis_scripts_location, "movement_range_and_cases_script_polygons.py", "python", parameters)
+
+
 # polygon union prediction wrapper
 
 # Is supported only if agglomeration_metthod is community

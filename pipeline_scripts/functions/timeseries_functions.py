@@ -365,6 +365,7 @@ def extract_all_timeseries_movement(locations, agglomeration_method, movement_ty
 
 	all_dfs = []
 
+
 	for location in locations:
 
 		equivalent_agglomeration_method = gf.get_agglomeration_equivalence(location, agglomeration_method)
@@ -382,7 +383,6 @@ def extract_all_timeseries_movement(locations, agglomeration_method, movement_ty
 		df_polygons = pd.read_csv(poly_location)
 
 		df_polygons.index = df_polygons.poly_id
-
 
 		all_polygons = set(df_mov_all.start_poly_id.unique()).union(set(df_mov_all.end_poly_id.unique()))
 		

@@ -153,9 +153,22 @@ parameters = "{} {} {} {} {}".format(location_folder,
                                 agglomeration_method,
                                 polygon_name,
                                 folder_name,
-                                poly_id)
+                                selected_geographic_neighbors_polygons_parameter)
 
 ef.excecute_script(analysis_scripts_location, "movement_range_plots_script_polygons.py", "python", parameters)
+
+
+# movement_range_and_cases_plots
+print()
+print("{}Excecuting movement_range_and_cases_script_polygons.py.py for {}".format(ident, polygon_name))
+parameters = "{} {} {} {} {}".format(location_folder,  
+                                agglomeration_method,
+                                polygon_name,
+                                folder_name,
+                                poly_id)
+
+ef.excecute_script(analysis_scripts_location, "movement_range_and_cases_script_polygons.py", "python", parameters)
+
 
 
 # polygon union prediction wrapper

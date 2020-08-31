@@ -195,33 +195,43 @@ df_cases_plot = df_cases[['date_time','value','type','Tipo']].copy()
 
 
 df = pd.concat((df_mov_plot, df_cases_plot), ignore_index = True)
+# Plots movement all
+print(ident + '   Plots movement for {} (All)'.format(selected_polygons_name))
+
+# Global Movmeent Plot
+df_plot = df
+
+g = sns.relplot(x="date_time", y="value",row="type", hue = 'Tipo',
+            height=height, aspect=aspect, facet_kws=dict(sharey=False),
+            kind="line", data=df_plot)
 
 
-print(ident + '   Plots Movement Range for Polygons {}'.format(selected_polygons_name))	
+# Axis
+g.set_axis_labels("Fecha", "")
+g.axes[0,0].set_ylabel('Proporción (0-1)')
+g.axes[1,0].set_ylabel('Número Casos')
 
-
-
-# Reads Polygons
-polygons = polygons.sort_values('num_cases', ascending = False)
-if polygons.shape[0] > max_selected:
-	polygons.loc[polygons.index[max_selected:],'poly_name'] = 'Otros (Promedio)'
-
-
-df_plot = df_mov_range.merge(polygons[['poly_id','poly_name']], on = 'poly_id')
-
-fig = plt.figure(figsize=(19,8))
-
-ax = sns.lineplot(data = df_plot, x = 'date_time', y = 'movement_change', hue = 'poly_name')
-ax.set_title('Cambio Porcentual en Movilidad en Unidades {} para {}'.format(unit_type_prural, selected_polygons_name), fontsize=suptitle_font_size)
-ax.set_xlabel('Fecha', fontsize=axis_font_size)
-ax.set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
-ax.legend().texts[0].set_text(f"Unidad {unit_type}")
+# Titles
+g.axes[0,0].set_title(f'Cambio Porcentual en el Movimiento en {selected_polygons_name}')
+g.axes[1,0].set_title(f'Casos Diarios en {selected_polygons_name}')
 
 
 # Adds the horizontal line
-ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)		
+g.axes[0,0].axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
 
-fig.savefig(os.path.join(export_folder_location, f'movement_range_selected_polygons_{selected_polygons_folder_name}.png'))
+min_dat, max_date = g.axes[0,0].get_xlim()
+
+tick = np.round(min_dat) + 4
+ticks = []
+jump = 15
+while tick  < max_date:
+	ticks.append(tick)
+	tick += jump
+
+
+
+g.axes[1,0].xaxis.set_ticks(ticks)
+g.savefig(os.path.join(export_folder_location, f'mov_range_{selected_polygons_folder_name}.png'))
 
 
 

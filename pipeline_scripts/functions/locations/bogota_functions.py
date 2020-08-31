@@ -77,7 +77,7 @@ class Unifier(GenericUnifier):
 	def build_polygons(self):
 
 		# MOCK
-		definition = 'manzana'
+		definition = 'sector'
 
 		if definition == 'manzana':
 			# Polygons
@@ -86,11 +86,10 @@ class Unifier(GenericUnifier):
 			# Sorts and drops
 			polygons = polygons.sort_values('Shape_Area', ascending = False).drop_duplicates(subset = ['MANCODIGO'], keep = 'first')
 			
-			# Merges 
-			# polygons['poly_name'] = polygons.OBJECTID.apply(lambda i: 'Sector {}'.format(i))
 
 			# Selects columns and renames
 			polygons = polygons[['MANCODIGO','Shape_Area','geometry']].rename(columns = {'MANCODIGO':'poly_id','Shape_Area':'attr_area'})
+			polygons['poly_name'] = polygons.poly_id.apply(lambda i: 'Manzana {}'.format(i))
 
 
 			# Extracts the center

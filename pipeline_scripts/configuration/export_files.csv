@@ -11,11 +11,11 @@ reporte_nacional,Mapa Cloropletico Historico,analysis,figure,colombia/geometry/p
 reporte_nacional,Mapa Cloropletico Reciente,analysis,figure,colombia/geometry/polygon_info_window/entire_location/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
 reporte_nacional,Mapa Cloropletico Reciente,analysis,table,colombia/geometry/polygon_info_window/entire_location/detail_choropleth_recent.csv,detail_choropleth_recent.csv
 reporte_nacional,Alertas Rojas,analysis,table,colombia/geometry/alerts/entire_location/alerts.csv,alerts.csv
-reporte_nacional,Estadisticas Municipio,analysis,table,colombia/geometry/stats/general_stats.csv,geometry_statistics.csv
-reporte_nacional,Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/general_stats.csv,community_statistics.csv
+reporte_nacional,Estadisticas Municipio,analysis,table,colombia/geometry/stats/entire_location/general_stats.csv,geometry_statistics.csv
+reporte_nacional,Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/entire_location/general_stats.csv,community_statistics.csv
 reporte_nacional,Estadisticas Prediccion,analysis,table,colombia/community/prediction/polygon_unions/entire_location/statistics.csv,prediction_statistics.csv
-reporte_nacional,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/incidence_map.jpeg,incidence_map_geometry.jpeg
-reporte_nacional,Incidence Table,analysis,table,colombia/geometry/incidence_maps/incidences.csv,incidences_geometry.csv
+reporte_nacional,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/entire_location/incidence_map.jpeg,incidence_map_geometry.jpeg
+reporte_nacional,Incidence Table,analysis,table,colombia/geometry/incidence_maps/entire_location/incidences.csv,incidences_geometry.csv
 reporte_nacional,Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv
 reporte_subnacional,Polygon Movement range,analysis,figure,colombia/community/movement_plots/entire_location/movement_range_selected_polygons_colombia.png,internal_movement_selected_polygons_colombia.png
 reporte_subnacional,Neighbor Series barranquilla,analysis,figure,colombia/community/neighbors/*/neighbor_timeseries_*.png,*
