@@ -25,7 +25,7 @@ location_name  =  sys.argv[1] # location name
 location_folder =  sys.argv[2] # polygon name
 criteria_parameter = sys.argv[3] # min_record or min_date
 
-if len(sys.argv) <= 3:
+if len(sys.argv) <= 4:
 	selected_polygons_boolean = False
 else :
     selected_polygons_boolean = True
@@ -42,6 +42,10 @@ WINDOW_SIZE = 7
 MAX_POINTS = WINDOW_SIZE
 NUM_CASES_THRESHOLD_RED = 1 #5 # This should be set to the desired slope of the epidemiological curve
 NUM_CASES_THRESHOLD_YELLOW = 0.5 #2  # This should be set to the desired slope of the epidemiological curve
+NATIONAL_IPM = 19.6
+NATIONAL_OLDAGE = 12
+NATIONAL_SUBSIDIZED = 53
+
 DONE = False
 
 TRANSLATE = {'internal_alert':'Alerta interna',
@@ -117,6 +121,12 @@ df_socioecon = pd.read_csv(socioecon)
 df_ipm = df_socioecon[["node_id", "ipm"]].copy()
 df_age = df_socioecon[["node_id","porcentaje_sobre_60"]].copy()
 df_age["porcentaje_sobre_60"] = df_age["porcentaje_sobre_60"].multiply(100)
+df_eps = df_socioecon[["node_id","porcentaje_subsidiado"]].copy()
+df_eps["porcentaje_subsidiado"] = df_eps["porcentaje_subsidiado"].multiply(100)
+
+df_ipm.set_index("node_id", inplace=True)
+df_age.set_index("node_id", inplace=True)
+df_eps.set_index("node_id", inplace=True)
 
 # Get polygons
 df_movement_recent = df_movement.loc[df_movement['date_time'] >= first_day].copy()
@@ -196,6 +206,24 @@ def get_max_alert(alert_1, alert_2, alert_3, alert_4, alert_5):
         return 'AMARILLO'
     else: return 'VERDE'
 
+def get_vulnerability_alert(poly_id):
+
+    alerts = []
+    if (df_ipm.at[poly_id, "ipm"] > NATIONAL_IPM):
+        alerts.append("IPM")
+    elif (df_age.at[poly_id, "porcentaje_sobre_60"] > NATIONAL_OLDAGE):
+        alerts.append(">60 ANOS")
+    elif (df_eps.at[poly_id, "porcentaje_subsidiado"] > NATIONAL_SUBSIDIZED):
+        alerts.append("EPS SUBSIDIADO")
+    else: return "-"
+
+    return ";".join(alerts)
+
+def set_vulnerability_color(vul_alert):
+    if vul_alert != "-":
+        return "ROJO"
+    else: return "VERDE"
+
 # ---------------------------------------- #
 # ---------- calculate alerts ------------ #
 # ---------------------------------------- #
@@ -232,6 +260,8 @@ df_alerts['internal_alert_color'] = df_alerts.apply(lambda x: set_color(x.intern
 df_alerts['external_num_cases_alert_color'] = df_alerts.apply(lambda x: set_color(x.alert_external_num_cases), axis=1)
 df_alerts['internal_num_cases_alert_color'] = df_alerts.apply(lambda x: set_color(x.alert_internal_num_cases), axis=1)
 df_alerts['first_case_color_alert'] = df_alerts.apply(lambda x: set_color(x.alert_first_case), axis=1)
+df_alerts['vulnerability_alert'] = df_alerts.apply(lambda x: get_vulnerability_alert(x.poly_id), axis=1)
+df_alerts['vulnerability_alert_color'] = df_alerts.apply(lambda x: set_vulnerability_color(x.vulnerability_alert), axis=1)
 
 # If asked for specific polygons, get subset
 if selected_polygons_boolean:
@@ -255,21 +285,21 @@ if not DONE:
         red_alerts = df_alerts.loc[(df_alerts['max_alert'] == 'ROJO')].copy()
     # Write alerts table
     
-    red_alerts = red_alerts.merge(df_age, how="outer", left_on="poly_id", right_on="node_id").dropna()
-    red_alerts = red_alerts.merge(df_ipm, how="outer", left_on="poly_id", right_on="node_id").dropna()
+    # red_alerts = red_alerts.merge(df_age, how="outer", left_on="poly_id", right_on="node_id").dropna()
+    # red_alerts = red_alerts.merge(df_ipm, how="outer", left_on="poly_id", right_on="node_id").dropna()
     red_alerts.sort_values(by=['Departamento','Municipio'], inplace=True)
     red_alerts.rename(columns={'internal_alert': 'Alerta interna (movimiento)', 'community_name':'Unidad funcional',
     'external_alert':'Alerta externa (movimiento)', 'alert_first_case':'Alerta de primer caso detectado', 
     "alert_external_num_cases":"Alerta numero de casos en municipios vecinos", "alert_internal_num_cases":"Alerta numero de casos",
-    "porcentaje_sobre_60":"Personas mayores a 60", "ipm":"IPM"}, inplace=True)
+    "vulnerability_alert":"Alerta de vulnerabilidad"}, inplace=True)
     red_alerts.to_csv(os.path.join(output_file_path, 'alerts.csv'), columns=['Departamento', 'Municipio', 'Unidad funcional',                                           
                                             'Alerta interna (movimiento)',
                                             'Alerta numero de casos',
                                             'Alerta de primer caso detectado',
                                             'Alerta externa (movimiento)', 
                                             'Alerta numero de casos en municipios vecinos',
-                                            'Personas mayores a 60',
-                                            'IPM'], index=False, float_format='%.3f', sep=",")
+                                            'vulnerability_alert_color',
+                                            'Alerta de vulnerabilidad'], index=False, float_format='%.3f', sep=",")
 
     # Map alerts
     df_alerts = geo_df.merge(df_alerts, left_on='Codigo_Dan', right_on='poly_id')

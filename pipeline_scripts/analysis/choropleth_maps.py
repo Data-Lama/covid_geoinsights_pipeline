@@ -160,13 +160,16 @@ if selected_polygons_boolean:
        df_deltas_recent = df_deltas_recent[df_deltas_recent["poly_id"].isin(selected_polygons)].set_index("poly_id")
        df_deltas_historic = df_deltas_historic[df_deltas_historic["poly_id"].isin(selected_polygons)].set_index("poly_id")
        output_file_path = os.path.join(output_file_path, selected_polygon_name)
+       scheme = "fisher_jenks"
        # get labels
 
        # Check if folder exists
        if not os.path.isdir(output_file_path):
               os.makedirs(output_file_path)
 else :
-     output_file_path = os.path.join(output_file_path, "entire_location")  
+     output_file_path = os.path.join(output_file_path, "entire_location") 
+     scheme = "user_defined"
+     bins = [0, 0.49, 1, 2, 5, 10] 
 print(ident+'   Building recent map (15 day window)')
 
 # Get choropleth map 15-day window 
@@ -174,9 +177,9 @@ choropleth_map_recent = geo_df.merge(df_deltas_recent, left_on='Codigo_Dan', rig
 choropleth_map_recent.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
 choropleth_map_recent.replace([np.inf, -np.inf], np.nan, inplace=True)
 choropleth_map_recent.to_crs(epsg=3857, inplace=True)
-scheme = [0, 0.49, 1, 2, 5, 10]
+
 ax = choropleth_map_recent.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(30,18),
-                                    scheme='user_defined', classification_kwds={'bins':scheme}, legend=True, linewidth=0.5, edgecolor=edgecolor)
+                                    scheme=scheme, classification_kwds={'bins':bins}, legend=True, linewidth=0.5, edgecolor=edgecolor)
 
 ax.set_axis_off()
 
