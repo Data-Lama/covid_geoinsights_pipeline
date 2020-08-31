@@ -1,8 +1,2 @@
 time,script_name,parameters,result
-2020-08-27 10:05:36.014659,universal_generic_unifier.py,Bogota bogota,0
-2020-08-27 10:08:15.661324,universal_geometry_agglomerate.py,Bogota bogota,0
-2020-08-27 10:08:19.963527,universal_community_agglomerate.R,Bogota bogota,0
-2020-08-27 10:12:04.503963,universal_daily_graphs_constructor.py,Bogota bogota all,0
-2020-08-27 10:29:43.408989,polygon_union_prediction_wrapper.py,colombia geometry 0.8 20 Palmira palmira 76520,0
-2020-08-27 10:29:43.550123,single_polygon_wrapper.py,colombia geometry Palmira palmira 76520,0
-2020-08-27 10:29:45.342795,copy_report_files.py,nan,256
+2020-08-30 21:08:43.302820,copy_report_files.py,nan,256

@@ -78,7 +78,7 @@ parameters = "{} {} {} {} {}".format(location_name,
                                 folder_name,
                                 selected_connected_neighbors_polygons_parameter)
 
-#ef.excecute_script(analysis_scripts_location, "graph_maps.R", "R", parameters)
+ef.excecute_script(analysis_scripts_location, "graph_maps.R", "R", parameters)
 
 # Execute polygon_info_timewindow
 print()
@@ -90,7 +90,7 @@ parameters = "{} {} {} {} {} {}".format(location_folder,
                                     folder_name,
                                     selected_geographic_neighbors_polygons_parameter)
 
-#ef.excecute_script(analysis_scripts_location, "polygon_info_timewindow.py", "python", parameters)
+ef.excecute_script(analysis_scripts_location, "polygon_info_timewindow.py", "python", parameters)
 
 # Execute generate_threshold_alerts
 print()
@@ -101,7 +101,7 @@ parameters = "{} {} {} {} {}".format(location_folder,
                                     folder_name, 
                                     selected_geographic_neighbors_polygons_parameter)
 
-#ef.excecute_script(analysis_scripts_location, "generate_threshold_alerts.py", "python", parameters)
+ef.excecute_script(analysis_scripts_location, "generate_threshold_alerts.py", "python", parameters)
 
 # Excecute choropleth_maps
 print()
@@ -111,7 +111,7 @@ parameters = "{} {} {} {}".format(location_folder,
                                 folder_name,
                                 selected_geographic_neighbors_polygons_parameter)
 
-#ef.excecute_script(analysis_scripts_location, "choropleth_maps.py", "python", parameters)
+ef.excecute_script(analysis_scripts_location, "choropleth_maps.py", "python", parameters)
 
 # Excecute general_stats
 print()
@@ -121,7 +121,7 @@ parameters = "{} {} {} {}".format(location_folder,
                                 folder_name,
                                 poly_id)
 
-#ef.excecute_script(analysis_scripts_location, "general_statistics.py", "python", parameters)
+ef.excecute_script(analysis_scripts_location, "general_statistics.py", "python", parameters)
 
 # Execute incidence_map
 print()
@@ -132,7 +132,7 @@ parameters = "{} {} {} {} {}".format( location_name,
                                 folder_name,
                                 selected_geographic_neighbors_polygons_parameter)
 
-#ef.excecute_script(analysis_scripts_location, "incidence_map.R", "R", parameters)
+ef.excecute_script(analysis_scripts_location, "incidence_map.R", "R", parameters)
 
 # polygon_socio_economic_analysis
 print()
@@ -144,7 +144,7 @@ parameters = "{} {} {} {} {}".format(location_folder,
                                 polygon_name,
                                 poly_id)
 
-#ef.excecute_script(analysis_scripts_location, "polygon_socio_economic_analysis.py", "python", parameters)
+ef.excecute_script(analysis_scripts_location, "polygon_socio_economic_analysis.py", "python", parameters)
 
 # movement_range_plots_script
 print()
@@ -155,7 +155,7 @@ parameters = "{} {} {} {} {}".format(location_folder,
                                 folder_name,
                                 selected_geographic_neighbors_polygons_parameter)
 
-#ef.excecute_script(analysis_scripts_location, "movement_range_plots_script_polygons.py", "python", parameters)
+ef.excecute_script(analysis_scripts_location, "movement_range_plots_script_polygons.py", "python", parameters)
 
 
 # movement_range_and_cases_plots
@@ -167,7 +167,7 @@ parameters = "{} {} {} {} {}".format(location_folder,
                                 folder_name,
                                 poly_id)
 
-#ef.excecute_script(analysis_scripts_location, "movement_range_and_cases_script_polygons.py", "python", parameters)
+ef.excecute_script(analysis_scripts_location, "movement_range_and_cases_script_polygons.py", "python", parameters)
 
 
 

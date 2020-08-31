@@ -25,7 +25,7 @@ location_name  =  sys.argv[1] # location name
 location_folder =  sys.argv[2] # polygon name
 criteria_parameter = sys.argv[3] # min_record or min_date
 
-if len(sys.argv) <= 3:
+if len(sys.argv) <= 4:
 	selected_polygons_boolean = False
 else :
     selected_polygons_boolean = True

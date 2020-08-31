@@ -177,8 +177,8 @@ if(add_labels){
 }
 p = p + scale_alpha_continuous(range = c(0.4, 1))
 p = p + scale_color_gradient(low = "darkblue", high = "red")
-p = p + labs(color = paste0("Incidencia\n(Casos por ",per_capita ,"\nPersonas)"), shape = 'Población\n(Miles)')
-p = p + ggtitle(paste0("COVID-19: Incidencia por Municipio (Casos por ",per_capita ," Personas)"))
+p = p + labs(color = paste0("Incidencia Acumulada\n(Total Casos por ",per_capita ,"\nPersonas)"), shape = 'Población\n(Miles)')
+p = p + ggtitle(paste0("COVID-19: Incidencia Acumulada por Municipio (Casos por ",per_capita ," Personas)"))
 p
 
 ggsave(file.path( export_folder,"incidence_map.jpeg"), plot = p, width = width, height = height, device = 'jpeg')
