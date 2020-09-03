@@ -204,7 +204,7 @@ for agglomeration_method in agglomeration_methods:
 		df_cases_other_date = df_cases_other_date[[date]].rename(columns = {date:'date_time'})
 
 		# back days
-		back_days = 45
+		back_days = 52
 		df_cases_other_date = df_cases_other_date[df_cases_other_date.date_time <= (df_cases_other_date.date_time.max() - timedelta(days = back_days))].copy()
 
 		df_cases_other_date['value'] = 1
