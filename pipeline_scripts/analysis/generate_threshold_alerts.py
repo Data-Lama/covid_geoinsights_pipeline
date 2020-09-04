@@ -207,16 +207,18 @@ def get_max_alert(alert_1, alert_2, alert_3, alert_4, alert_5):
     else: return 'VERDE'
 
 def get_vulnerability_alert(poly_id):
-
     alerts = []
-    if (df_ipm.at[poly_id, "ipm"] > NATIONAL_IPM):
+    ipm = df_ipm.at[poly_id, "ipm"]
+    age = df_age.at[poly_id, "porcentaje_sobre_60"]
+    eps = df_eps.at[poly_id, "porcentaje_subsidiado"]
+    if (ipm > NATIONAL_IPM):
         alerts.append("IPM")
-    elif (df_age.at[poly_id, "porcentaje_sobre_60"] > NATIONAL_OLDAGE):
+    if (age > NATIONAL_OLDAGE):
         alerts.append(">60 ANOS")
-    elif (df_eps.at[poly_id, "porcentaje_subsidiado"] > NATIONAL_SUBSIDIZED):
+    if (eps > NATIONAL_SUBSIDIZED):
         alerts.append("EPS SUBSIDIADO")
     else: return "-"
-
+    
     return ";".join(alerts)
 
 def set_vulnerability_color(vul_alert):
