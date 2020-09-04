@@ -230,7 +230,7 @@ translate = {'delta_inner_movement':'Incremento flujo dentro del municipio',
 
 
 # Get darker names in table
-df_highlights_recent = choropleth_map_recent[choropleth_map_recent['delta_external_movement'] > 0.5].fillna(0)
+df_highlights_recent = choropleth_map_recent[choropleth_map_recent['delta_external_movement'] > 0.48].fillna(0)
 df_highlights_historic = choropleth_map_historic[choropleth_map_historic['delta_external_movement'] > 1].fillna(0)
 
 # Get polygons on river
