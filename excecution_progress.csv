@@ -1,5 +1,2 @@
 timestamp,script_name,parameters,result,elapsed_time
-2020-09-02 19:51:29.262931,general_statistics.py,colombia geometry palmira 76520,0,1
-2020-09-02 19:51:40.616120,incidence_map.R,Colombia colombia geometry palmira 76520 76869 76892 73616 76001 76130 76563,0,11
-2020-09-02 19:51:40.764934,single_polygon_wrapper.py,colombia geometry Palmira palmira 76520,0,21
-2020-09-02 19:51:42.132986,copy_report_files.py,nan,0,1
+2020-09-03 22:44:46.249884,johns_hopkins_extractor.py,nan,0,2

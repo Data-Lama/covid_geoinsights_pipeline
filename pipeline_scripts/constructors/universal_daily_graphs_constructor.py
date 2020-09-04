@@ -68,16 +68,16 @@ for agglomeration_method in agglomeration_methods:
 	print(ident + '      Loads Data:')
 
 	print(ident + '         Polygons')
-	polygons = pd.read_csv(os.path.join(agglomeration_folder, 'polygons.csv'))
+	polygons = pd.read_csv(os.path.join(agglomeration_folder, 'polygons.csv'), dtype={'poly_id': str})
 
 	print(ident + '         Cases')
-	cases = pd.read_csv(os.path.join(agglomeration_folder, 'cases.csv'), parse_dates = ['date_time'])
+	cases = pd.read_csv(os.path.join(agglomeration_folder, 'cases.csv'), parse_dates = ['date_time'], dtype={'poly_id': str})
 
 	print(ident + '         Movement')
-	movement = pd.read_csv(os.path.join(agglomeration_folder,  'movement.csv'), parse_dates = ['date_time'])
+	movement = pd.read_csv(os.path.join(agglomeration_folder,  'movement.csv'), parse_dates = ['date_time'], dtype={'start_poly_id': str, 'end_poly_id': str})
 
 	print(ident + '         Population')
-	population = pd.read_csv(os.path.join(agglomeration_folder,  'population.csv'), parse_dates = ['date_time'])
+	population = pd.read_csv(os.path.join(agglomeration_folder,  'population.csv'), parse_dates = ['date_time'], dtype={'poly_id': str})
 
 	print()
 	print(ident + '      Constructs:')

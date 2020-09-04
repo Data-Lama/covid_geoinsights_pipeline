@@ -269,6 +269,7 @@ def extract_connected_neighbors(location, poly_id, agglomeration_method, num_day
     nodes = nodes[nodes.date_time >= (nodes.date_time.max() - datetime.timedelta(days = num_days))].copy()
     edges = edges[edges.date_time >= (edges.date_time.max() - datetime.timedelta(days = num_days))].copy()
     edges = edges[(edges.start_id == poly_id) | (edges.end_id == poly_id)].copy()
+
     final_edges = edges.groupby(['date_time','day','start_id','end_id']).mean().reset_index()
 
     # Only the ones with positive movement
