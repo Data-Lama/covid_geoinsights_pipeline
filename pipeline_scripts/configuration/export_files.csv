@@ -71,3 +71,19 @@ reporte_palmira,Estadisticas Prediccion,analysis,table,colombia/geometry/predict
 reporte_palmira,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/palmira/incidence_map.jpeg,incidence_map_geometry.jpeg
 reporte_palmira,Incidence Table,analysis,table,colombia/geometry/incidence_maps/palmira/incidences.csv,incidences_geometry.csv
 reporte_palmira,Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv
+reporte_tolima,Graph Map First Day,analysis,figure,colombia/community/graph_maps/tolima/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
+reporte_tolima,Graph Map Current Day,analysis,figure,colombia/community/graph_maps/tolima/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
+reporte_tolima,Polygon Movement range,analysis,figure,colombia/community/movement_plots/tolima/movement_range_selected_polygons_tolima.png,movement_range_selected_polygons.png
+reporte_tolima,Movement FB,analysis,figure,colombia/community/movement_plots/tolima/mov_range_tolima.png,mov_range.png
+reporte_tolima,Prediction ,analysis,figure,colombia/community/prediction/polygon_unions/tolima/prediction_tolima.png,prediction.png
+reporte_tolima,Simulacion ,analysis,figure,colombia/community/prediction/polygon_unions/tolima/simulations_tolima.png,simulations.png
+reporte_tolima,Mapa Alerta General,analysis,figure,colombia/geometry/alerts/tolima/map_max_alert.png,map_max_alert.png
+reporte_tolima,Mapa Cloropletico Historico,analysis,figure,colombia/geometry/polygon_info_window/tolima/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
+reporte_tolima,Mapa Cloropletico Reciente,analysis,figure,colombia/geometry/polygon_info_window/tolima/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
+reporte_tolima,Mapa Cloropletico Reciente,analysis,table,colombia/geometry/polygon_info_window/tolima/detail_choropleth_recent.csv,detail_choropleth_recent.csv
+reporte_tolima,Alertas Rojas,analysis,table,colombia/geometry/alerts/tolima/alerts.csv,alerts.csv
+reporte_tolima,Estadisticas Municipio,analysis,table,colombia/geometry/stats/tolima/general_stats.csv,geometry_statistics.csv
+reporte_tolima,Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/tolima/general_stats.csv,community_statistics.csv
+reporte_tolima,Estadisticas Prediccion,analysis,table,colombia/community/prediction/polygon_unions/tolima/statistics.csv,prediction_statistics.csv
+reporte_tolima,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/tolima/incidence_map.jpeg,incidence_map_geometry.jpeg
+reporte_tolima,Incidence Table,analysis,table,colombia/geometry/incidence_maps/tolima/incidences.csv,incidences_geometry.csv

@@ -110,6 +110,9 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
         - movement_change: Relative movement change
     '''
 
+    calculate_intersections = True
+    intersections_path = os.path.join(data_dir, "geo", "mov_range_intersections", "colombia.csv")
+
     print(ident + "      Constructing movement range by polygon.")
     print("{}Adjusting crs to equal area projection".format(ident))
 
@@ -136,10 +139,17 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
 
         # Calculate intersecitons between polygons and external polygons
         print("   {}{}Calculating intersections for polygons".format(ident, ident))
-        start = time.time()
-        gdf_polygons["intersections"] = gdf_polygons.apply(lambda x: get_intersection_areas_pop_density(x.geometry, gdf_external_ids), axis=1)
-        end = time.time()
-        print("   {}{}({} seconds to build intersections)".format(ident,ident, end-start))
+        
+        if calculate_intersections:
+            start = time.time()
+            gdf_polygons["intersections"] = gdf_polygons.apply(lambda x: get_intersection_areas_pop_density(x.geometry, gdf_external_ids), axis=1)
+            gdf_polygons.to_csv(intersections_path, columns=["poly_id", "intersections"], index=False)
+            end = time.time()
+            print("   {}{}({} seconds to build intersections)".format(ident,ident, end-start))
+        else:
+            print("   {}{}Retreiving intersections from file".format(ident,ident))
+            df_intersections = pd.read_csv(intersections_path)
+            gdf_polygons = gdf_polygons.merge(df_intersections, on="poly_id", how="outer")
 
 
         # Use intersections to calculate movement range
@@ -157,11 +167,17 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
         print("{}Only area attribute detected. Processing by area.".format(ident))
 
         # Calculate intersecitons between polygons and external polygons
-        print("      {}{}Calculating intersections for polygons".format(ident, ident))
-        start = time.time()
-        gdf_polygons["intersections"] = gdf_polygons.apply(lambda x: get_intersection_areas(x.geometry, gdf_external_ids), axis=1)
-        end = time.time()
-        print("      {}{}({} seconds to build intersections)".format(ident,ident, end-start))
+        if calculate_intersections:
+            print("      {}{}Calculating intersections for polygons".format(ident, ident))
+            start = time.time()
+            gdf_polygons["intersections"] = gdf_polygons.apply(lambda x: get_intersection_areas(x.geometry, gdf_external_ids), axis=1)
+            end = time.time()
+            print("      {}{}({} seconds to build intersections)".format(ident,ident, end-start))
+            gdf_polygons.to_csv(intersections_path, columns=["poly_id", "intersections"], index=False)
+        else:
+            print("   {}{}Retreiving intersections from file".format(ident,ident))
+            df_intersections = pd.read_csv(intersections_path)
+            gdf_polygons = gdf_polygons.merge(df_intersections, on="poly_id", how="outer")
 
         # Use intersections to calculate movement range
         df_movement_range_by_polygon = pd.DataFrame(columns=["date_time", "poly_id", "movement_change"])
@@ -174,3 +190,4 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
             df_movement_range_by_polygon = pd.concat([df_movement_range_by_polygon, gdf_polygons], ignore_index=True, join="inner")
 
         return df_movement_range_by_polygon.dropna()
+
