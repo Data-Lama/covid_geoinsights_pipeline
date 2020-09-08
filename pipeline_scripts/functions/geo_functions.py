@@ -112,40 +112,34 @@ def extract_lat(poly, pos = 1):
 # --- Movement Range to Movement Tile ----
 # ----------------------------------------
 
-
-def __get_GADM_polygon(GADM_id, df_GADM=None):
-	if df_GADM == None:
-		path = os.path.join(data_dir, 'data_stages', 'colombia', 'raw', 'geo', 'gadm36_COL_shp', 'gadm36_COL_2.shp')
-		# GADM geodataset originally crs = {epsg:4326}
-		df_GADM = gpd.read_file(path)
-	df_GADM.set_index("GID_2", inplace=True)
-	# polygon = df_GADM[df_GADM['GID_2'] == GADM_id]['geometry']
-	# polygons = []
-	polygon = df_GADM.at[GADM_id, 'geometry']
-	return polygon
-
-def __get_GADM_popdensity(GADM_id, df_GADM=None):
-	if df_GADM == None:
-		path = os.path.join(data_dir, 'data_stages', 'colombia', 'raw', 'geo', 'gadm36_COL_shp', 'gadm36_COL_2_population_density.csv')
-		# GADM geodataset originally crs = {epsg:4326}
-		df_GADM = pd.read_csv(path)
-	df_GADM.set_index("GID_2", inplace=True)
-	polygon = df_GADM.at[GADM_id, 'geometry']
-	pop_density = df_GADM.at[GADM_id, 'population_density']
-	return pop_density
+# Shapefiles map
+shape_file_map = {}
+shape_file_map['colombia'] = 'colombia'
+shape_file_map['gabon'] = 'gadm36_GAB'
+shape_file_map['equatorial_guinea'] = 'gadm36_GNQ'
+shape_file_map['cameroon'] = 'gadm36_CMR'
 
 
-def get_gadm_polygons(location_name):
+
+
+
+
+
+
+def get_gadm_polygons(location_name, level = 2):
 	'''
 	Method that gets the  GADM polygons (the ones that facebook uses)
 	'''
 
-	gadm_dir = os.path.join(data_dir, 'geo', 'gadm_polygons', location_name, f"{location_name}_2.shp")
+	if location_name not in shape_file_map:
+		raise ValueError(f'No shapefile name found for location: {location_name} please add it!')
+
+	gadm_dir = os.path.join(data_dir, 'geo', 'gadm_polygons', location_name, f"{shape_file_map[location_name]}_{level}.shp")
 
 	if not os.path.exists(gadm_dir):
 		raise ValueError('No GADM Polygons found for location: {}. Please save it in: {}'.format(location_name, gadm_dir))
 
-	df_GADM = gpd.read_file(gadm_dir).rename(columns = {'GID_2':'external_polygon_id'})
+	df_GADM = gpd.read_file(gadm_dir).rename(columns = {f'GID_{level}':'poly_id', f'NAME_{level}':'poly_name'})
 
 	return(df_GADM)
 
