@@ -122,10 +122,6 @@ shape_file_map['cameroon'] = 'gadm36_CMR'
 
 
 
-
-
-
-
 def get_gadm_polygons(location_name, level = 2):
 	'''
 	Method that gets the  GADM polygons (the ones that facebook uses)
@@ -159,3 +155,13 @@ def haversine(lon1, lat1, lon2, lat2):
     # Radius of earth in kilometers is 6371
     km = 6371* c
     return km
+
+
+def get_centroids(geometry):
+	'''
+	Returns the centroids of a given geometry in WS84
+	'''
+
+	# Converts to mercator and then back to WS84
+	centroids = geometry.to_crs('EPSG:3395').centroid.to_crs("EPSG:4326")
+	return(centroids)

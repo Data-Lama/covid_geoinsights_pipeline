@@ -17,6 +17,12 @@ table_folder_name = 'report_table_folder'
 # Progress file
 progress_file = 'excecution_progress.csv'
 
+
+hopkins_country_names = {"equatorial_guinea":"Equatorial Guinea",
+                        "cameroon":"Cameroon",
+                        "gabon":"Gabon"}
+
+                        
 # For prediction
 days_back = 5
 days_ahead = 8

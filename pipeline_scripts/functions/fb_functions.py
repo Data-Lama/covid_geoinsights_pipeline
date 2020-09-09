@@ -127,7 +127,7 @@ def check_movement_integrity(folder_name, fb_location_name, type_data, start_dat
 
 	if type_data == 'movement':
 
-		name_string = '{} Coronavirus'.format(fb_location_name)
+		name_string = '{}'.format(fb_location_name)
 		type_data_string = 'Movement between Tiles'
 		
 		# Wtong files
@@ -172,7 +172,6 @@ def check_movement_integrity(folder_name, fb_location_name, type_data, start_dat
 		for d in pd.date_range(start=start_date, end=end_date):
 			dates.add(d )
 		
-		print()
 		# Iterates over the files in folder
 		for file in os.listdir(directory):
 			if file.endswith('.csv'):
@@ -313,6 +312,15 @@ def build_population(location_folder_name, stage = 'raw', dropna = True):
 
 	return(build_dataset_in_directory(directory, dropna = dropna))
 
+def build_empty_population():
+	'''
+	Method that returns an empyt dataframe with the population structure
+	'''
+
+	cols = ['lat','lon','country','date_time','n_baseline','n_crisis','n_difference','density_baseline','density_crisis','percent_change','clipped_z_score','ds']
+	df = pd.DataFrame(columns = cols)
+
+	return(df)
 
 
 def build_movement_range(location_folder_name, stage = 'raw', dropna = True):

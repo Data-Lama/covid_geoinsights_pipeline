@@ -63,7 +63,7 @@ else:
 	for ind, row in selected_locations.iterrows():
 
 		_, m = fb.check_movement_integrity(row.location_folder, row.fb_location_name, row.type_data, row.start_date, end_date)
-		print(ident + '   {}: {} missing'.format(row.location_name, len(m)))
+		print(ident + '   {} ({}): {} missing'.format(row.location_name, row.type_data, len(m)))
 
 		if len(m) > 0:
 			# Adds them

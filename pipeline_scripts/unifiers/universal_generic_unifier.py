@@ -132,6 +132,11 @@ poly_date = cases_date
 df_poly.to_csv(os.path.join(unified_dir, 'polygons.csv'), index = False)
 
 
+
+# -------------------
+# - Movement Range --
+# -------------------
+print(ident + '   Movement Range')
 # Checks if location has movement range
 if os.path.exists( os.path.join(unifier.raw_folder, 'movement_range')):
 	
@@ -144,7 +149,8 @@ if os.path.exists( os.path.join(unifier.raw_folder, 'movement_range')):
 		df_movement_range = df_movement_range[df_movement_range.ds < max_date]
 
 	df_movement_range.to_csv(os.path.join(unified_dir, 'movement_range.csv'), index = False)
-
+else:
+	print(ident + '      No Movement Range Found Skipping...')
 
 
 print(ident + 'Saving Dates')
