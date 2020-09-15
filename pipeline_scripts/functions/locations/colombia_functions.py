@@ -111,8 +111,9 @@ class Unifier(GenericUnifier):
 		polygons_final = polygons.merge(polygons_info, on = 'poly_id')
 
 		# Extracts the center
-		polygons_final['poly_lon'] = polygons_final.geometry.centroid.to_crs('epsg:4326').x
-		polygons_final['poly_lat'] = polygons_final.geometry.centroid.to_crs('epsg:4326').y
+		centroids = geo.get_centroids(polygons_final.geometry) 
+		polygons_final['poly_lon'] = centroids.x
+		polygons_final['poly_lat'] = centroids.y
 
 		# Adjusts geometry  to latiude and longitud
 		polygons_final = polygons_final.to_crs('epsg:4326')
@@ -128,6 +129,10 @@ class Unifier(GenericUnifier):
 		# Manually adjusts adjusts Cucuta
 		polygons_final.loc[polygons_final.poly_id == '54001', 'poly_lon'] = -72.495447
 		polygons_final.loc[polygons_final.poly_id == '54001', 'poly_lat'] = 7.890634	
+
+		# Manually adjusts Valledupar
+		polygons_final.loc[polygons_final.poly_id == '20001', 'poly_lon'] = -73.2548254
+		polygons_final.loc[polygons_final.poly_id == '20001', 'poly_lat'] = 10.4686143			
 
 
 		return(polygons_final)

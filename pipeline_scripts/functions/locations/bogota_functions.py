@@ -93,8 +93,9 @@ class Unifier(GenericUnifier):
 
 
 			# Extracts the center
-			polygons['poly_lon'] = polygons.geometry.centroid.to_crs('epsg:4326').x
-			polygons['poly_lat'] = polygons.geometry.centroid.to_crs('epsg:4326').y
+			centroids = geo.get_centroids(polygons.geometry)
+			polygons['poly_lon'] = centroids.x
+			polygons['poly_lat'] = centroids.y
 
 			# Adjusts geometry  to latiude and longitud
 			polygons = polygons.to_crs('epsg:4326')
@@ -119,8 +120,9 @@ class Unifier(GenericUnifier):
 
 
 			# Extracts the center
-			polygons['poly_lon'] = polygons.geometry.centroid.to_crs('epsg:4326').x
-			polygons['poly_lat'] = polygons.geometry.centroid.to_crs('epsg:4326').y
+			centroids = geo.get_centroids(polygons.geometry)
+			polygons['poly_lon'] = centroids.x
+			polygons['poly_lat'] = centroids.y
 
 			# Adjusts geometry  to latiude and longitud
 			polygons = polygons.to_crs('epsg:4326')

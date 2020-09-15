@@ -1,2 +1,3 @@
 timestamp,script_name,parameters,result,elapsed_time
-2020-09-03 22:44:46.249884,johns_hopkins_extractor.py,nan,0,2
+2020-09-08 15:10:19.489864,universal_geometry_agglomerate.py,WestAfrica west_africa,256,57
+2020-09-08 15:10:20.573306,universal_community_agglomerate.R,WestAfrica west_africa,256,1
