@@ -204,7 +204,7 @@ for agglomeration_method in agglomeration_methods:
 		df_cases_other_date = df_cases_other_date[[date]].rename(columns = {date:'date_time'})
 
 		# back days
-		back_days = 58
+		back_days = 66
 		df_cases_other_date = df_cases_other_date[df_cases_other_date.date_time <= (df_cases_other_date.date_time.max() - timedelta(days = back_days))].copy()
 
 		df_cases_other_date['value'] = 1
@@ -240,8 +240,56 @@ for agglomeration_method in agglomeration_methods:
 
 
 	df = pd.concat((df_mov_plot, df_cases_plot), ignore_index = True)
+
+
 	# Plots movement all
 	print(ident + '   Plots movement for {} (All)'.format(location_name))
+
+	# Only movement
+	# --------------------------------------------
+
+	#df_mov_plot.to_csv('temp.csv', index = False)
+
+	fig = plt.figure(figsize=(19,8))
+	ax = sns.lineplot(x = "date_time",y = "value", data = df_mov_plot)
+
+
+	ax.set_title('Cambio Porcentual en el Movimiento a Nivel Nacional')
+	ax.set_xlabel('Fecha', fontsize=axis_font_size)
+	ax.set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
+
+
+	#Adds milestones
+	if df_miles is not None:
+		limits = ax.get_ylim()
+		top_pos = limits[1] - (limits[1] - limits[0])*0.05
+
+
+		for ind, row in df_miles.iterrows():
+			ax.text(row.date_time - timedelta(hours = 12), top_pos, str(ind))
+			ax.axvline( row.date_time, color=miles_stones_color, linestyle='--', lw=miles_stones_width, ymin = 0.0,  ymax = 0.9)
+			ax.axvline( row.date_time, color=miles_stones_color, linestyle='--', lw=miles_stones_width, ymin = 0.0,  ymax = 1)
+
+
+	# Adds the horizontal line
+	ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
+
+	min_dat, max_date = ax.get_xlim()
+
+	tick = np.round(min_dat) + 4
+	ticks = []
+	jump = 15
+	while tick  < max_date:
+		ticks.append(tick)
+		tick += jump
+
+
+
+	ax.xaxis.set_ticks(ticks)
+	fig.savefig(os.path.join(export_folder_location, f'only_mov_range_{location_folder}.png'))
+
+	# --------------------------------------------
+
 
 	# Global Movmeent Plot
 	df_plot = df

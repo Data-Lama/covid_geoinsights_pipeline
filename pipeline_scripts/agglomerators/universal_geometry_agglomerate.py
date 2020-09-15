@@ -29,7 +29,7 @@ method_name = 'geometry'
 location_name  = sys.argv[1] # location namme
 location_folder_name  = sys.argv[2] # location folder name
 if len(sys.argv) > 3:
-	calculate_intersections = sys.argv[3]
+	calculate_intersections = sys.argv[3].upper() == 'TRUE'
 else:
 	calculate_intersections = True
 

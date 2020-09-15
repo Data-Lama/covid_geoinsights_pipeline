@@ -10,13 +10,13 @@ Colombia,colombia,agglomerate,agglomerators,1,NO,universal_geometry_agglomerate,
 Colombia,colombia,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Colombia colombia all
 Colombia,colombia,analyse,analysis,1,NO,tda_script,r,Colombia colombia community
 Colombia,colombia,analyse,analysis,1,NO,graph_maps,r,Colombia colombia community
-Colombia,colombia,analyse,analysis,2,NO,movement_range_plots_script,python,Colombia colombia community
+Colombia,colombia,analyse,analysis,2,YES,movement_range_plots_script,python,Colombia colombia community
 Colombia,colombia,analyse,analysis,3,NO,neighbors_location_extraction,python,Colombia colombia community
 Cameroon,cameroon,unify,unifiers,1,NO,johns_hopkins_unifier,python,Cameroon cameroon 0
 Equatorial Guinea,equatorial_guinea,unify,unifiers,1,NO,johns_hopkins_unifier,python,EquatorialGuniea equatorial_guinea 0
 Gabon,gabon,unify,unifiers,1,NO,johns_hopkins_unifier,python,Gabon gabon 0
 West Africa,west_africa,unify,unifiers,2,NO,multiple_location_unifier,python,west_africa gabon equatorial_guinea cameroon
-West Africa,west_africa,agglomerate,agglomerators,1,YES,universal_geometry_agglomerate,python,WestAfrica west_africa False
+West Africa,west_africa,agglomerate,agglomerators,1,NO,universal_geometry_agglomerate,python,WestAfrica west_africa False
 West Africa,west_africa,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,WestAfrica west_africa
 West Africa,west_africa,construct,constructors,1,NO,universal_daily_graphs_constructor,python,WestAfrica west_africa all
 West Africa,west_africa,analyse,analysis,1,NO,tda_script,r,WestAfrica west_africa geometry
