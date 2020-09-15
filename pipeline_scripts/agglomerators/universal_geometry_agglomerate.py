@@ -28,6 +28,10 @@ method_name = 'geometry'
 # Reads the parameters from excecution
 location_name  = sys.argv[1] # location namme
 location_folder_name  = sys.argv[2] # location folder name
+if len(sys.argv) > 3:
+	calculate_intersections = sys.argv[3]
+else:
+	calculate_intersections = True
 
 # Checks if its encrypted
 encrypted = gf.is_encrypted(location_folder_name)
@@ -152,8 +156,8 @@ if os.path.exists(mov_range_file):
 	gadm_polygons = geo.get_gadm_polygons(location_folder_name)
 	gadm_polygons.rename(columns = {f'poly_id':'external_polygon_id'}, inplace = True)
 
-	agg_movement_range = mov_fun.construct_movement_range_by_polygon(df_movement_range_unified, agg_polygons,  gadm_polygons)
-
+	agg_movement_range = mov_fun.construct_movement_range_by_polygon(df_movement_range_unified, agg_polygons,  gadm_polygons, \
+		location_folder_name, calculate_intersections)
 
 print()
 print(ident + '   Saves Data:')

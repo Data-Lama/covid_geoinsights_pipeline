@@ -57,9 +57,8 @@ def get_intersection_areas_pop_density(polygon, gdf):
     return list(df_polygons.itertuples(index=False, name=None))
 
 def get_intersection_areas(polygon, gdf):
-    polygons = gdf[['external_polygon_id', 'geometry', 'population_density']].copy()
+    polygons = gdf[['external_polygon_id', 'geometry']].copy()
     polygons["area"] = polygons["geometry"].area
-    polygons['population_density'] = polygons['population_density']
     intersections = polygons['geometry'].intersection(polygon)
     polygons['intersections'] = intersections
     df_polygons = polygons[~polygons['intersections'].is_empty].copy()
@@ -69,11 +68,13 @@ def get_intersection_areas(polygon, gdf):
     df_polygons.dropna(inplace=True)
     return list(df_polygons.itertuples(index=False, name=None))
 
+def load_intersections(intersections):
+    return ast.literal_eval(intersections)
+
 def calculate_movement(intersections, gdf):
     gdf = gdf.set_index('external_polygon_id')
     total_movement = 0
     total_factor = 0
-    intersections = ast.literal_eval(intersections)
     if intersections == []:
         return 0
     for i in intersections:
@@ -113,9 +114,9 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
         - movement_change: Relative movement change
     '''
 
-    if calculate_intersections == "True":
+    if calculate_intersections == "True" or calculate_intersections == True :
         calc_inter = True
-    elif calculate_intersections == "False":
+    elif calculate_intersections == "False" or calculate_intersections == False:
         calc_inter = False
     else:
         raise Exception("calculate_intersections parameter must be boolean")
@@ -150,7 +151,7 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
             end = time.time()
             print("   {}{}({} seconds to build population density)".format(ident, ident, end-start))
 
-            # Calculate intersecitons between polygons and external polygons
+            # Calculate intersections between polygons and external polygons
             print("   {}{}Calculating intersections for polygons".format(ident, ident))
 
             start = time.time()
@@ -162,7 +163,7 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
             print("   {}{}Retreiving intersections from file".format(ident,ident))
             df_intersections = pd.read_csv(os.path.join(intersections_path, "intersections.csv"))
             gdf_polygons = gdf_polygons.merge(df_intersections, on="poly_id", how="outer")
-            print(gdf_polygons.head())
+            gdf_polygons["intersections"] = gdf_polygons.apply(lambda x: load_intersections(x.intersections), axis=1)
 
 
         # Use intersections to calculate movement range
@@ -186,17 +187,17 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
             gdf_polygons["intersections"] = gdf_polygons.apply(lambda x: get_intersection_areas(x.geometry, gdf_external_ids), axis=1)
             end = time.time()
             print("      {}{}({} seconds to build intersections)".format(ident,ident, end-start))
-            gdf_polygons.to_csv(intersections_path, columns=["poly_id", "intersections"], index=False)
+            gdf_polygons.to_csv(os.path.join(intersections_path, "intersections.csv"), columns=["poly_id", "intersections"], index=False)
         else:
             print("   {}{}Retreiving intersections from file".format(ident,ident))
-            df_intersections = pd.read_csv(intersections_path)
+            df_intersections = pd.read_csv(os.path.join(intersections_path, "intersections.csv"))
             gdf_polygons = gdf_polygons.merge(df_intersections, on="poly_id", how="outer")
+            gdf_polygons["intersections"] = gdf_polygons.apply(lambda x: load_intersections(x.intersections), axis=1)
 
         # Use intersections to calculate movement range
         df_movement_range_by_polygon = pd.DataFrame(columns=["date_time", "poly_id", "movement_change"])
         for d in df_movement_range["ds"].unique():
             gdf_movement_range_sm = df_movement_range[df_movement_range["ds"] == d].copy()
-            #print("{}{}Calculating movement range for {}".format(ident, ident, d))
             gdf_polygons["movement_change"] = \
                 gdf_polygons.apply(lambda x: calculate_movement(x["intersections"], gdf_movement_range_sm), axis=1)
             gdf_polygons["date_time"] = d

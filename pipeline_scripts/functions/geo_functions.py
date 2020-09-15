@@ -118,6 +118,7 @@ shape_file_map['colombia'] = 'colombia'
 shape_file_map['gabon'] = 'gadm36_GAB'
 shape_file_map['equatorial_guinea'] = 'gadm36_GNQ'
 shape_file_map['cameroon'] = 'gadm36_CMR'
+shape_file_map['west_africa'] = 'west_africa'
 
 
 
