@@ -4,8 +4,10 @@ from shapely import wkt
 import pandas as pd
 import numpy as np
 import geopandas
+import json
 import time
 import sys
+import ast
 import os
 
 # Direcotries
@@ -71,6 +73,7 @@ def calculate_movement(intersections, gdf):
     gdf = gdf.set_index('external_polygon_id')
     total_movement = 0
     total_factor = 0
+    intersections = ast.literal_eval(intersections)
     if intersections == []:
         return 0
     for i in intersections:
@@ -86,7 +89,7 @@ def calculate_movement(intersections, gdf):
         return np.nan
     return total_movement / total_factor
 
-def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_external_ids):
+def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_external_ids, location, calculate_intersections):
     '''
     Method that constructs the movent range by polygon ID based on its geometry.
 
@@ -110,8 +113,17 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
         - movement_change: Relative movement change
     '''
 
-    calculate_intersections = True
-    intersections_path = os.path.join(data_dir, "geo", "mov_range_intersections", "colombia.csv")
+    if calculate_intersections == "True":
+        calc_inter = True
+    elif calculate_intersections == "False":
+        calc_inter = False
+    else:
+        raise Exception("calculate_intersections parameter must be boolean")
+    
+
+    intersections_path = os.path.join(data_dir, "geo", "mov_range_intersections", location)
+    if not os.path.exists(intersections_path):
+	    os.makedirs(intersections_path)  
 
     print(ident + "      Constructing movement range by polygon.")
     print("{}Adjusting crs to equal area projection".format(ident))
@@ -130,26 +142,27 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
 
     if ("attr_population" in gdf_polygons.columns) and ("attr_area" in gdf_polygons.columns):
         
-        # Add population_density to external ids
-        print("{}      Area and population attributes detected. Calculating population density".format(ident))
-        start = time.time()
-        gdf_external_ids["population_density"] = gdf_external_ids.apply(lambda x: get_population_density(x.geometry, gdf_polygons), axis=1).dropna()
-        end = time.time()
-        print("   {}{}({}seconds to build population density)".format(ident, ident, end-start))
+        if calc_inter:
+            # Add population_density to external ids
+            print("{}      Area and population attributes detected. Calculating population density".format(ident))
+            start = time.time()
+            gdf_external_ids["population_density"] = gdf_external_ids.apply(lambda x: get_population_density(x.geometry, gdf_polygons), axis=1).dropna()
+            end = time.time()
+            print("   {}{}({} seconds to build population density)".format(ident, ident, end-start))
 
-        # Calculate intersecitons between polygons and external polygons
-        print("   {}{}Calculating intersections for polygons".format(ident, ident))
-        
-        if calculate_intersections:
+            # Calculate intersecitons between polygons and external polygons
+            print("   {}{}Calculating intersections for polygons".format(ident, ident))
+
             start = time.time()
             gdf_polygons["intersections"] = gdf_polygons.apply(lambda x: get_intersection_areas_pop_density(x.geometry, gdf_external_ids), axis=1)
-            gdf_polygons.to_csv(intersections_path, columns=["poly_id", "intersections"], index=False)
+            gdf_polygons.to_csv(os.path.join(intersections_path, "intersections.csv"), columns=["poly_id", "intersections"], index=False)
             end = time.time()
             print("   {}{}({} seconds to build intersections)".format(ident,ident, end-start))
         else:
             print("   {}{}Retreiving intersections from file".format(ident,ident))
-            df_intersections = pd.read_csv(intersections_path)
+            df_intersections = pd.read_csv(os.path.join(intersections_path, "intersections.csv"))
             gdf_polygons = gdf_polygons.merge(df_intersections, on="poly_id", how="outer")
+            print(gdf_polygons.head())
 
 
         # Use intersections to calculate movement range
@@ -167,7 +180,7 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
         print("{}Only area attribute detected. Processing by area.".format(ident))
 
         # Calculate intersecitons between polygons and external polygons
-        if calculate_intersections:
+        if calc_inter:
             print("      {}{}Calculating intersections for polygons".format(ident, ident))
             start = time.time()
             gdf_polygons["intersections"] = gdf_polygons.apply(lambda x: get_intersection_areas(x.geometry, gdf_external_ids), axis=1)
