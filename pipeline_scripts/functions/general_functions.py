@@ -261,6 +261,10 @@ def extract_connected_neighbors(location, poly_id, agglomeration_method, num_day
     '''
     nodes, edges, node_locations = get_graphs(agglomeration_method, location)
 
+    if edges.shape[0] == 0:
+    	# Returns the geographic neighbors
+    	return(get_geographic_neighbors(poly_id, location, agglomeration_method))
+
     nodes.node_id = nodes.node_id.astype(str)
     edges.start_id = edges.start_id.astype(str)
     edges.end_id = edges.end_id.astype(str)
@@ -287,9 +291,14 @@ def extract_connected_neighbors(location, poly_id, agglomeration_method, num_day
 returns a geoDataFrame of geograohic neighbors for a given poly_id
 '''
 def get_geographic_neighbors(poly_id, location, agglomeration_method):
-	poly_id = int(poly_id)
+	
+
 	polygons = os.path.join(data_folder, location, 'agglomerated', agglomeration_method, "polygons.csv")
 	df_polygons = pd.read_csv(polygons)
+
+	# Sets the poly id to string
+	df_polygons.poly_id = df_polygons.poly_id.astype(str)
+
 	df_polygons['geometry'] = df_polygons['geometry'].apply(wkt.loads)
 	gdf_polygons = gpd.GeoDataFrame(df_polygons, geometry='geometry')
 	gdf_polygons.set_index("poly_id", inplace=True)

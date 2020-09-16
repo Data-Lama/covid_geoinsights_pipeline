@@ -1,3 +1,4 @@
 timestamp,script_name,parameters,result,elapsed_time
-2020-09-08 15:10:19.489864,universal_geometry_agglomerate.py,WestAfrica west_africa,256,57
-2020-09-08 15:10:20.573306,universal_community_agglomerate.R,WestAfrica west_africa,256,1
+2020-09-15 18:39:50.602105,movement_range_plots_script_polygons.py,west_africa geometry GuineaEcuatorial equatorial_guinea GAB GNQ CMR,0,2
+2020-09-15 18:39:57.473270,movement_range_and_cases_script_polygons.py,west_africa geometry GuineaEcuatorial equatorial_guinea GNQ,0,7
+2020-09-15 18:54:37.208172,polygon_union_prediction_wrapper.py,west_africa geometry 0.8 20 GuineaEcuatorial equatorial_guinea GNQ,0,880

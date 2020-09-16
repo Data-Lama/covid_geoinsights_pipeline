@@ -278,7 +278,7 @@ for agglomeration_method in agglomeration_methods:
 
 	tick = np.round(min_dat) + 4
 	ticks = []
-	jump = 15
+	jump = 25
 	while tick  < max_date:
 		ticks.append(tick)
 		tick += jump
@@ -328,7 +328,7 @@ for agglomeration_method in agglomeration_methods:
 
 	tick = np.round(min_dat) + 4
 	ticks = []
-	jump = 15
+	jump = 25
 	while tick  < max_date:
 		ticks.append(tick)
 		tick += jump
