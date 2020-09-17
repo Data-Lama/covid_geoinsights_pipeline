@@ -180,6 +180,11 @@ dir.create(file.path(export_folder, 'maps_on_day'))
 
 cat(paste(ident, '   Generating Maps on day', '\n', sep = ""))
 cat(paste(ident, '   ', sep = ""))
+
+
+window_nodes_on_day = c()
+window_edges_on_day = c()
+
 # First for non cumulative scenarios (only cases of the day)
 for(day in start_day:end_day)
 {
@@ -224,7 +229,16 @@ for(day in start_day:end_day)
   
   ggsave(file.path( export_folder, "maps_on_day", paste0("map_on_",day,".jpeg")), plot = p, width = width, height = height, device = 'jpeg')
   
+  
+  # Adds to the results
+  window_nodes_on_day = rbind(window_nodes_on_day, current_graph )
+  window_edges_on_day = rbind(window_edges_on_day, current_edges)
 }
+
+# Exports data
+cat(paste(ident, '\n     Exports Data', '\n', sep = ""))
+write.csv(window_nodes_on_day, file = file.path( export_folder, "maps_on_day", "map_on_day_nodes_data.csv"))
+write.csv(window_edges_on_day, file = file.path( export_folder, "maps_on_day", "map_on_day_edges_data.csv"))
 
 cat('\n')
 cat(paste(ident, '  Done', '\n', sep = ""))
@@ -253,6 +267,10 @@ cases = rep(0, nrow(locations))
 
 cat(paste(ident, '   Generating Maps by day', '\n', sep = ""))
 cat(paste(ident, '   ', sep = ""))
+
+window_nodes_by_day = c()
+window_edges_by_day = c()
+
 for(day in start_day:end_day)
 {   
   curr_date = nodes[nodes$day == day,]$date_time
@@ -305,10 +323,18 @@ for(day in start_day:end_day)
   ggsave(file.path( export_folder, "maps_by_day", paste0("map_by_",day,".jpeg")), plot = p, width = width, height = height, device = 'jpeg')
   
   cases = cases + nodes[nodes$day == day,]$num_cases
+  
+  # Adds to the results
+  window_nodes_by_day = rbind(window_nodes_by_day, current_graph )
+  window_edges_by_day = rbind(window_edges_by_day, current_edges)
 }
 
-cat('\n')
+# Exports data
+cat(paste(ident, '\n     Exports Data', '\n', sep = ""))
+write.csv(window_nodes_on_day, file = file.path( export_folder, "maps_by_day", "map_by_day_nodes_data.csv"))
+write.csv(window_edges_on_day, file = file.path( export_folder, "maps_by_day", "map_by_day_edges_data.csv"))
 
+cat('\n')
 cat(paste0('   Done','\n'))
 
 

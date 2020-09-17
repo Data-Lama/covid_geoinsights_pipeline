@@ -338,6 +338,10 @@ for agglomeration_method in agglomeration_methods:
 	g.axes[1,0].xaxis.set_ticks(ticks)
 	g.savefig(os.path.join(export_folder_location, f'mov_range_{location_folder}.png'))
 
+	# Saves data
+	print(ident + f'      Saving Data. Size: {df_plot.shape}')	
+	df_plot.to_csv(os.path.join(export_folder_location, f'mov_range_{location_folder}_data.csv'), index = False)
+
 
 	print(ident + '   Plots Movement Range for Polygons {}'.format(location_name))	
 
@@ -348,7 +352,7 @@ for agglomeration_method in agglomeration_methods:
 	polygons.loc[polygons.index[max_selected:],'poly_name'] = 'Otros (Promedio)'
 
 
-	df_plot = df_mov_range.merge(polygons, on = 'poly_id')
+	df_plot = df_mov_range.merge(polygons[['poly_id','poly_name']], on = 'poly_id')
 
 	fig = plt.figure(figsize=(19,8))
 
@@ -363,6 +367,9 @@ for agglomeration_method in agglomeration_methods:
 	ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)		
 
 	fig.savefig(os.path.join(export_folder_location, f'movement_range_selected_polygons_{location_folder}.png'))
+	# Saves data
+	print(ident + f'      Saving Data. Size: {df_plot.shape}')	
+	df_plot.to_csv(os.path.join(export_folder_location, f'movement_range_selected_polygons_{location_folder}_data.csv'), index = False)
 
 
 	

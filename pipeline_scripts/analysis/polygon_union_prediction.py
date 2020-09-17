@@ -246,6 +246,13 @@ def main(location_folder, agglomeration_method, selected_polygons_name, selected
 
     plt.close()
 
+    # Saves Data
+    df_plot.to_csv(os.path.join(folder_location, 'prediction_{}_data.csv'.format(selected_polygons_folder_name)), index = False)
+
+
+    # -----------------------------
+    # -----------------------------
+    # ------- Simulation
     print(ident + '   Plots Simulations')
 
 
@@ -300,6 +307,10 @@ def main(location_folder, agglomeration_method, selected_polygons_name, selected
     fig.savefig(os.path.join(folder_location, 'simulations_{}.png'.format(selected_polygons_folder_name)))    
 
     plt.close()
+
+    # Saves Data
+    df_plot.to_csv(os.path.join(folder_location, 'simulations_{}_data.csv'.format(selected_polygons_folder_name)), index = False)
+
 
     print(ident + '   Exports Statistics')
 

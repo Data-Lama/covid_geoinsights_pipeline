@@ -198,6 +198,9 @@ rivers_df.plot(ax=ax, alpha=0.1)
 plt.title('Comparativo entre el último Viernes y 15 días atrás')
 plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_15-day-window.png'.format(location_name)), bbox_inches="tight")
 
+# Saves data
+choropleth_map_recent.to_crs(epsg=4326, inplace=True)
+choropleth_map_recent.to_csv(os.path.join(output_file_path, 'choropleth_map_{}_15-day-window_data.csv'.format(location_name)), index = False)
 
 print(ident+'   Building historic map (15 day window)')
 
@@ -222,6 +225,10 @@ rivers_df.to_crs(epsg=3857, inplace=True)
 rivers_df.plot(ax=ax, alpha=0.1)
 plt.title('Comparativo entre el último Viernes y los primeros 15 días de Abril')
 plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_historic.png'.format(location_name)), bbox_inches="tight")
+
+# Saves data
+choropleth_map_historic.to_crs(epsg=4326, inplace=True)
+choropleth_map_historic.to_csv(os.path.join(output_file_path, 'choropleth_map_{}_historic_data.csv'.format(location_name)), index = False)
 
 
 translate = {'delta_inner_movement':'Incremento flujo dentro del municipio',

@@ -330,8 +330,18 @@ if not DONE:
         ax.set_axis_off()
         ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
         plt.title(TRANSLATE[i])
+
         # plt.show()
         plt.savefig(os.path.join(output_file_path, 'map_{}.png'.format(i)), bbox_inches="tight")
+
+
+    # Saves data
+    print(ident + '   Saving Data')
+    df_alerts.to_crs(epsg=4326, inplace=True)
+    df_alerts.to_csv(os.path.join(output_file_path, 'map_data.csv'), index = False)
+
+
+
 
 
 
