@@ -24,6 +24,7 @@ reporte_subnacional,Socio-economic Statistics,analysis,table,colombia/community/
 reporte_norte_de_santander,Graph Map First Day,analysis,figure,colombia/community/graph_maps/norte_de_santander/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
 reporte_norte_de_santander,Graph Map Current Day,analysis,figure,colombia/community/graph_maps/norte_de_santander/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
 reporte_norte_de_santander,Polygon Movement range,analysis,figure,colombia/community/movement_plots/norte_de_santander/movement_range_selected_polygons_norte_de_santander.png,movement_range_selected_polygons.png
+reporte_norte_de_santander,Polygon Movement range,analysis,figure,colombia/community/movement_plots/norte_de_santander/movement_range_selected_polygons_norte_de_santander_split.png,movement_range_selected_polygons_split.png
 reporte_norte_de_santander,Movement FB,analysis,figure,colombia/community/movement_plots/norte_de_santander/mov_range_norte_de_santander.png,mov_range.png
 reporte_norte_de_santander,Prediction ,analysis,figure,colombia/community/prediction/polygon_unions/norte_de_santander/prediction_norte_de_santander.png,prediction.png
 reporte_norte_de_santander,Simulacion ,analysis,figure,colombia/community/prediction/polygon_unions/norte_de_santander/simulations_norte_de_santander.png,simulations.png
@@ -41,6 +42,7 @@ reporte_popayan,Polygon Community Map ,data,table,data_stages/colombia/agglomera
 reporte_popayan,Graph Map First Day,analysis,figure,colombia/community/graph_maps/popayan/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
 reporte_popayan,Graph Map Current Day,analysis,figure,colombia/community/graph_maps/popayan/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
 reporte_popayan,Polygon Movement range,analysis,figure,colombia/community/movement_plots/popayan/movement_range_selected_polygons_popayan.png,movement_range_selected_polygons.png
+reporte_popayan,Polygon Movement range,analysis,figure,colombia/community/movement_plots/popayan/movement_range_selected_polygons_popayan_split.png,movement_range_selected_polygons_split.png
 reporte_popayan,Movement FB,analysis,figure,colombia/community/movement_plots/popayan/mov_range_popayan.png,mov_range.png
 reporte_popayan,Prediction ,analysis,figure,colombia/community/prediction/polygon_unions/popayan/prediction_popayan.png,prediction.png
 reporte_popayan,Simulacion ,analysis,figure,colombia/community/prediction/polygon_unions/popayan/simulations_popayan.png,simulations.png
@@ -58,6 +60,7 @@ reporte_popayan,Polygon Community Map ,data,table,data_stages/colombia/agglomera
 reporte_palmira,Graph Map First Day,analysis,figure,colombia/geometry/graph_maps/palmira/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
 reporte_palmira,Graph Map Current Day,analysis,figure,colombia/geometry/graph_maps/palmira/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
 reporte_palmira,Polygon Movement range,analysis,figure,colombia/geometry/movement_plots/palmira/movement_range_selected_polygons_palmira.png,movement_range_selected_polygons.png
+reporte_palmira,Polygon Movement range,analysis,figure,colombia/geometry/movement_plots/palmira/movement_range_selected_polygons_palmira_split.png,movement_range_selected_polygons_split.png
 reporte_palmira,Movement FB,analysis,figure,colombia/geometry/movement_plots/palmira/mov_range_palmira.png,mov_range.png
 reporte_palmira,Prediction ,analysis,figure,colombia/geometry/prediction/polygon_unions/palmira/prediction_palmira.png,prediction.png
 reporte_palmira,Simulacion ,analysis,figure,colombia/geometry/prediction/polygon_unions/palmira/simulations_palmira.png,simulations.png
@@ -74,6 +77,7 @@ reporte_palmira,Polygon Community Map ,data,table,data_stages/colombia/agglomera
 reporte_tolima,Graph Map First Day,analysis,figure,colombia/community/graph_maps/tolima/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
 reporte_tolima,Graph Map Current Day,analysis,figure,colombia/community/graph_maps/tolima/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
 reporte_tolima,Polygon Movement range,analysis,figure,colombia/community/movement_plots/tolima/movement_range_selected_polygons_tolima.png,movement_range_selected_polygons.png
+reporte_tolima,Polygon Movement range,analysis,figure,colombia/community/movement_plots/tolima/movement_range_selected_polygons_tolima_split.png,movement_range_selected_polygons_split.png
 reporte_tolima,Movement FB,analysis,figure,colombia/community/movement_plots/tolima/mov_range_tolima.png,mov_range.png
 reporte_tolima,Prediction ,analysis,figure,colombia/community/prediction/polygon_unions/tolima/prediction_tolima.png,prediction.png
 reporte_tolima,Simulacion ,analysis,figure,colombia/community/prediction/polygon_unions/tolima/simulations_tolima.png,simulations.png
@@ -87,3 +91,20 @@ reporte_tolima,Estadisticas Unidad Funcional,analysis,table,colombia/community/s
 reporte_tolima,Estadisticas Prediccion,analysis,table,colombia/community/prediction/polygon_unions/tolima/statistics.csv,prediction_statistics.csv
 reporte_tolima,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/tolima/incidence_map.jpeg,incidence_map_geometry.jpeg
 reporte_tolima,Incidence Table,analysis,table,colombia/geometry/incidence_maps/tolima/incidences.csv,incidences_geometry.csv
+reporte_quindio,Graph Map First Day,analysis,figure,colombia/community/graph_maps/quindio/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
+reporte_quindio,Graph Map Current Day,analysis,figure,colombia/community/graph_maps/quindio/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
+reporte_quindio,Polygon Movement range,analysis,figure,colombia/community/movement_plots/quindio/movement_range_selected_polygons_quindio.png,movement_range_selected_polygons.png
+reporte_quindio,Polygon Movement range,analysis,figure,colombia/community/movement_plots/quindio/movement_range_selected_polygons_quindio_split.png,movement_range_selected_polygons_split.png
+reporte_quindio,Movement FB,analysis,figure,colombia/community/movement_plots/quindio/mov_range_quindio.png,mov_range.png
+reporte_quindio,Prediction ,analysis,figure,colombia/community/prediction/polygon_unions/quindio/prediction_quindio.png,prediction.png
+reporte_quindio,Simulacion ,analysis,figure,colombia/community/prediction/polygon_unions/quindio/simulations_quindio.png,simulations.png
+reporte_quindio,Mapa Alerta General,analysis,figure,colombia/geometry/alerts/quindio/map_max_alert.png,map_max_alert.png
+reporte_quindio,Mapa Cloropletico Historico,analysis,figure,colombia/geometry/polygon_info_window/quindio/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
+reporte_quindio,Mapa Cloropletico Reciente,analysis,figure,colombia/geometry/polygon_info_window/quindio/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
+reporte_quindio,Mapa Cloropletico Reciente,analysis,table,colombia/geometry/polygon_info_window/quindio/detail_choropleth_recent.csv,detail_choropleth_recent.csv
+reporte_quindio,Alertas Rojas,analysis,table,colombia/geometry/alerts/quindio/alerts.csv,alerts.csv
+reporte_quindio,Estadisticas Municipio,analysis,table,colombia/geometry/stats/quindio/general_stats.csv,geometry_statistics.csv
+reporte_quindio,Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/quindio/general_stats.csv,community_statistics.csv
+reporte_quindio,Estadisticas Prediccion,analysis,table,colombia/community/prediction/polygon_unions/quindio/statistics.csv,prediction_statistics.csv
+reporte_quindio,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/quindio/incidence_map.jpeg,incidence_map_geometry.jpeg
+reporte_quindio,Incidence Table,analysis,table,colombia/geometry/incidence_maps/quindio/incidences.csv,incidences_geometry.csv
