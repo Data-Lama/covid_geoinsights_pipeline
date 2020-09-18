@@ -164,6 +164,8 @@ map = suppressMessages(get_stamenmap(c(left = left, bottom = bottom, right = rig
 
 df_plot = polygons[order(polygons$incidence),]
 
+
+
 # Split poly_name in two for labling
 df_plot <- df_plot %>% tidyr::separate(poly_name, 
                       c("municipio"), extra='drop', sep="-")
@@ -182,5 +184,9 @@ p = p + ggtitle(paste0("Incidencia Acumulada por Municipio (Casos por ",per_capi
 p
 
 ggsave(file.path( export_folder,"incidence_map.jpeg"), plot = p, width = width, device = 'jpeg')
+
+# Saves data
+df_plot = df_plot[, c('poly_id','attr_population', 'municipio', 'poly_lon', 'poly_lat', 'num_cases','incidence','group')]
+write.csv(df_plot, file = file.path( export_folder,"incidence_map_data.csv"), row.names = FALSE)
   
   

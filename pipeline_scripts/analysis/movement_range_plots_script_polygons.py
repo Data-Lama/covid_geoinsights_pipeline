@@ -47,6 +47,7 @@ max_selected = 7
 height = 2.5
 aspect= 5
 num_ticks = 6
+jump = 25
 
 # Reads the parameters from excecution
 location_folder =  sys.argv[1] # locatio folder name
@@ -178,10 +179,10 @@ df_mov_range_all['Tipo'] = 'Movimiento Nacional'
 df_mov_plot = pd.concat((df_mov[['date_time','value','type','Tipo']], df_mov_range_all[['date_time','value','type','Tipo']]), ignore_index = True)
 
 # Loads cases
-df_cases_raw = pd.read_csv(os.path.join(unified_folder_location, 'cases.csv'), parse_dates = ['date_time'])
-df_cases_all = df_cases_raw.rename(columns = {'num_cases':'value', 'geo_id': 'polygon_id'})
-df_cases_all = df_cases_all[['date_time','value', 'polygon_id']].copy()
-df_cases_all = df_cases_all[df_cases_all.polygon_id.isin(selected_polygons)]
+df_cases_raw = pd.read_csv(os.path.join(agglomerated_folder_location, 'cases.csv'), parse_dates = ['date_time'])
+df_cases_all = df_cases_raw.rename(columns = {'num_cases':'value'})
+df_cases_all = df_cases_all[['date_time','value', 'poly_id']].copy()
+df_cases_all = df_cases_all[df_cases_all.poly_id.isin(selected_polygons)]
 
 df_cases = df_cases_all[['date_time','value']].groupby('date_time').sum().reset_index()
 

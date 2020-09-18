@@ -41,8 +41,7 @@ folder_name = sys.argv[4]
 poly_id =  sys.argv[5]
 
 
-
-location_name = location_folder.replace('_',' ').title()
+location_name = location_folder.replace('_',' ').title().replace(' ','')
 
 # Set paths
 agglomerated_path = os.path.join(data_dir, "data_stages", location_folder, "agglomerated", agglomeration_method) 

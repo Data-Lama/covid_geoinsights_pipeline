@@ -79,17 +79,21 @@ print(ident + 'Builds Datasets:')
 # ----------------
 # ---- Cases -----
 # ----------------
-def get_geo_id(province_state):
-    if(province_state):
+def get_geo_id(province_state, country):
+    if pd.isna(province_state) and pd.isna(country):
         return np.nan
+    elif pd.isna(province_state):
+        return("-".join(country.upper().split(" ")))
     else:
         return "-".join(province_state.upper().split(" "))
 
-def get_location(province_state):
-    if(province_state):
+def get_location(province_state, country):
+    if pd.isna(province_state) and pd.isna(country):
         return np.nan
+    elif pd.isna(province_state):
+        return(country)
     else:
-        return "-".join(province_state.split(" "))
+        return(province_state)
 
 print(ident + '   Cases')
 df_cases_country = pd.read_csv(os.path.join(raw_cases_folder, "cases.csv"))
@@ -98,8 +102,9 @@ df_cases = pd.DataFrame(columns=["date_time", "num_cases", "geo_id", "location",
 dates = df_cases_country.columns[4:]
 for i in list(df_cases_country.index):
     df_cases_sm = pd.DataFrame()
-    geo_id = get_geo_id(df_cases_country.at[i, "Province/State"])
-    location = get_location(df_cases_country.at[i, "Province/State"])
+    geo_id = get_geo_id(df_cases_country.at[i, "Province/State"], df_cases_country.at[i, "Country/Region"])
+    location = get_location(df_cases_country.at[i, "Province/State"], df_cases_country.at[i, "Country/Region"])
+
     lat = df_cases_country.at[i, "Lat"]
     lon = df_cases_country.at[i, "Long"]
     df_cases_by_date = df_cases_country.iloc[i, 4:].copy().to_numpy()
@@ -113,6 +118,17 @@ for i in list(df_cases_country.index):
     df_cases_sm["lat"] = lat
     df_cases_sm["lon"] = lon
     df_cases = df_cases.append(df_cases_sm)
+
+
+# Removes the starting zeros
+index = np.arange(df_cases.shape[0])
+starting = np.min(index[df_cases.num_cases > 0])
+df_cases = df_cases.iloc[starting:].copy()
+
+
+# Parse the dates
+df_cases['date_time'] = pd.to_datetime(df_cases['date_time']).apply(lambda s: s.strftime("%Y-%m-%d"))
+
 
 # Checks if max date is given
 if max_date is not None:

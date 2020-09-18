@@ -47,6 +47,7 @@ max_selected = 7
 height = 2.5
 aspect= 5
 num_ticks = 6
+jump = 25
 
 # Reads the parameters from excecution
 location_folder =  sys.argv[1] # locatio folder name
@@ -172,16 +173,16 @@ df_mov['Tipo'] = 'Movimiento Local'
 
 df_mov_range_all = df_mov_range_all[['date_time','value']].copy()
 df_mov_range_all['type'] = 'movement'
-df_mov_range_all['Tipo'] = 'Movimiento Nacional'
+df_mov_range_all['Tipo'] = 'Movimiento Global'
 
 
 df_mov_plot = pd.concat((df_mov[['date_time','value','type','Tipo']], df_mov_range_all[['date_time','value','type','Tipo']]), ignore_index = True)
 
 # Loads cases
-df_cases_raw = pd.read_csv(os.path.join(unified_folder_location, 'cases.csv'), parse_dates = ['date_time'])
-df_cases_all = df_cases_raw.rename(columns = {'num_cases':'value', 'geo_id': 'polygon_id'})
-df_cases_all = df_cases_all[['date_time','value', 'polygon_id']].copy()
-df_cases_all = df_cases_all[df_cases_all.polygon_id.isin(selected_polygons)]
+df_cases_raw = pd.read_csv(os.path.join(agglomerated_folder_location, 'cases.csv'), parse_dates = ['date_time'])
+df_cases_all = df_cases_raw.rename(columns = {'num_cases':'value'})
+df_cases_all = df_cases_all[['date_time','value', 'poly_id']].copy()
+df_cases_all = df_cases_all[df_cases_all.poly_id.isin(selected_polygons)]
 
 df_cases = df_cases_all[['date_time','value']].groupby('date_time').sum().reset_index()
 
@@ -189,7 +190,7 @@ df_cases = df_cases_all[['date_time','value']].groupby('date_time').sum().reset_
 # Somooths
 df_cases['value'] = gf.smooth_curve(df_cases['value'], con.smooth_days )
 df_cases['type'] = 'cases'
-df_cases['Tipo'] = 'Casos (Fecha Diagnóstico)' 
+df_cases['Tipo'] = 'Casos' 
 
 df_cases_plot = df_cases[['date_time','value','type','Tipo']].copy()
 
@@ -200,6 +201,7 @@ print(ident + '   Plots movement for {} (All)'.format(selected_polygons_name))
 
 # Global Movmeent Plot
 df_plot = df
+
 
 g = sns.relplot(x="date_time", y="value",row="type", hue = 'Tipo',
             height=height, aspect=aspect, facet_kws=dict(sharey=False),
@@ -223,7 +225,6 @@ min_dat, max_date = g.axes[0,0].get_xlim()
 
 tick = np.round(min_dat) + 4
 ticks = []
-jump = 15
 while tick  < max_date:
 	ticks.append(tick)
 	tick += jump
