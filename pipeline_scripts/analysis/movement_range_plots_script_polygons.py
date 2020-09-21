@@ -47,7 +47,6 @@ max_selected = 7
 height = 2.5
 aspect= 5
 num_ticks = 6
-jump = 25
 
 # Reads the parameters from excecution
 location_folder =  sys.argv[1] # locatio folder name
@@ -177,10 +176,10 @@ df_mov_range_all['Tipo'] = 'Movimiento Nacional'
 df_mov_plot = pd.concat((df_mov[['date_time','value','type','Tipo']], df_mov_range_all[['date_time','value','type','Tipo']]), ignore_index = True)
 
 # Loads cases
-df_cases_raw = pd.read_csv(os.path.join(agglomerated_folder_location, 'cases.csv'), parse_dates = ['date_time'])
-df_cases_all = df_cases_raw.rename(columns = {'num_cases':'value'})
-df_cases_all = df_cases_all[['date_time','value', 'poly_id']].copy()
-df_cases_all = df_cases_all[df_cases_all.poly_id.isin(selected_polygons)]
+df_cases_raw = pd.read_csv(os.path.join(unified_folder_location, 'cases.csv'), parse_dates = ['date_time'])
+df_cases_all = df_cases_raw.rename(columns = {'num_cases':'value', 'geo_id': 'polygon_id'})
+df_cases_all = df_cases_all[['date_time','value', 'polygon_id']].copy()
+df_cases_all = df_cases_all[df_cases_all.polygon_id.isin(selected_polygons)]
 
 df_cases = df_cases_all[['date_time','value']].groupby('date_time').sum().reset_index()
 
@@ -208,19 +207,36 @@ if polygons.shape[0] > max_selected:
 
 df_plot = df_mov_range.merge(polygons[['poly_id','poly_name']], on = 'poly_id')
 
-fig = plt.figure(figsize=(19,8))
+# Plot separate plots
+data = df_plot["poly_name"].unique()
+ax = sns.FacetGrid(df_plot, col="poly_name", col_wrap=4, hue='poly_name', margin_titles=True)
+ax.map(sns.lineplot, "date_time", "movement_change", linewidth=0.7)
 
+axes = ax.axes.flatten()
+for i in range(len(data)):
+	axes[i].set_title(data[i])
+	axes[i].set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
+	axes[i].set_xlabel('Fecha', fontsize=axis_font_size)
+	axes[i].set_xticklabels(axes[i].get_xticklabels(), rotation=45)
+
+plt.savefig(os.path.join(export_folder_location, f'movement_range_selected_polygons_{selected_polygons_folder_name}_split.png'))
+
+# Plots joint plots
+fig = plt.figure(figsize=(19,8))
 ax = sns.lineplot(data = df_plot, x = 'date_time', y = 'movement_change', hue = 'poly_name')
 ax.set_title('Cambio Porcentual en Movilidad en Unidades {} para {}'.format(unit_type_prural, selected_polygons_name), fontsize=suptitle_font_size)
 ax.set_xlabel('Fecha', fontsize=axis_font_size)
 ax.set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
 ax.legend().texts[0].set_text(f"Unidad {unit_type}")
 
-
 # Adds the horizontal line
-ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)		
+ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)	
 
 fig.savefig(os.path.join(export_folder_location, f'movement_range_selected_polygons_{selected_polygons_folder_name}.png'))
+
+	
+
+
 
 
 

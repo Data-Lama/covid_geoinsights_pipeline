@@ -33,7 +33,21 @@ def update_git_repository(respository):
 	'''
 
 	g = git.cmd.Git(os.path.join(git_repositories_location, respository))
-	g.pull()
+
+	repo = git.Repo(os.path.join(git_repositories_location, respository))
+
+	# blast any current changes
+	repo.git.reset('--hard')
+	# ensure master is checked out
+	repo.heads.master.checkout()
+	# blast any changes there (only if it wasn't checked out)
+	repo.git.reset('--hard')
+	# remove any extra non-tracked files (.pyc, etc)
+	repo.git.clean('-xdf')
+	# pull in the changes from from the remote
+	repo.remotes.origin.pull()
+
+	#g.pull()
 	
 
 def download_file(url, name):

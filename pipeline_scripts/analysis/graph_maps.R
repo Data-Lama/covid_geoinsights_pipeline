@@ -48,7 +48,7 @@ map_type = "terrain"
 }else{
 
 selected_polygons = args[5:length(args)]
-add_labels = FALSE
+add_labels = TRUE
 selected_polygons = unique(selected_polygons)
 map_type = "terrain-background"
 if(length(selected_polygons) == 0)
@@ -168,8 +168,8 @@ right = right + margin
 
 
 cat(paste(ident, '   Downloading Map', '\n', sep = ""))
-# map = suppressMessages(get_stamenmap(c(left = left, bottom = bottom, right = right, top = top), maptype = map_type, color = 'bw'))
-map = suppressMessages(get_map(c(left = left, bottom = bottom, right = right, top = top), maptype = "satellite", color = 'bw'))
+map = suppressMessages(get_stamenmap(c(left = left, bottom = bottom, right = right, top = top), maptype = map_type, color = 'bw'))
+# map = suppressMessages(get_map(c(left = left, bottom = bottom, right = right, top = top), maptype = "satellite", color = 'bw'))
 
 
 start_day =  min(nodes$day)

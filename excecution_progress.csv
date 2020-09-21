@@ -1,11 +1,27 @@
 timestamp,script_name,parameters,result,elapsed_time
-2020-09-17 12:36:05.651130,graph_maps.R,Colombia colombia geometry amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,488
-2020-09-17 12:36:09.304540,polygon_info_timewindow.py,colombia geometry 5 days amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,4
-2020-09-17 12:36:29.484473,generate_threshold_alerts.py,colombia geometry min_record amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,20
-2020-09-17 12:37:42.924615,choropleth_maps.py,colombia geometry amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,73
-2020-09-17 12:37:45.591319,general_statistics.py,colombia geometry amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,256,3
-2020-09-17 12:37:46.526958,incidence_map.R,Colombia colombia geometry amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,256,1
-2020-09-17 12:37:47.302828,polygon_socio_economic_analysis.py,colombia geometry amazonas Amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,1
-2020-09-17 12:37:53.581124,movement_range_plots_script_polygons.py,colombia geometry Amazonas amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,6
-2020-09-17 12:38:00.015633,movement_range_and_cases_script_polygons.py,colombia geometry Amazonas amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,6
-2020-09-17 12:38:00.371909,polygon_union_wrapper.py,colombia geometry Amazonas amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,610
+2020-09-21 03:41:11.836996,single_file_download_extractor.py,Peru peru,0,51
+2020-09-21 03:50:42.392097,universal_generic_unifier.py,Peru peru,0,571
+2020-09-21 03:51:02.304664,universal_radius_agglomerate.py,Peru peru 10,0,20
+2020-09-21 03:51:03.922476,universal_community_agglomerate.R,Peru peru,0,2
+2020-09-21 03:54:10.829201,universal_daily_graphs_constructor.py,Peru peru all,0,187
+2020-09-21 03:54:21.336637,universal_git_single_extractor.py,Chile chile,256,11
+2020-09-21 03:56:17.414853,universal_generic_unifier.py,Chile chile,0,116
+2020-09-21 03:56:34.267547,universal_radius_agglomerate.py,Chile chile 10,0,17
+2020-09-21 03:56:35.882285,universal_community_agglomerate.R,Chile chile,0,2
+2020-09-21 03:59:26.284873,universal_daily_graphs_constructor.py,Chile chile all,2,170
+2020-09-21 03:59:26.571333,universal_git_single_extractor.py,Brazil brazil,2,0
+2020-09-21 03:59:26.699275,universal_generic_unifier.py,Brazil brazil,2,0
+2020-09-21 03:59:26.745604,universal_radius_agglomerate.py,Brazil brazil 10,2,0
+2020-09-21 03:59:26.793873,universal_community_agglomerate.R,Brazil brazil,2,0
+2020-09-21 03:59:26.842950,universal_daily_graphs_constructor.py,Brazil brazil all,2,0
+2020-09-21 03:59:26.867983,universal_git_single_extractor.py,Germany germany,2,0
+2020-09-21 03:59:26.909560,universal_generic_unifier.py,Germany germany,2,0
+2020-09-21 03:59:26.993090,universal_radius_agglomerate.py,Germany germany 10,2,0
+2020-09-21 03:59:27.015371,universal_community_agglomerate.R,Germany germany,2,0
+2020-09-21 03:59:27.075310,universal_daily_graphs_constructor.py,Germany germany all,2,0
+2020-09-21 03:59:27.166448,usa_state_unifier.py,Indiana indiana_usa,2,0
+2020-09-21 03:59:27.210700,universal_radius_agglomerate.py,Indiana indiana_usa 10,2,0
+2020-09-21 03:59:27.264529,universal_community_agglomerate.R,Indiana indiana_usa,2,0
+2020-09-21 03:59:27.319012,universal_daily_graphs_constructor.py,Indiana indiana_usa all,2,0
+2020-09-21 03:59:28.032100,usa_state_unifier.py,Illinois illinois_usa,2,1
+2020-09-21 03:59:28.049931,universal_radius_agglomerate.py,Illinois illinois_usa 10,2,0
