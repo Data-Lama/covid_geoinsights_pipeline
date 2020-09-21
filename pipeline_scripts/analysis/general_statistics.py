@@ -46,6 +46,7 @@ try:
 except:
     df_cases = pd.read_csv(cases, low_memory=False, encoding = 'latin-1', parse_dates=['date_time'])
 
+
 def get_nodes_with_cases(df):
     total = df.groupby('poly_id').sum()
     nodes_with_cases = total[total['num_cases'] > 0]

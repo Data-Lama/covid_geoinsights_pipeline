@@ -1,4 +1,11 @@
 timestamp,script_name,parameters,result,elapsed_time
-2020-09-15 18:39:50.602105,movement_range_plots_script_polygons.py,west_africa geometry GuineaEcuatorial equatorial_guinea GAB GNQ CMR,0,2
-2020-09-15 18:39:57.473270,movement_range_and_cases_script_polygons.py,west_africa geometry GuineaEcuatorial equatorial_guinea GNQ,0,7
-2020-09-15 18:54:37.208172,polygon_union_prediction_wrapper.py,west_africa geometry 0.8 20 GuineaEcuatorial equatorial_guinea GNQ,0,880
+2020-09-17 12:36:05.651130,graph_maps.R,Colombia colombia geometry amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,488
+2020-09-17 12:36:09.304540,polygon_info_timewindow.py,colombia geometry 5 days amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,4
+2020-09-17 12:36:29.484473,generate_threshold_alerts.py,colombia geometry min_record amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,20
+2020-09-17 12:37:42.924615,choropleth_maps.py,colombia geometry amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,73
+2020-09-17 12:37:45.591319,general_statistics.py,colombia geometry amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,256,3
+2020-09-17 12:37:46.526958,incidence_map.R,Colombia colombia geometry amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,256,1
+2020-09-17 12:37:47.302828,polygon_socio_economic_analysis.py,colombia geometry amazonas Amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,1
+2020-09-17 12:37:53.581124,movement_range_plots_script_polygons.py,colombia geometry Amazonas amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,6
+2020-09-17 12:38:00.015633,movement_range_and_cases_script_polygons.py,colombia geometry Amazonas amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,6
+2020-09-17 12:38:00.371909,polygon_union_wrapper.py,colombia geometry Amazonas amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798,0,610

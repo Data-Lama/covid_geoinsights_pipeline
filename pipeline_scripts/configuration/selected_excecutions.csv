@@ -22,9 +22,9 @@ West Africa,west_africa,construct,constructors,1,NO,universal_daily_graphs_const
 West Africa,west_africa,analyse,analysis,1,NO,movement_range_plots_script,python,WestAfrica west_africa geometry
 West Africa,west_africa,analyse,analysis,1,NO,graph_maps,r,WestAfrica west_africa geometry equatorial_guinea GAB GNQ CMR
 West Africa,west_africa,analyse,analysis,1,NO,incidence_map,r,WestAfrica west_africa geometry equatorial_guinea GAB GNQ CMR
-West Africa,west_africa,analyse,analysis,1,YES,movement_range_plots_script_polygons,python,west_africa geometry GuineaEcuatorial equatorial_guinea GAB GNQ CMR
-West Africa,west_africa,analyse,analysis,1,YES,movement_range_and_cases_script_polygons,python,west_africa geometry GuineaEcuatorial equatorial_guinea GNQ
-West Africa,west_africa,POS,wrappers,1,YES,polygon_union_prediction_wrapper,python,west_africa geometry 0.8 20 GuineaEcuatorial equatorial_guinea GNQ
+West Africa,west_africa,analyse,analysis,1,NO,movement_range_plots_script_polygons,python,west_africa geometry GuineaEcuatorial equatorial_guinea GAB GNQ CMR
+West Africa,west_africa,analyse,analysis,1,NO,movement_range_and_cases_script_polygons,python,west_africa geometry GuineaEcuatorial equatorial_guinea GNQ
+West Africa,west_africa,POS,wrappers,1,NO,polygon_union_prediction_wrapper,python,west_africa geometry 0.8 20 GuineaEcuatorial equatorial_guinea GNQ
 Peru,peru,extract,extractors,1,NO,single_file_download_extractor,python,Peru peru
 Peru,peru,unify,unifiers,1,NO,universal_generic_unifier,python,Peru peru
 Peru,peru,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Peru peru 10
@@ -113,4 +113,5 @@ Colombia,colombia,POS,analysis,1,NO,choropleth_maps,python,colombia geometry
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia geometry
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia community
 Colombia,colombia,POS,analysis,1,NO,incidence_map,r,Colombia colombia geometry
+Colombia,colombia,POS,wrappers,2,YES,polygon_union_wrapper,python,colombia geometry Amazonas amazonas 91001 91263 91407 91405 91430 91460 91530 91536 91540 91669 91798
 All,,POS,POS,6,NO,copy_report_files.py,python,

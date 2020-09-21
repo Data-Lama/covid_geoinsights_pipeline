@@ -72,8 +72,6 @@ miles_stones_width = 1
 cut_line_color = 'red'
 cut_stones_width = 1
 
-
-
 unit_type, unit_type_prural = gf.get_agglomeration_names(agglomeration_method)
 
 # Agglomerated folder location

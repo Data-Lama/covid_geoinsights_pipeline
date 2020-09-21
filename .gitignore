@@ -62,3 +62,6 @@ docs/_build/
 
 # Mac files
 .DS_Store
+
+# ENVS
+./env/*
