@@ -49,8 +49,9 @@ aspect= 5
 num_ticks = 6
 
 # Reads the parameters from excecution
-location_folder =  sys.argv[1] # locatio folder name
+location_folder =  sys.argv[1] # location folder name
 agglomeration_method = sys.argv[2] # Aglomeration name
+
 selected_polygons_name = sys.argv[3] # Selected polygon names
 selected_polygons_folder_name = sys.argv[4] # Selected polygon names
 
@@ -91,6 +92,7 @@ if not os.path.exists(movement_range_file):
 
 # Export folder location
 export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'movement_plots', selected_polygons_folder_name)
+
 
 # Creates the folder if does not exists
 if not os.path.exists(export_folder_location):

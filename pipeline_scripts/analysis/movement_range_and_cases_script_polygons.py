@@ -183,11 +183,9 @@ df_cases_raw = pd.read_csv(os.path.join(agglomerated_folder_location, 'cases.csv
 df_cases_all = df_cases_raw.rename(columns = {'num_cases':'value'})
 df_cases_all = df_cases_all[['date_time','value', 'poly_id']].copy()
 df_cases_all = df_cases_all[df_cases_all.poly_id.isin(selected_polygons)]
-
 df_cases = df_cases_all[['date_time','value']].groupby('date_time').sum().reset_index()
 
-
-# Somooths
+# Smooths 
 df_cases['value'] = gf.smooth_curve(df_cases['value'], con.smooth_days )
 df_cases['type'] = 'cases'
 df_cases['Tipo'] = 'Casos' 

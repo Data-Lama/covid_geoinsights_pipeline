@@ -25,6 +25,7 @@ location_folder =  sys.argv[2] # polygon name
 # Agglomerated folder location
 agglomerated_folder_location = os.path.join(data_dir, 'data_stages', location_folder, 'agglomerated', agglomeration_method)
 agglomerated_folder_location = '~/Dropbox/covid_fb/data/data_stages/colombia/agglomerated/geometry/cases.csv'
+
 def get_posteriors(sr, sigma=0.15):
 
     # We create an array for every possible value of Rt
@@ -279,5 +280,10 @@ df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(
 df_all = prepare_cases(df_all, col='num_cases', cutoff=0)
 min_time = df_all.index[0]
 FIS_KEY = 'date_time'
+
+# Export folder location
+export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'movement_plots', selected_polygons_folder_name)
+
+path_to_save = os.path.join(export_folder_location, f'mov_range_{selected_polygons_folder_name}.png')
 
 plot_cases_rt(df_all, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=None)

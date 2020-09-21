@@ -37,7 +37,6 @@ agglomerated_file_path = os.path.join(data_dir, 'data_stages', location_name, 'a
 movement = os.path.join(agglomerated_file_path, 'movement.csv')
 cases = os.path.join(agglomerated_file_path, 'cases.csv')
 
-
 df_movement = pd.read_csv(movement, low_memory=False, parse_dates=['date_time'])
 
 #Load num_cases 
@@ -54,6 +53,7 @@ def get_nodes_with_cases(df):
     nodes_with_cases = set(nodes_with_cases['poly_id'])
 
     return nodes_with_cases
+
 
 # Returns dataframe with max and min num_cases and movement per node
 def max_min_day_by_node(df):
