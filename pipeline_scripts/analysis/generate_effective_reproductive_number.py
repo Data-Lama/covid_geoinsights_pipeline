@@ -20,7 +20,7 @@ data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
 # Reads the parameters from excecution
-location_folder   =  sys.argv[1] # location name
+location_folder   =  sys.argv[1]    # location name
 agglomeration_method =  sys.argv[2] # agglomeration method
 
 if len(sys.argv) <= 3:

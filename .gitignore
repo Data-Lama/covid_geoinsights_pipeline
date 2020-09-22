@@ -4,6 +4,10 @@ global_config/config_file.csv
 # Rplots
 Rplots.pdf
 
+# All pdf's
+*.pdf
+
+
 
 #Excel locks
 .~lock*
