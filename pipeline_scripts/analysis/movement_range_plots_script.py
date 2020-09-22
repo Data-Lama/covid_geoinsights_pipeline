@@ -360,7 +360,8 @@ for agglomeration_method in agglomeration_methods:
 	ax.set_title('Cambio Porcentual en Movilidad en Unidades {} para {}'.format(unit_type_prural, location_name), fontsize=suptitle_font_size)
 	ax.set_xlabel('Fecha', fontsize=axis_font_size)
 	ax.set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
-	ax.legend().texts[0].set_text(f"Unidad {unit_type}")
+	#ax.legend().texts[0].set_text(f"Unidad {unit_type}")
+	ax.legend(title = f"Unidad {unit_type}")
 
 
 	# Adds the horizontal line
