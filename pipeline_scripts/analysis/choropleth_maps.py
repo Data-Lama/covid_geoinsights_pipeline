@@ -8,6 +8,7 @@ import geopandas as gpd
 import contextily as ctx
 from datetime import date
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 
 from pipeline_scripts.functions.general_functions import load_README
 # import polygon_info_timewindow 
@@ -46,6 +47,11 @@ RIVERS_DICT = {'sinu':'RÍO SINÚ',
        'amazonas':'RÌO AMAZONAS'}
 
 RIVERS = ['RÍO SINÚ','RÍO MAGDALENA','RÍO CAUCA','RÍO META','RÌO AMAZONAS']
+
+scheme = "user_defined"
+bins = {'bins':[0, 0.49, 1, 2, 5, 10, 50]} 
+colors = [(1, 0.96, 0.94), (0.99, 0.83, 0.76), (0.98, 0.62, 0.51), (0.98, 0.41, 0.29), (0.89, 0.18, 0.15), (0.69, 0.07, 0.09), (0.37, 0.04, 0.1)] 
+
 
 # Get name of files
 movement = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', location_folder, 'movement.csv')
@@ -93,6 +99,30 @@ def calculate_delta(t_0, t_1):
                                                                'internal_movement': 'delta_inner_movement'})
 
        return df_delta
+
+def set_color(x, bins, colors):
+       index = 0
+       for i in range(len(bins)):
+              if x <= bins[i]:
+                     index = i
+                     break
+       if index == 0:
+              label = "(-10, {}]".format(bins[index])
+       else:
+              label = "({}, {}]".format(bins[index-1], bins[index])
+
+       return colors[index], label
+
+def construct_legend(bins):
+       l = []
+       for i in range(len(bins)):              
+              if i == 0:
+                     label = "(-10, {}]".format(bins[i])
+              else:
+                     label = "({}, {}]".format(bins[i-1], bins[i])
+              l.append(label)
+
+       return l
 
 # Get deltas
 df_municipalites_t2 = df_movement[df_movement["date_time"] >= day_t3].copy()
@@ -153,9 +183,6 @@ df_deltas_recent = calculate_delta(df_municipalites_t1, df_municipalites_t2)
 df_deltas_recent = df_deltas_recent.replace([np.inf, -np.inf], np.nan).dropna(axis=0)                                                                    
 
 # If asked for specific polygons, get subset
-scheme = "user_defined"
-bins = {'bins':[0, 0.49, 1, 2, 5, 10]} 
-
 if selected_polygons_boolean:
        edgecolor = "grey"
        df_deltas_historic.reset_index(inplace=True)
@@ -180,8 +207,9 @@ choropleth_map_recent.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
 choropleth_map_recent.replace([np.inf, -np.inf], np.nan, inplace=True)
 choropleth_map_recent.to_crs(epsg=3857, inplace=True)
 
-ax = choropleth_map_recent.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(30,18),
-                                    scheme=scheme, classification_kwds=bins, legend=True, linewidth=0.5, edgecolor=edgecolor)
+choropleth_map_recent["color"], choropleth_map_recent["label"] = zip(*choropleth_map_recent.apply(lambda x: set_color(x.delta_external_movement, bins["bins"], colors), axis=1))
+ax = choropleth_map_recent.fillna(0).plot(figsize=(30,18), color=choropleth_map_recent['color'], label=choropleth_map_recent['label'] \
+       , linewidth=0.5, edgecolor=edgecolor)
 
 ax.set_axis_off()
 
@@ -195,6 +223,13 @@ if selected_polygons_boolean:
 ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
 rivers_df.to_crs(epsg=3857, inplace=True)
 rivers_df.plot(ax=ax, alpha=0.1)
+
+# Here we create a legend: The convoluted way
+legend = construct_legend(bins["bins"])
+for i in range(len(legend)):
+    plt.scatter([], [], color=colors[i], label=str(legend[i]))
+plt.legend(scatterpoints=1, frameon=False, labelspacing=1, title='Movimiento')
+
 plt.title('Comparativo entre el último Viernes y 15 días atrás')
 plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_15-day-window.png'.format(location_name)), bbox_inches="tight")
 
@@ -209,8 +244,12 @@ choropleth_map_historic = geo_df.merge(df_deltas_historic, left_on='Codigo_Dan',
 choropleth_map_historic.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
 choropleth_map_historic.replace([np.inf, -np.inf], np.nan, inplace=True)
 choropleth_map_historic.to_crs(epsg=3857, inplace=True)
-ax = choropleth_map_historic.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(30,18),
-                                    scheme=scheme, classification_kwds=bins, legend=True, linewidth=0.5, edgecolor=edgecolor)
+# ax = choropleth_map_historic.fillna(0).plot(column='delta_external_movement', cmap='Reds', figsize=(30,18),
+#                                     scheme=scheme, classification_kwds=bins, legend=True, linewidth=0.5, edgecolor=edgecolor)
+choropleth_map_historic["color"], choropleth_map_historic["label"] = zip(*choropleth_map_historic.apply(lambda x: set_color(x.delta_external_movement, bins["bins"], colors), axis=1))
+ax = choropleth_map_historic.fillna(0).plot(figsize=(30,18), color=choropleth_map_historic['color'], label=choropleth_map_historic['label'] \
+       , linewidth=0.5, edgecolor=edgecolor)
+
 ax.set_axis_off()
 
 if selected_polygons_boolean:
@@ -223,6 +262,12 @@ if selected_polygons_boolean:
 ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
 rivers_df.to_crs(epsg=3857, inplace=True)
 rivers_df.plot(ax=ax, alpha=0.1)
+
+# Here we create a legend: The convoluted way
+for i in range(len(legend)):
+    plt.scatter([], [], color=colors[i], label=str(legend[i]))
+plt.legend(scatterpoints=1, frameon=False, labelspacing=1, title='Movimiento')
+
 plt.title('Comparativo entre el último Viernes y los primeros 15 días de Abril')
 plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_historic.png'.format(location_name)), bbox_inches="tight")
 
