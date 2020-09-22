@@ -64,6 +64,9 @@ def prepare_cases(daily_cases, col='Cases', cutoff=0):
 def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min_time=pd.to_datetime('2020-02-26'), state=None, path_to_save=None):
     fig, ax = plt.subplots(2,1, figsize=(12.5, 10) )
 
+    cases_df = df_poly_id 
+    col_cases= 'num_cases'
+    col_cases_smoothed='Smoothed_num_cases'
 
     index           = cases_df[col_cases].index.get_level_values(FIS_KEY)
     if pop:
@@ -71,7 +74,7 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
         values_cases_sm = cases_df[col_cases_smoothed].values*100000/pop
     else: 
         values_cases    = cases_df[col_cases].values
-        values_cases_sm = cases_df[col_cases_smoothed].values
+        values_cases_sm = cases_df[col_cases_smoothed].values+1
 
     # Plot smoothed cases
     ax[0].bar(index, values_cases, color='k', alpha=0.3, zorder=1,  label= 'Cases')
@@ -99,7 +102,7 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     ax[0].spines['top'].set_visible(False)
     ax[0].spines['right'].set_visible(False)
 
-    ax[0].yaxis.set_major_locator(ticker.MultipleLocator(np.round(values_cases.max()/100+0.1)*100//5))
+    ax[0].yaxis.set_major_locator(ticker.MultipleLocator( np.round(values_cases.max()/100+0.1*100//5 ) )  )
     ax[0].yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.0f}"))
     #ax.yaxis.tick_right()
     ax[0].spines['left'].set_visible(False)
@@ -110,14 +113,14 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
 
 
     cases_df = cases_df.iloc[list(cases_df[col_cases_smoothed].cumsum()>1)]
-    posteriors, log_likelihood = get_posteriors(cases_df[col_cases_smoothed], sigma=.25)
+    posteriors, log_likelihood = get_posteriors(cases_df[col_cases_smoothed]+1, sigma=.25)
     posteriors = posteriors[posteriors.keys()[1:]]
+    posteriors_cm  = posteriors.dropna(axis=1)
+
 
     # Note that this takes a while to execute - it's not the most efficient algorithm
     hdis = highest_density_interval(posteriors, p=CI/100)
     CI = str(CI) 
-
-
     most_likely = posteriors.idxmax().rename('ML')
     result = pd.concat([most_likely, hdis], axis=1)
     result = result.reset_index().rename( columns={'date_time': 'date', 'FIS': 'date'}).set_index('date')
@@ -209,10 +212,13 @@ export_folder_location = os.path.join(analysis_dir, location_folder, agglomerati
 if not os.path.isdir(export_folder_location):
         os.makedirs(export_folder_location)
 
+import pdb
+if selected_polygons_boolean:
+    #pdb.set_trace()
 
-if selected_polygons_boolean
     df_all = df_cases.copy()
-    for idx, poly_id in list(set(df_all['poly_id'])):
+    for idx, poly_id in enumerate( list( df_all['poly_id'].unique()) ):
+
         df_poly_id = df_all[df_all['poly_id'] == poly_id ].copy()
 
         df_poly_id['date_time'] = pd.to_datetime( df_poly_id['date_time'] )
@@ -224,24 +230,26 @@ if selected_polygons_boolean
             df_poly_id = prepare_cases(df_poly_id, col='num_cases', cutoff=0)
             min_time = df_poly_id.index[0]
             FIS_KEY = 'date_time'
-
             path_to_save = os.path.join(export_folder_location, str(poly_id)+'_Rt.png')
+            #pdb.set_trace()
             plot_cases_rt(df_poly_id, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+        
         else:
-            print('Warning: for poly_id f{poly_id} Rt was not computed...')
+            print('\n Warning: for poly_id {} Rt was not computed...'.format(poly_id))
+            print('poly_id: {} has only {} cases must be greater than 100\n'.format(poly_id, all_cases))
+    
+df_all = df_cases.copy()
+df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
+df_all = df_all.groupby('date_time').sum()[['num_cases']]
+if all_cases > 100:
+
+    df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
+
+    df_all = prepare_cases(df_all, col='num_cases', cutoff=0)
+    min_time = df_all.index[0]
+    FIS_KEY = 'date_time'
+
+    path_to_save = os.path.join(export_folder_location, 'aggregated_Rt.png')
+    plot_cases_rt(df_all, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
 else:
-    df_all = df_cases.copy()
-    df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
-    df_all = df_all.groupby('date_time').sum()[['num_cases']]
-    if all_cases > 100:
-
-        df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
-
-        df_all = prepare_cases(df_all, col='num_cases', cutoff=0)
-        min_time = df_all.index[0]
-        FIS_KEY = 'date_time'
-
-        path_to_save = os.path.join(export_folder_location, 'r_t.png')
-        plot_cases_rt(df_all, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
-    else:
-        print('Warning: for poly_id f{poly_id} Rt was not computed...')
+    print('Warning: for poly_id {} Rt was not computed...'.format(poly_id))

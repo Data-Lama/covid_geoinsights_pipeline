@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+from scipy import stats as sps
+
 
 def get_posteriors(sr, sigma=0.15):
     """
