@@ -9,7 +9,7 @@ import numpy as np
 import os
 from scipy import stats as sps
 from scipy.interpolate import interp1d
-from utils import get_posteriors, highest_density_interval
+from pipeline_scripts.functions.Rt_estimate import get_posteriors, highest_density_interval
 
 import sys
 
@@ -44,15 +44,11 @@ if selected_polygons_boolean:
     selected_polygons = [int(x) for x in selected_polygons]
     selected_polygons_folder_name = selected_polygon_name
     df_cases = df_cases[df_cases["poly_id"].isin(selected_polygons)].copy()
+
+
 else:
     selected_polygons_folder_name = "entire_location"
 
-# Export folder location
-export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'R_t', selected_polygons_folder_name)
-
-# Check if folder exists
-if not os.path.isdir(export_folder_location):
-        os.makedirs(export_folder_location)
 
 def prepare_cases(daily_cases, col='Cases', cutoff=0):
     daily_cases['Smoothed_'+col] = daily_cases[col].rolling(7,
@@ -61,11 +57,9 @@ def prepare_cases(daily_cases, col='Cases', cutoff=0):
         center=True).mean(std=2).round()
 
     idx_start = np.searchsorted(daily_cases['Smoothed_'+col], cutoff)
-
     daily_cases['Smoothed_'+col] = daily_cases['Smoothed_'+col].iloc[idx_start:]
 
     return daily_cases
-
 
 def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min_time=pd.to_datetime('2020-02-26'), state=None, path_to_save=None):
     fig, ax = plt.subplots(2,1, figsize=(12.5, 10) )
@@ -208,17 +202,46 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
         
     return (lowfn, highfn, result)
 
+# Export folder location
+export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'R_t', selected_polygons_folder_name)
 
-df_all = df_cases.copy()
-df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
+# Check if folder exists
+if not os.path.isdir(export_folder_location):
+        os.makedirs(export_folder_location)
 
-df_all = df_all.groupby('date_time').sum()[['num_cases']]
 
-df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
+if selected_polygons_boolean
+    df_all = df_cases.copy()
+    for idx, poly_id in list(set(df_all['poly_id'])):
+        df_poly_id = df_all[df_all['poly_id'] == poly_id ].copy()
 
-df_all = prepare_cases(df_all, col='num_cases', cutoff=0)
-min_time = df_all.index[0]
-FIS_KEY = 'date_time'
+        df_poly_id['date_time'] = pd.to_datetime( df_poly_id['date_time'] )
+        df_poly_id = df_poly_id.groupby('date_time').sum()[['num_cases']]
+        all_cases = df_poly_id['num_cases'].sum()
+        if all_cases > 100:
+            df_poly_id = df_poly_id.reset_index().set_index('date_time').resample('D').sum().fillna(0)
 
-path_to_save = os.path.join(export_folder_location, 'r_t.png')
-plot_cases_rt(df_all, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+            df_poly_id = prepare_cases(df_poly_id, col='num_cases', cutoff=0)
+            min_time = df_poly_id.index[0]
+            FIS_KEY = 'date_time'
+
+            path_to_save = os.path.join(export_folder_location, str(poly_id)+'_Rt.png')
+            plot_cases_rt(df_poly_id, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+        else:
+            print('Warning: for poly_id f{poly_id} Rt was not computed...')
+else:
+    df_all = df_cases.copy()
+    df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
+    df_all = df_all.groupby('date_time').sum()[['num_cases']]
+    if all_cases > 100:
+
+        df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
+
+        df_all = prepare_cases(df_all, col='num_cases', cutoff=0)
+        min_time = df_all.index[0]
+        FIS_KEY = 'date_time'
+
+        path_to_save = os.path.join(export_folder_location, 'r_t.png')
+        plot_cases_rt(df_all, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+    else:
+        print('Warning: for poly_id f{poly_id} Rt was not computed...')
