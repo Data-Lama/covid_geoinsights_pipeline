@@ -235,6 +235,5 @@ ax.legend().texts[0].set_text(f"Unidad {unit_type}")
 # Adds the horizontal line
 ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)	
 
-
 fig.savefig(os.path.join(export_folder_location, f'movement_range_selected_polygons_{selected_polygons_folder_name}.png'))	
 print(ident + 'Done')
