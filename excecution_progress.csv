@@ -1,27 +1,3 @@
 timestamp,script_name,parameters,result,elapsed_time
-2020-09-21 03:41:11.836996,single_file_download_extractor.py,Peru peru,0,51
-2020-09-21 03:50:42.392097,universal_generic_unifier.py,Peru peru,0,571
-2020-09-21 03:51:02.304664,universal_radius_agglomerate.py,Peru peru 10,0,20
-2020-09-21 03:51:03.922476,universal_community_agglomerate.R,Peru peru,0,2
-2020-09-21 03:54:10.829201,universal_daily_graphs_constructor.py,Peru peru all,0,187
-2020-09-21 03:54:21.336637,universal_git_single_extractor.py,Chile chile,256,11
-2020-09-21 03:56:17.414853,universal_generic_unifier.py,Chile chile,0,116
-2020-09-21 03:56:34.267547,universal_radius_agglomerate.py,Chile chile 10,0,17
-2020-09-21 03:56:35.882285,universal_community_agglomerate.R,Chile chile,0,2
-2020-09-21 03:59:26.284873,universal_daily_graphs_constructor.py,Chile chile all,2,170
-2020-09-21 03:59:26.571333,universal_git_single_extractor.py,Brazil brazil,2,0
-2020-09-21 03:59:26.699275,universal_generic_unifier.py,Brazil brazil,2,0
-2020-09-21 03:59:26.745604,universal_radius_agglomerate.py,Brazil brazil 10,2,0
-2020-09-21 03:59:26.793873,universal_community_agglomerate.R,Brazil brazil,2,0
-2020-09-21 03:59:26.842950,universal_daily_graphs_constructor.py,Brazil brazil all,2,0
-2020-09-21 03:59:26.867983,universal_git_single_extractor.py,Germany germany,2,0
-2020-09-21 03:59:26.909560,universal_generic_unifier.py,Germany germany,2,0
-2020-09-21 03:59:26.993090,universal_radius_agglomerate.py,Germany germany 10,2,0
-2020-09-21 03:59:27.015371,universal_community_agglomerate.R,Germany germany,2,0
-2020-09-21 03:59:27.075310,universal_daily_graphs_constructor.py,Germany germany all,2,0
-2020-09-21 03:59:27.166448,usa_state_unifier.py,Indiana indiana_usa,2,0
-2020-09-21 03:59:27.210700,universal_radius_agglomerate.py,Indiana indiana_usa 10,2,0
-2020-09-21 03:59:27.264529,universal_community_agglomerate.R,Indiana indiana_usa,2,0
-2020-09-21 03:59:27.319012,universal_daily_graphs_constructor.py,Indiana indiana_usa all,2,0
-2020-09-21 03:59:28.032100,usa_state_unifier.py,Illinois illinois_usa,2,1
-2020-09-21 03:59:28.049931,universal_radius_agglomerate.py,Illinois illinois_usa 10,2,0
+2020-09-22 02:54:28.462441,movement_range_plots_script.py,Colombia colombia community,0,19
+2020-09-22 02:54:30.382764,copy_report_files.py,nan,256,2
