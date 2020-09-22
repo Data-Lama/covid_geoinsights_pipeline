@@ -177,7 +177,6 @@ for agglomeration_method in agglomeration_methods:
 	# Starts Predicition construction
 	# ---------------------
 
-
 	print(ident + '   Constructs Prediction Data')
 	# Gets current (Keeps NANs)
 	df_current_prediction = extract_prediction_data_for_location(agglomeration_method, [location_folder], days_back = days_back, days_ahead = days_ahead)

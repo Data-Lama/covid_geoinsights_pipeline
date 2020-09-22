@@ -48,13 +48,11 @@ else:
     selected_polygons_folder_name = "entire_location"
 
 # Export folder location
-export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'r_t', selected_polygons_folder_name)
+export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'R_t', selected_polygons_folder_name)
 
 # Check if folder exists
 if not os.path.isdir(export_folder_location):
         os.makedirs(export_folder_location)
-
-
 
 def prepare_cases(daily_cases, col='Cases', cutoff=0):
     daily_cases['Smoothed_'+col] = daily_cases[col].rolling(7,
@@ -209,7 +207,6 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
         fig.savefig(path_to_save, dpi=400)
         
     return (lowfn, highfn, result)
-
 
 
 df_all = df_cases.copy()
