@@ -6,6 +6,7 @@ from matplotlib.colors import ListedColormap
 from matplotlib.patches import Patch
 from matplotlib import pyplot as plt
 import numpy as np
+import os
 from scipy import stats as sps
 from scipy.interpolate import interp1d
 
@@ -19,12 +20,41 @@ data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
 # Reads the parameters from excecution
-location_name   =  sys.argv[1] # location name
-location_folder =  sys.argv[2] # polygon name
+location_folder   =  sys.argv[1] # location name
+agglomeration_method =  sys.argv[2] # agglomeration method
+
+if len(sys.argv) <= 3:
+	selected_polygons_boolean = False
+else :
+    selected_polygons_boolean = True
+    selected_polygons = []
+    i = 3
+    while i < len(sys.argv):
+        selected_polygons.append(sys.argv[i])
+        i += 1
+    selected_polygon_name = selected_polygons.pop(0)
 
 # Agglomerated folder location
-agglomerated_folder_location = os.path.join(data_dir, 'data_stages', location_folder, 'agglomerated', agglomeration_method)
-agglomerated_folder_location = '~/Dropbox/covid_fb/data/data_stages/colombia/agglomerated/geometry/cases.csv'
+agglomerated_folder_location = os.path.join(data_dir, 'data_stages', location_folder, 'agglomerated', agglomeration_method, "cases.csv")
+
+# Get cases
+df_cases = pd.read_csv(agglomerated_folder_location)
+
+if selected_polygons_boolean:
+    # Set polygons to int
+    selected_polygons = [int(x) for x in selected_polygons]
+    selected_polygons_folder_name = selected_polygon_name
+    df_cases = df_cases[df_cases["poly_id"].isin(selected_polygons)].copy()
+else:
+    selected_polygons_folder_name = "entire_location"
+
+# Export folder location
+export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'r_t', selected_polygons_folder_name)
+
+# Check if folder exists
+if not os.path.isdir(export_folder_location):
+        os.makedirs(export_folder_location)
+
 
 def get_posteriors(sr, sigma=0.15):
 
@@ -260,7 +290,7 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     ax[1].grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
     ax[1].set_ylabel(r'R_eff', size=15)
     ax[0].set_title(state, size=15)
-    plt.show()
+    # plt.show()
 
     if path_to_save:
         plt.tight_layout()
@@ -269,8 +299,8 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     return (lowfn, highfn, result)
 
 
-df = pd.read_csv(agglomerated_folder_location)
-df_all = df.copy()
+
+df_all = df_cases.copy()
 df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
 
 df_all = df_all.groupby('date_time').sum()[['num_cases']]
@@ -281,9 +311,5 @@ df_all = prepare_cases(df_all, col='num_cases', cutoff=0)
 min_time = df_all.index[0]
 FIS_KEY = 'date_time'
 
-# Export folder location
-export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'movement_plots', selected_polygons_folder_name)
-
-path_to_save = os.path.join(export_folder_location, f'mov_range_{selected_polygons_folder_name}.png')
-
-plot_cases_rt(df_all, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=None)
+path_to_save = os.path.join(export_folder_location, 'r_t.png')
+plot_cases_rt(df_all, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)

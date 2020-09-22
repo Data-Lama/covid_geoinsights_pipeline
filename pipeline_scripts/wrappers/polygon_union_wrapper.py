@@ -24,6 +24,7 @@ analysis_dir = config.get_property('analysis_dir')
 7. polygon_socio_economic_analysis
 8. movement_range_plots_script
 9. polygon_prediction_wrapper
+10. effective_reproductive_number (r_t)
 
 '''
 
@@ -163,7 +164,6 @@ parameters = "{} {} {} {} {}".format(location_folder,
 
 ef.excecute_script(analysis_scripts_location, "movement_range_and_cases_script_polygons.py", "python", parameters)
 
-
 # polygon union prediction wrapper
 
 # Is supported only if agglomeration_metthod is community
@@ -183,3 +183,14 @@ if agglomeration_method == 'community':
 else:
     print()
     print(ident + "Prediction only supported for community agglomeration. Skipping")
+
+
+# effective_reproductive_number
+print()
+print("{}Excecuting generate_effective_reproductive_number.py for {}".format(ident, selected_polygons_name))
+parameters = "{} {} {} {}".format(location_folder,  
+                                agglomeration_method,
+                                folder_name, 
+                                selected_polygons_parameter)
+                                
+ef.excecute_script(analysis_scripts_location, "generate_effective_reproductive_number.py", "python", parameters)
