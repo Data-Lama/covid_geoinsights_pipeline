@@ -219,7 +219,7 @@ for(day in start_day:end_day)
   p = p + geom_segment(data = current_edges, aes(x = lon.x, y = lat.x, xend = lon.y, yend = lat.y, alpha = movement), color = 'yellow', size = 1.5)
   p = p + geom_point(data = current_graph, aes(x = lon, y = lat, size = inner_movement, color = num_cases))
   if(add_labels){
-    p = p + geom_text(data = locations, aes(label = municipio))
+    p = p + geom_text(data = locations, aes(label = municipio), fontface = "bold", check_overlap = TRUE, nudge_x = 0.1)
   }    
   p = p + scale_color_gradient(low = "darkblue", high = "red", limits=c(cases_min, cases_max))
   p = p + scale_size(limits=c(internal_min, internal_max))
@@ -312,7 +312,7 @@ for(day in start_day:end_day)
   p = p + geom_segment(data = current_edges, aes(x = lon.x, y = lat.x, xend = lon.y, yend = lat.y, alpha = movement), color = 'yellow', size = 1.5)
   p = p + geom_point(data = current_graph, aes(x = lon, y = lat, size = inner_movement, color = num_cases))
   if(add_labels){
-    p = p + geom_text(data = locations, aes(label = municipio))
+    p = p + geom_text(data = locations, aes(label = municipio), fontface = "bold", check_overlap = TRUE, nudge_x = 0.1)
   }      
   p = p + scale_color_gradient(low = "darkblue", high = "red", limits=c(cases_min, cases_max))
   p = p + scale_size(limits=c(internal_min, internal_max))

@@ -175,7 +175,7 @@ p = p + geom_point(data = df_plot, aes(x = poly_lon, y = poly_lat, color = incid
 p = p + guides(size=FALSE, alpha = FALSE)
 p = p + scale_shape(breaks = labels)
 if(add_labels){
-    p = p + geom_text(data = df_plot, aes(label = municipio, x = poly_lon + 0.02, y = poly_lat - 0.01), inherit.aes = FALSE)
+    p = p + geom_text(data = df_plot, aes(label = municipio), inherit.aes = FALSE, fontface = "bold", check_overlap = TRUE, nudge_x = 0.1)
 }
 p = p + scale_alpha_continuous(range = c(0.4, 1))
 p = p + scale_color_gradient(low = "darkblue", high = "red")
