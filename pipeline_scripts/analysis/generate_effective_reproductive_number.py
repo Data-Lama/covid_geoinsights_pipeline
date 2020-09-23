@@ -1,16 +1,15 @@
-import pandas as pd
 from matplotlib.dates import date2num, num2date
 from matplotlib import dates as mdates
 from matplotlib import ticker
 from matplotlib.colors import ListedColormap
 from matplotlib.patches import Patch
 from matplotlib import pyplot as plt
+import pandas as pd
 import numpy as np
 import os
 from scipy import stats as sps
 from scipy.interpolate import interp1d
-
-
+from pipeline_scripts.functions.Rt_estimate import get_posteriors, highest_density_interval
 
 import sys
 
@@ -20,7 +19,7 @@ data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
 # Reads the parameters from excecution
-location_folder   =  sys.argv[1] # location name
+location_folder   =  sys.argv[1]    # location name
 agglomeration_method =  sys.argv[2] # agglomeration method
 
 if len(sys.argv) <= 3:
@@ -45,104 +44,11 @@ if selected_polygons_boolean:
     selected_polygons = [int(x) for x in selected_polygons]
     selected_polygons_folder_name = selected_polygon_name
     df_cases = df_cases[df_cases["poly_id"].isin(selected_polygons)].copy()
+
+
 else:
     selected_polygons_folder_name = "entire_location"
 
-# Export folder location
-export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'r_t', selected_polygons_folder_name)
-
-# Check if folder exists
-if not os.path.isdir(export_folder_location):
-        os.makedirs(export_folder_location)
-
-
-def get_posteriors(sr, sigma=0.15):
-
-    # We create an array for every possible value of Rt
-    R_T_MAX = 12
-    r_t_range = np.linspace(0, R_T_MAX, R_T_MAX*100+1)
-
-    # Gamma is 1/serial interval
-    # https://wwwnc.cdc.gov/eid/article/26/7/20-0282_article
-    # https://www.nejm.org/doi/full/10.1056/NEJMoa2001316
-    GAMMA = 1/5.5
-
-    # (1) Calculate Lambda
-    lam = sr[:-1].values * np.exp(GAMMA * (r_t_range[:, None] - 1))
-
-    # (2) Calculate each day's likelihood
-    likelihoods = pd.DataFrame(
-        data = sps.poisson.pmf(sr[1:].values, lam),
-        index = r_t_range,
-        columns = sr.index[1:])
-    
-    # (3) Create the Gaussian Matrix
-    process_matrix = sps.norm(loc=r_t_range,
-                              scale=sigma
-                             ).pdf(r_t_range[:, None]) 
-
-    # (3a) Normalize all rows to sum to 1
-    process_matrix /= process_matrix.sum(axis=0)
-    
-    # (4) Calculate the initial prior
-    #prior0 = sps.gamma(a=4).pdf(r_t_range)
-    prior0 = np.ones_like(r_t_range)/len(r_t_range)
-    prior0 /= prior0.sum()
-
-    # Create a DataFrame that will hold our posteriors for each day
-    # Insert our prior as the first posterior.
-    posteriors = pd.DataFrame(
-        index=r_t_range,
-        columns=sr.index,
-        data={sr.index[0]: prior0}
-    )
-    
-    # We said we'd keep track of the sum of the log of the probability
-    # of the data for maximum likelihood calculation.
-    log_likelihood = 0.0
-
-    # (5) Iteratively apply Bayes' rule
-    for previous_day, current_day in zip(sr.index[:-1], sr.index[1:]):
-
-        #(5a) Calculate the new prior
-        current_prior = process_matrix @ posteriors[previous_day]
-        
-        #(5b) Calculate the numerator of Bayes' Rule: P(k|R_t)P(R_t)
-        numerator = likelihoods[current_day] * current_prior
-        
-        #(5c) Calcluate the denominator of Bayes' Rule P(k)
-        denominator = np.sum(numerator)
-        
-        # Execute full Bayes' Rule
-        posteriors[current_day] = numerator/denominator
-        
-        # Add to the running sum of log likelihoods
-        log_likelihood += np.log(denominator)
-    
-    return posteriors, log_likelihood
-
-def highest_density_interval(pmf, p=.9, debug=False):
-    # If we pass a DataFrame, just call this recursively on the columns
-    if(isinstance(pmf, pd.DataFrame)):
-        return pd.DataFrame([highest_density_interval(pmf[col], p=p) for col in pmf],
-                            index=pmf.columns)
-    cumsum = np.cumsum(pmf.values)
-    
-    # N x N matrix of total probability mass for each low, high
-    total_p = cumsum - cumsum[:, None]
-    
-    # Return all indices with total_p > p
-    lows, highs = (total_p > p).nonzero()
-    
-    # Find the smallest range (highest density)
-    best = (highs - lows).argmin()
-    
-    low = pmf.index[lows[best]]
-    high = pmf.index[highs[best]]
-
-    return pd.Series([low, high],
-                     index=[f'Low_{p*100:.0f}',
-                            f'High_{p*100:.0f}'])
 
 def prepare_cases(daily_cases, col='Cases', cutoff=0):
     daily_cases['Smoothed_'+col] = daily_cases[col].rolling(7,
@@ -151,15 +57,16 @@ def prepare_cases(daily_cases, col='Cases', cutoff=0):
         center=True).mean(std=2).round()
 
     idx_start = np.searchsorted(daily_cases['Smoothed_'+col], cutoff)
-
     daily_cases['Smoothed_'+col] = daily_cases['Smoothed_'+col].iloc[idx_start:]
 
     return daily_cases
 
-
 def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min_time=pd.to_datetime('2020-02-26'), state=None, path_to_save=None):
     fig, ax = plt.subplots(2,1, figsize=(12.5, 10) )
 
+    cases_df = df_poly_id 
+    col_cases= 'num_cases'
+    col_cases_smoothed='Smoothed_num_cases'
 
     index           = cases_df[col_cases].index.get_level_values(FIS_KEY)
     if pop:
@@ -167,7 +74,7 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
         values_cases_sm = cases_df[col_cases_smoothed].values*100000/pop
     else: 
         values_cases    = cases_df[col_cases].values
-        values_cases_sm = cases_df[col_cases_smoothed].values
+        values_cases_sm = cases_df[col_cases_smoothed].values+1
 
     # Plot smoothed cases
     ax[0].bar(index, values_cases, color='k', alpha=0.3, zorder=1,  label= 'Cases')
@@ -195,7 +102,7 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     ax[0].spines['top'].set_visible(False)
     ax[0].spines['right'].set_visible(False)
 
-    ax[0].yaxis.set_major_locator(ticker.MultipleLocator(np.round(values_cases.max()/100+0.1)*100//5))
+    ax[0].yaxis.set_major_locator(ticker.MultipleLocator( np.round(values_cases.max()/100+0.1*100//5 ) )  )
     ax[0].yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.0f}"))
     #ax.yaxis.tick_right()
     ax[0].spines['left'].set_visible(False)
@@ -206,14 +113,14 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
 
 
     cases_df = cases_df.iloc[list(cases_df[col_cases_smoothed].cumsum()>1)]
-    posteriors, log_likelihood = get_posteriors(cases_df[col_cases_smoothed], sigma=.25)
+    posteriors, log_likelihood = get_posteriors(cases_df[col_cases_smoothed]+1, sigma=.25)
     posteriors = posteriors[posteriors.keys()[1:]]
+    posteriors_cm  = posteriors.dropna(axis=1)
+
 
     # Note that this takes a while to execute - it's not the most efficient algorithm
     hdis = highest_density_interval(posteriors, p=CI/100)
     CI = str(CI) 
-
-
     most_likely = posteriors.idxmax().rename('ML')
     result = pd.concat([most_likely, hdis], axis=1)
     result = result.reset_index().rename( columns={'date_time': 'date', 'FIS': 'date'}).set_index('date')
@@ -298,18 +205,51 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
         
     return (lowfn, highfn, result)
 
+# Export folder location
+export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'R_t', selected_polygons_folder_name)
 
+# Check if folder exists
+if not os.path.isdir(export_folder_location):
+        os.makedirs(export_folder_location)
 
+import pdb
+if selected_polygons_boolean:
+    #pdb.set_trace()
+
+    df_all = df_cases.copy()
+    for idx, poly_id in enumerate( list( df_all['poly_id'].unique()) ):
+
+        df_poly_id = df_all[df_all['poly_id'] == poly_id ].copy()
+
+        df_poly_id['date_time'] = pd.to_datetime( df_poly_id['date_time'] )
+        df_poly_id = df_poly_id.groupby('date_time').sum()[['num_cases']]
+        all_cases = df_poly_id['num_cases'].sum()
+        if all_cases > 100:
+            df_poly_id = df_poly_id.reset_index().set_index('date_time').resample('D').sum().fillna(0)
+
+            df_poly_id = prepare_cases(df_poly_id, col='num_cases', cutoff=0)
+            min_time = df_poly_id.index[0]
+            FIS_KEY = 'date_time'
+            path_to_save = os.path.join(export_folder_location, str(poly_id)+'_Rt.png')
+            #pdb.set_trace()
+            plot_cases_rt(df_poly_id, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+        
+        else:
+            print('\n Warning: for poly_id {} Rt was not computed...'.format(poly_id))
+            print('poly_id: {} has only {} cases must be greater than 100\n'.format(poly_id, all_cases))
+    
 df_all = df_cases.copy()
 df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
-
 df_all = df_all.groupby('date_time').sum()[['num_cases']]
+if all_cases > 100:
 
-df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
+    df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
 
-df_all = prepare_cases(df_all, col='num_cases', cutoff=0)
-min_time = df_all.index[0]
-FIS_KEY = 'date_time'
+    df_all = prepare_cases(df_all, col='num_cases', cutoff=0)
+    min_time = df_all.index[0]
+    FIS_KEY = 'date_time'
 
-path_to_save = os.path.join(export_folder_location, 'r_t.png')
-plot_cases_rt(df_all, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+    path_to_save = os.path.join(export_folder_location, 'aggregated_Rt.png')
+    plot_cases_rt(df_all, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+else:
+    print('Warning: for poly_id {} Rt was not computed...'.format(poly_id))

@@ -4,6 +4,10 @@ global_config/config_file.csv
 # Rplots
 Rplots.pdf
 
+# All pdf's
+*.pdf
+
+
 
 #Excel locks
 .~lock*
@@ -64,4 +68,4 @@ docs/_build/
 .DS_Store
 
 # ENVS
-./env/*
+env/*

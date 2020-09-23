@@ -2,7 +2,6 @@
 
 # Other imports
 import os, sys
-
 from pathlib import Path
 
 import pandas as pd
