@@ -215,7 +215,6 @@ if not os.path.isdir(export_folder_location):
 import pdb
 if selected_polygons_boolean:
     #pdb.set_trace()
-
     df_all = df_cases.copy()
     for idx, poly_id in enumerate( list( df_all['poly_id'].unique()) ):
 
@@ -232,15 +231,18 @@ if selected_polygons_boolean:
             FIS_KEY = 'date_time'
             path_to_save = os.path.join(export_folder_location, str(poly_id)+'_Rt.png')
             #pdb.set_trace()
-            plot_cases_rt(df_poly_id, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
-        
+            (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+            result.to_csv(os.path.join(export_folder_location, str(poly_id)+'_Rt.csv'))
         else:
+
             print('\n Warning: for poly_id {} Rt was not computed...'.format(poly_id))
             print('poly_id: {} has only {} cases must be greater than 100\n'.format(poly_id, all_cases))
-    
+
 df_all = df_cases.copy()
 df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
 df_all = df_all.groupby('date_time').sum()[['num_cases']]
+all_cases = df_all['num_cases'].sum()
+
 if all_cases > 100:
 
     df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
@@ -250,6 +252,8 @@ if all_cases > 100:
     FIS_KEY = 'date_time'
 
     path_to_save = os.path.join(export_folder_location, 'aggregated_Rt.png')
-    plot_cases_rt(df_all, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+    (_, _, result) = plot_cases_rt(df_all, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+    result.to_csv(os.path.join(export_folder_location,'aggregated_Rt.csv'))
+
 else:
     print('Warning: for poly_id {} Rt was not computed...'.format(poly_id))
