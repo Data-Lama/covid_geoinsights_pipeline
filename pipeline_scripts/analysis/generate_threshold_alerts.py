@@ -45,6 +45,9 @@ NUM_CASES_THRESHOLD_YELLOW = 0.5 #2  # This should be set to the desired slope o
 NATIONAL_IPM = 19.6
 NATIONAL_OLDAGE = 12
 NATIONAL_SUBSIDIZED = 53
+RED_RT = 1.5
+YELLOW_RT = 1
+
 
 DONE = False
 
@@ -60,11 +63,13 @@ TRANSLATE = {'internal_alert':'Alerta interna',
 # Colors for map
 COLORS = {'ROJO':'#b30000',
 'AMARILLO':'#ffcc00',
-'VERDE':'#006600'}
+'VERDE':'#006600',
+'N/A': '#d4d4d4'}
 
 COLORS_ = {'#b30000':'ROJO',
 '#ffcc00':'AMARILLO',
-'#006600':'VERDE'}
+'#006600':'VERDE',
+'#d4d4d4':'N/A'}
 
 # Get name of files
 agglomerated_file_path = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', location_folder)
@@ -72,6 +77,22 @@ output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'a
 cases = os.path.join(agglomerated_file_path, 'cases.csv')
 movement = os.path.join(agglomerated_file_path, 'movement.csv')
 socioecon = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'socio_economic', 'estadisticas_por_municipio.csv')
+rt = os.path.join(analysis_dir, location_name, location_folder, "r_t")
+
+# Load r_t
+files = os.listdir(rt)
+r_t_files = []
+# 54874_Rt
+for i in files:
+    if i[-4:] == ".csv":
+       r_t_files.append(i) 
+
+df_rt = pd.DataFrame(columns=["date_time", "poly_id", "rt"])
+
+for i in r_t_files:
+    df_rt = df_rt.concat(pd.read_csv(i, parse_dates=['date_time']))
+
+print(df_rt.head())
 
 # If polygon_union_wrapper
 if selected_polygons_boolean:
@@ -199,10 +220,10 @@ def  calculate_alerts_record(df_stats, df_movement_recent):
 def calculate_threshold_min_date():
     return NotImplemented
 
-def get_max_alert(alert_1, alert_2, alert_3, alert_4, alert_5):
-    if (alert_1 == 'ROJO') or (alert_2 == 'ROJO') or (alert_3 == 'ROJO') or (alert_4 == 'ROJO') or (alert_5 == 'ROJO'):
+def get_max_alert(alerts):
+    if "ROJO" in alerts:
         return 'ROJO'
-    if (alert_1 == 'AMARILLO') or (alert_2 == 'AMARILLO') or (alert_3 == 'AMARILLO') or (alert_4 == 'AMARILLO') or (alert_5 == 'AMARILLO'):
+    if "AMARILLO" in alerts:
         return 'AMARILLO'
     else: return 'VERDE'
 
@@ -226,6 +247,13 @@ def set_vulnerability_color(vul_alert):
         return "ROJO"
     else: return "VERDE"
 
+def set_rt_alert_color(rt):
+    if rt >= RED_RT:
+        return "ROJO"
+    if rt >= YELLOW_RT:
+        return "YELLOW"
+    else: return "GREEN"
+
 # ---------------------------------------- #
 # ---------- calculate alerts ------------ #
 # ---------------------------------------- #
@@ -246,24 +274,36 @@ new_cases = gf.new_cases(df_cases, WINDOW_SIZE)
 df_alerts['alert_first_case'] = df_alerts.apply(lambda x: set_cases_alert_firstcase(new_cases, x.poly_id), axis=1)
 df_alerts.drop(columns=["points_inner_movement", "points_external_movement"], inplace=True)
 
+# RT alerts
+df_rt = df_rt[df_rt["date_time"] > first_day]
+df_rt = df_rt.groupby(["poly_id"])["rt"].mean().to_frame()
+df_rt["rt_alert"] = df_rt.apply(lambda x: set_rt_alert_color(x.rt), axis=1)
+
 # Merge 
 df_alerts = df_alerts.merge(df_alerts_cases, on="poly_id", how="outer").fillna("VERDE")
-df_alerts['max_alert'] = df_alerts.apply(lambda x: get_max_alert(x.internal_alert, x.external_alert, x.alert_first_case, 
-                                                                    x.alert_internal_num_cases, x.alert_external_num_cases), axis=1)
+df_alerts = df_alerts.merge(df_rt, on="poly_id", how="outer").fillna("N/A")
+df_alerts['max_alert'] = df_alerts.apply(lambda x: get_max_alert([x.internal_alert, x.external_alert, x.alert_first_case, 
+                                                                    x.alert_internal_num_cases, x.alert_external_num_cases, x.rt_alert]), axis=1)
 
 df_alerts = df_alerts.merge(df_community.drop(columns=["community_id"], axis=1), on='poly_id', how='outer')
 df_alerts[['Municipio', 'Departamento']] = df_alerts.poly_name.str.split('-',expand=True) 
 df_alerts = df_alerts.fillna("VERDE")
 
-# set_colors
-df_alerts['max_alert_color'] = df_alerts.apply(lambda x: set_color(x.max_alert), axis=1)
-df_alerts['external_alert_color'] = df_alerts.apply(lambda x: set_color(x.external_alert), axis=1)
-df_alerts['internal_alert_color'] = df_alerts.apply(lambda x: set_color(x.internal_alert), axis=1)
-df_alerts['external_num_cases_alert_color'] = df_alerts.apply(lambda x: set_color(x.alert_external_num_cases), axis=1)
-df_alerts['internal_num_cases_alert_color'] = df_alerts.apply(lambda x: set_color(x.alert_internal_num_cases), axis=1)
-df_alerts['first_case_color_alert'] = df_alerts.apply(lambda x: set_color(x.alert_first_case), axis=1)
 df_alerts['vulnerability_alert'] = df_alerts.apply(lambda x: get_vulnerability_alert(x.poly_id), axis=1)
-df_alerts['vulnerability_alert_color'] = df_alerts.apply(lambda x: set_vulnerability_color(x.vulnerability_alert), axis=1)
+
+# set_colors
+alert_list = ['max_alert', 'external_alert'. 'internal_alert', 'alert_external_num_cases', \
+    'alert_internal_num_cases', 'alert_first_case', 'vulnerability_alert', 'rt_alert']
+for i in alert_list:
+    df_alerts[f"{i}_color"] = df_alerts.apply(lambda x: set_color(x[i]), axis=1)
+
+# df_alerts['max_alert_color'] = df_alerts.apply(lambda x: set_color(x.max_alert), axis=1)
+# df_alerts['external_alert_color'] = df_alerts.apply(lambda x: set_color(x.external_alert), axis=1)
+# df_alerts['internal_alert_color'] = df_alerts.apply(lambda x: set_color(x.internal_alert), axis=1)
+# df_alerts['external_num_cases_alert_color'] = df_alerts.apply(lambda x: set_color(x.alert_external_num_cases), axis=1)
+# df_alerts['internal_num_cases_alert_color'] = df_alerts.apply(lambda x: set_color(x.alert_internal_num_cases), axis=1)
+# df_alerts['first_case_color_alert'] = df_alerts.apply(lambda x: set_color(x.alert_first_case), axis=1)
+# df_alerts['vulnerability_alert_color'] = df_alerts.apply(lambda x: set_vulnerability_color(x.vulnerability_alert), axis=1)
 
 # If asked for specific polygons, get subset
 if selected_polygons_boolean:
@@ -293,13 +333,14 @@ if not DONE:
     red_alerts.rename(columns={'internal_alert': 'Alerta interna (movimiento)', 'community_name':'Unidad funcional',
     'external_alert':'Alerta externa (movimiento)', 'alert_first_case':'Alerta de primer caso detectado', 
     "alert_external_num_cases":"Alerta numero de casos en municipios vecinos", "alert_internal_num_cases":"Alerta numero de casos",
-    "vulnerability_alert":"Alerta de vulnerabilidad"}, inplace=True)
+    "vulnerability_alert":"Alerta de vulnerabilidad", "rt_alert":"Alerta por RT"}, inplace=True)
     red_alerts.to_csv(os.path.join(output_file_path, 'alerts.csv'), columns=['Departamento', 'Municipio', 'Unidad funcional',                                           
                                             'Alerta interna (movimiento)',
                                             'Alerta numero de casos',
                                             'Alerta de primer caso detectado',
                                             'Alerta externa (movimiento)', 
                                             'Alerta numero de casos en municipios vecinos',
+                                            'Alerta por RT',
                                             'vulnerability_alert_color',
                                             'Alerta de vulnerabilidad'], index=False, float_format='%.3f', sep=",")
 
