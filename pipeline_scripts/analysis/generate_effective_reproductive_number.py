@@ -64,9 +64,6 @@ def prepare_cases(daily_cases, col='Cases', cutoff=0):
 def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min_time=pd.to_datetime('2020-02-26'), state=None, path_to_save=None):
     fig, ax = plt.subplots(2,1, figsize=(12.5, 10) )
 
-    cases_df = df_poly_id 
-    col_cases= 'num_cases'
-    col_cases_smoothed='Smoothed_num_cases'
 
     index           = cases_df[col_cases].index.get_level_values(FIS_KEY)
     if pop:
@@ -195,7 +192,7 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     ax[1].spines['right'].set_visible(False)
     ax[1].margins(0)
     ax[1].grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
-    ax[1].set_ylabel(r'R_eff', size=15)
+    ax[1].set_ylabel(r'Rt', size=15)
     ax[0].set_title(state, size=15)
     # plt.show()
 

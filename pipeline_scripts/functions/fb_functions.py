@@ -17,18 +17,19 @@ from sklearn.metrics import pairwise_distances
 from datetime import timedelta, datetime
 import ot
 
-
 import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException 
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.firefox.options import Options
 
 import geo_functions as geo
 
 
 #Directories
 from global_config import config
-data_dir = config.get_property('data_dir')
+data_dir     = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
 # Facebook user and password
@@ -39,18 +40,27 @@ data_stages_location = os.path.join(data_dir, 'data_stages')
 
 
 def get_driver(download_dir):
-	'''
-	Gets the dirver with the automatic download options to the received directory
-	'''
+    '''
+    Gets the dirver with the automatic download options to the received directory
+    '''
 
-	fp = webdriver.FirefoxProfile()
-	fp.set_preference("browser.download.folderList", 2)
-	fp.set_preference("browser.download.manager.showWhenStarting", False)
-	fp.set_preference("browser.download.dir", download_dir)
-	fp.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv")
-	driver = webdriver.Firefox(firefox_profile=fp)
+    fp = webdriver.FirefoxProfile()
+    fp.set_preference("browser.download.folderList", 2)
+    fp.set_preference("browser.download.manager.showWhenStarting", False)
+    fp.set_preference("browser.download.dir", download_dir)
+    fp.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv")
+    cap = DesiredCapabilities().FIREFOX
+    cap["marionette"] = True
+    binary = '/opt/conda/bin/FirefoxApp/firefox' 
+    
+    options = Options()
+    options.set_headless(headless=True)
+    options.binary = binary
+    
+    driver = webdriver.Firefox(firefox_options=options, capabilities=cap, firefox_profile=fp)
 
-	return(driver)
+
+    return(driver)
 
 
 def login_driver(driver):
