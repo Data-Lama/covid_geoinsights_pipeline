@@ -19,7 +19,6 @@ except FileNotFoundError:
     raise ValueError('The configuration file: "config_file.csv", was not found insise the directory: "global_config/". Please add it')
 
 
-
 def get_property(name):
 
     try:

@@ -203,7 +203,7 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     return (lowfn, highfn, result)
 
 # Export folder location
-export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'R_t', selected_polygons_folder_name)
+export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'r_t', selected_polygons_folder_name)
 
 # Check if folder exists
 if not os.path.isdir(export_folder_location):

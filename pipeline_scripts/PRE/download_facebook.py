@@ -1,11 +1,6 @@
 # Script that doelioads the facebook movement data and moves it to the corresponding folders
-
-
 # Imports all the necesary functions
 import fb_functions as fb
-
-
-
 # Other imports
 import os, sys
 from datetime import datetime, timedelta
@@ -13,7 +8,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import time
-
 import shutil
 
 #Directories
@@ -131,9 +125,6 @@ else:
 	driver.close()
 
 
-
-
-
 # Removes Temporal Folder
 
 print()
@@ -158,10 +149,6 @@ for ind, row in selected_locations_all.iterrows():
 		continue
 
 	w, m = fb.check_movement_integrity(row.location_folder, row.fb_location_name, row.type_data, row.start_date, end_date)
-
-
-
-	
 
 	# Missing
 	print(ident + '      Missing: {}'.format(len(m)))
