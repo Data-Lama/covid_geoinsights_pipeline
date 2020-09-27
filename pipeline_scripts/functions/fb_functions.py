@@ -40,27 +40,42 @@ data_stages_location = os.path.join(data_dir, 'data_stages')
 
 
 def get_driver(download_dir):
-    '''
-    Gets the dirver with the automatic download options to the received directory
-    '''
-
-    fp = webdriver.FirefoxProfile()
-    fp.set_preference("browser.download.folderList", 2)
-    fp.set_preference("browser.download.manager.showWhenStarting", False)
-    fp.set_preference("browser.download.dir", download_dir)
-    fp.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv")
-    cap = DesiredCapabilities().FIREFOX
-    cap["marionette"] = True
-    binary = '/opt/conda/bin/FirefoxApp/firefox' 
-    
-    options = Options()
-    options.set_headless(headless=True)
-    options.binary = binary
-    
-    driver = webdriver.Firefox(firefox_options=options, capabilities=cap, firefox_profile=fp)
+	'''
+	Gets the dirver with the automatic download options to the received directory
+	'''
 
 
-    return(driver)
+	desktop = False
+
+	if desktop:
+
+		fp = webdriver.FirefoxProfile()
+		fp.set_preference("browser.download.folderList", 2)
+		fp.set_preference("browser.download.manager.showWhenStarting", False)
+		fp.set_preference("browser.download.dir", download_dir)
+		fp.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv")
+		driver = webdriver.Firefox(firefox_profile=fp)
+
+	else:
+
+		fp = webdriver.FirefoxProfile()
+		fp.set_preference("browser.download.folderList", 2)
+		fp.set_preference("browser.download.manager.showWhenStarting", False)
+		fp.set_preference("browser.download.dir", download_dir)
+		fp.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv")
+
+		cap = DesiredCapabilities().FIREFOX
+		cap["marionette"] = True
+		binary = '/opt/conda/bin/FirefoxApp/firefox' 
+
+		options = Options()
+		options.set_headless(headless=True)
+		options.binary = binary
+
+		driver = webdriver.Firefox(firefox_options=options, capabilities=cap, firefox_profile=fp)
+
+
+	return(driver)
 
 
 def login_driver(driver):
@@ -100,7 +115,7 @@ def login_driver(driver):
 
 
 
-def download_fb_file(driver, type_data, dataset_id, date, extra_param = None, timeout = 15):
+def download_fb_file(driver, type_data, dataset_id, date, extra_param = None, timeout = 45):
 	'''
 	Downloads the given date for the dataset
 	'''
