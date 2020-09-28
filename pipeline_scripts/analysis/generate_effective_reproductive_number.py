@@ -108,15 +108,21 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     ax[0].spines['top'].set_visible(False)
     ax[0].spines['right'].set_visible(False)    
 
-    #max_cases_tick = values_cases.max()
-    #if 0<max_cases_tick<=10:
-    #    tick_loc = 2
-    #elif 10<max_cases_tick<=50:
-    #    tick_loc = 10
-    #elif 50<max_cases_tick<=200:
-    #    tick_loc = 30        
-    #elif 200<max_cases_tick<=1000:
-    #    tick_loc = 150 
+    max_cases_tick = values_cases.max()
+    if 0<max_cases_tick<=10:
+        tick_loc = 2
+    elif 10<max_cases_tick<=50:
+        tick_loc = 10
+    elif 50<max_cases_tick<=200:
+        tick_loc = 30        
+    elif 200<max_cases_tick<=1000:
+        tick_loc = 150 
+    elif 1000<max_cases_tick<=5000:
+        tick_loc = 1000 
+    elif 5000<max_cases_tick<=15000:
+        tick_loc = 3000 
+    elif 15000<max_cases_tick<=30000:
+        tick_loc = 5000 
 
     #else:    
     #    tick_loc = np.round( max_cases_tick/100+0.1*100//5 )  
