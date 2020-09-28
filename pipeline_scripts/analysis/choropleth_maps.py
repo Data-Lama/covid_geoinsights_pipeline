@@ -49,9 +49,9 @@ RIVERS_DICT = {'sinu':'RÍO SINÚ',
 RIVERS = ['RÍO SINÚ','RÍO MAGDALENA','RÍO CAUCA','RÍO META','RÌO AMAZONAS']
 
 scheme = "user_defined"
-bins = {'bins':[0, 0.49, 1, 2, 5, 10, 50]} 
+bins = {'bins':[0, 0.49, 1, 2, 5, 10, 50], 'bins_rt':[0, 0.5, 0.8, 1, 1.5, 2, 5]} 
 colors = [(1, 0.96, 0.94), (0.99, 0.83, 0.76), (0.98, 0.62, 0.51), (0.98, 0.41, 0.29), (0.89, 0.18, 0.15), (0.69, 0.07, 0.09), (0.37, 0.04, 0.1)] 
-
+colors_rt = [(0.98, 0.99, 0.78), (0.86, 0.94, 0.65), (0.66, 0.85, 0.55), (0.42, 0.75, 0.45), (0.11, 0.49, 0.25), (0, 0.41, 0.21), (0, 0.28, 0.16)] 
 
 # Get name of files
 movement = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', location_folder, 'movement.csv')
@@ -59,6 +59,32 @@ community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomera
 shape_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'geo', 'Municpios_Dane_2017.shp')
 river_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'geo', 'river_lines', 'River_lines.shp')
 output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window')
+
+if selected_polygons_boolean:
+    rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", selected_polygon_name)
+else:
+    rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", "entire_location")
+
+# Load r_t
+files = os.listdir(rt)
+r_t_files = []
+
+for i in files:
+    if i[-4:] == ".csv":
+       r_t_files.append(i) 
+
+df_rt = pd.DataFrame(columns=["date_time", "poly_id", "ML", "Low_50", "High_50"])
+
+for i in r_t_files:
+    poly_id = i[:-7]
+    try:
+        poly_id = int(poly_id)
+    except ValueError:
+        continue
+    df_tmp = pd.read_csv(os.path.join(rt, i), parse_dates=['date'])
+    df_tmp.rename(columns={"date": "date_time"}, inplace=True)
+    df_tmp["poly_id"] = poly_id
+    df_rt = pd.concat([df_rt, df_tmp])
 
 # Import shapefile
 geo_df = gpd.read_file(shape_file_path)
@@ -80,6 +106,10 @@ day_t3 = pd.Timestamp('today') - datetime.timedelta(days = WINDOW_SIZE)
 day_t2 = day_t3 - datetime.timedelta(days = WINDOW_SIZE)
 day_t0 = pd.Timestamp(datetime.datetime.strptime("2020-04-02", '%Y-%m-%d'))
 day_t1 = day_t0 + datetime.timedelta(days = WINDOW_SIZE)
+
+# RT alerts
+df_rt = df_rt[df_rt["date_time"] >= day_t3]
+df_rt = df_rt.groupby("poly_id").mean()
 
 # returns name of river node intersects or nan
 def is_polygon_on_river(node_id, buffer=False):
@@ -199,9 +229,39 @@ if selected_polygons_boolean:
               os.makedirs(output_file_path)
 else :
      output_file_path = os.path.join(output_file_path, "entire_location") 
-print(ident+'   Building recent map (15 day window)')
 
-# Get choropleth map 15-day window 
+print(ident+"   Building choropleth map for last week's RT")
+# Plot rt_choroplet
+gdf_rt = geo_df.merge(df_rt, left_on='Codigo_Dan', right_on="poly_id") 
+gdf_rt.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
+gdf_rt.to_crs(epsg=3857, inplace=True)
+gdf_rt["color"], gdf_rt["label"] = zip(*gdf_rt.apply(lambda x: set_color(x.ML, bins["bins_rt"], colors_rt), axis=1))
+ax = gdf_rt.fillna(0).plot(figsize=(30,18), color=gdf_rt['color'], label=gdf_rt['label'] \
+       , linewidth=0.5, edgecolor=edgecolor)
+# ax = gdf_rt.fillna(0).plot(figsize=(30,18), column="ML", cmap='YlGn', scheme='quantiles', alpha=0.7, linewidth=0.5, edgecolor=edgecolor, legend=True)
+ax.set_axis_off()
+
+if selected_polygons_boolean:
+       gdf_rt["label"] = gdf_rt.apply(lambda x: x.geometry.representative_point(), axis=1)
+       gdf_rt["label_x"] = gdf_rt.apply(lambda p: p.label.x, axis=1)
+       gdf_rt["label_y"] = gdf_rt.apply(lambda p: p.label.y, axis=1)
+       for x, y, label in zip(gdf_rt.label_x, gdf_rt.label_y, gdf_rt.Municipio):
+              ax.annotate(label, xy=(x, y), xytext=(3, 3), textcoords="offset points", fontsize=10)
+
+ctx.add_basemap(ax, source=ctx.providers.CartoDB.VoyagerNoLabels)
+rivers_df.to_crs(epsg=3857, inplace=True)
+rivers_df.plot(ax=ax, alpha=0.1)
+# Here we create a legend: The convoluted way
+legend = construct_legend(bins["bins_rt"])
+for i in range(len(legend)):
+    plt.scatter([], [], color=colors_rt[i], label=str(legend[i]))
+plt.legend(scatterpoints=1, frameon=False, labelspacing=1, title='RT')
+plt.title('Promedio de RT para la Última Semana')
+plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_rt.png'.format(location_name)), bbox_inches="tight")
+
+
+print(ident+'   Building recent map (15 day window)')
+# Get choropleth map 15-day window
 choropleth_map_recent = geo_df.merge(df_deltas_recent, left_on='Codigo_Dan', right_on='poly_id')
 choropleth_map_recent.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
 choropleth_map_recent.replace([np.inf, -np.inf], np.nan, inplace=True)

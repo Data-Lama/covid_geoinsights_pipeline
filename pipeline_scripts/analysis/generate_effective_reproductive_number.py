@@ -7,11 +7,16 @@ from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
 import os
+import pdb
+import json
 from scipy import stats as sps
 from scipy.interpolate import interp1d
 from pipeline_scripts.functions.Rt_estimate import get_posteriors, highest_density_interval
 
 import sys
+
+# Constants
+indent = "\t"
 
 # Direcotries
 from global_config import config
@@ -40,14 +45,16 @@ agglomerated_folder_location = os.path.join(data_dir, 'data_stages', location_fo
 df_cases = pd.read_csv(agglomerated_folder_location)
 
 if selected_polygons_boolean:
+    print(indent + f"Calculating rt for {len(selected_polygons)} polygons in {selected_polygon_name}")
     # Set polygons to int
     selected_polygons = [int(x) for x in selected_polygons]
     selected_polygons_folder_name = selected_polygon_name
     df_cases = df_cases[df_cases["poly_id"].isin(selected_polygons)].copy()
 
-
 else:
+    print(indent + f"Calculating rt for {location_folder} entire location.")
     selected_polygons_folder_name = "entire_location"
+    selected_polygons_boolean = True
 
 
 def prepare_cases(daily_cases, col='Cases', cutoff=0):
@@ -65,7 +72,7 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     fig, ax = plt.subplots(2,1, figsize=(12.5, 10) )
 
 
-    index           = cases_df[col_cases].index.get_level_values(FIS_KEY)
+    index = cases_df[col_cases].index.get_level_values(FIS_KEY)
     if pop:
         values_cases    = cases_df[col_cases].values*100000/pop
         values_cases_sm = cases_df[col_cases_smoothed].values*100000/pop
@@ -209,12 +216,15 @@ export_folder_location = os.path.join(analysis_dir, location_folder, agglomerati
 if not os.path.isdir(export_folder_location):
         os.makedirs(export_folder_location)
 
-import pdb
+skipped_polygons = []
+computed_polygons = []
 if selected_polygons_boolean:
     #pdb.set_trace()
     df_all = df_cases.copy()
+    print(indent + indent + f"Calculating individual polygon rt.")
     for idx, poly_id in enumerate( list( df_all['poly_id'].unique()) ):
-
+        print(indent + indent + indent + f" {poly_id}.")
+        computed_polygons.append(poly_id)
         df_poly_id = df_all[df_all['poly_id'] == poly_id ].copy()
 
         df_poly_id['date_time'] = pd.to_datetime( df_poly_id['date_time'] )
@@ -231,17 +241,17 @@ if selected_polygons_boolean:
             (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
             result.to_csv(os.path.join(export_folder_location, str(poly_id)+'_Rt.csv'))
         else:
-
-            print('\n Warning: for poly_id {} Rt was not computed...'.format(poly_id))
-            print('poly_id: {} has only {} cases must be greater than 100\n'.format(poly_id, all_cases))
+            skipped_polygons.append(poly_id)
+            print('\nWARNING: for poly_id {} Rt was not computed...'.format(poly_id))
+            print('\tpoly_id: {} has only {} cases must be greater than 100\n'.format(poly_id, all_cases))
 
 df_all = df_cases.copy()
 df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
 df_all = df_all.groupby('date_time').sum()[['num_cases']]
 all_cases = df_all['num_cases'].sum()
 
+print(indent + indent + f"Calculating aggregated rt.")
 if all_cases > 100:
-
     df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
 
     df_all = prepare_cases(df_all, col='num_cases', cutoff=0)
@@ -253,4 +263,9 @@ if all_cases > 100:
     result.to_csv(os.path.join(export_folder_location,'aggregated_Rt.csv'))
 
 else:
-    print('Warning: for poly_id {} Rt was not computed...'.format(poly_id))
+    print('WARNING: for poly_id {} Rt was not computed...'.format(poly_id))
+
+print(indent + indent + f"Writting computation stats for rt.")
+with open(os.path.join(export_folder_location,'rt_computation_stats.txt'), "w") as fp:
+    fp.write(f"computed polygons: {computed_polygons}\n")
+    fp.write(f"skipped polygons: {skipped_polygons}\n")

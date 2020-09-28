@@ -45,8 +45,8 @@ NUM_CASES_THRESHOLD_YELLOW = 0.5 #2  # This should be set to the desired slope o
 NATIONAL_IPM = 19.6
 NATIONAL_OLDAGE = 12
 NATIONAL_SUBSIDIZED = 53
-RED_RT = 1.5
-YELLOW_RT = 1
+RED_RT = 1
+YELLOW_RT = 0.8
 
 
 DONE = False
@@ -57,7 +57,8 @@ TRANSLATE = {'internal_alert':'Alerta interna',
             'external_alert': 'Alerta externa',
             'node_name':'Municipio',
             'community_name': 'Unidad funcional',
-            'max_alert': 'Alertas generales'}
+            'max_alert': 'Alertas generales',
+            'rt_alert': 'Alertas por RT'}
 
 
 # Colors for map
@@ -77,22 +78,32 @@ output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'a
 cases = os.path.join(agglomerated_file_path, 'cases.csv')
 movement = os.path.join(agglomerated_file_path, 'movement.csv')
 socioecon = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'socio_economic', 'estadisticas_por_municipio.csv')
-rt = os.path.join(analysis_dir, location_name, location_folder, "r_t")
+
+if selected_polygons_boolean:
+    rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", selected_polygon_name)
+else:
+    rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", "entire_location")
 
 # Load r_t
 files = os.listdir(rt)
 r_t_files = []
-# 54874_Rt
+
 for i in files:
     if i[-4:] == ".csv":
        r_t_files.append(i) 
 
-df_rt = pd.DataFrame(columns=["date_time", "poly_id", "rt"])
+df_rt = pd.DataFrame(columns=["date_time", "poly_id", "ML", "Low_50", "High_50"])
 
 for i in r_t_files:
-    df_rt = df_rt.concat(pd.read_csv(i, parse_dates=['date_time']))
-
-print(df_rt.head())
+    poly_id = i[:-7]
+    try:
+        poly_id = int(poly_id)
+    except ValueError:
+        continue
+    df_tmp = pd.read_csv(os.path.join(rt, i), parse_dates=['date'])
+    df_tmp.rename(columns={"date": "date_time"}, inplace=True)
+    df_tmp["poly_id"] = poly_id
+    df_rt = pd.concat([df_rt, df_tmp])
 
 # If polygon_union_wrapper
 if selected_polygons_boolean:
@@ -251,8 +262,8 @@ def set_rt_alert_color(rt):
     if rt >= RED_RT:
         return "ROJO"
     if rt >= YELLOW_RT:
-        return "YELLOW"
-    else: return "GREEN"
+        return "AMARILLO"
+    else: return "VERDE"
 
 # ---------------------------------------- #
 # ---------- calculate alerts ------------ #
@@ -275,13 +286,13 @@ df_alerts['alert_first_case'] = df_alerts.apply(lambda x: set_cases_alert_firstc
 df_alerts.drop(columns=["points_inner_movement", "points_external_movement"], inplace=True)
 
 # RT alerts
-df_rt = df_rt[df_rt["date_time"] > first_day]
-df_rt = df_rt.groupby(["poly_id"])["rt"].mean().to_frame()
-df_rt["rt_alert"] = df_rt.apply(lambda x: set_rt_alert_color(x.rt), axis=1)
+df_rt = df_rt[df_rt["date_time"] >= first_day]
+df_rt_alert = df_rt.groupby("poly_id").mean()
+df_rt_alert["rt_alert"] = df_rt_alert.apply(lambda x: set_rt_alert_color(x.ML), axis=1)
 
 # Merge 
 df_alerts = df_alerts.merge(df_alerts_cases, on="poly_id", how="outer").fillna("VERDE")
-df_alerts = df_alerts.merge(df_rt, on="poly_id", how="outer").fillna("N/A")
+df_alerts = df_alerts.merge(df_rt_alert, on="poly_id", how="outer").fillna("N/A")
 df_alerts['max_alert'] = df_alerts.apply(lambda x: get_max_alert([x.internal_alert, x.external_alert, x.alert_first_case, 
                                                                     x.alert_internal_num_cases, x.alert_external_num_cases, x.rt_alert]), axis=1)
 
@@ -292,8 +303,8 @@ df_alerts = df_alerts.fillna("VERDE")
 df_alerts['vulnerability_alert'] = df_alerts.apply(lambda x: get_vulnerability_alert(x.poly_id), axis=1)
 
 # set_colors
-alert_list = ['max_alert', 'external_alert'. 'internal_alert', 'alert_external_num_cases', \
-    'alert_internal_num_cases', 'alert_first_case', 'vulnerability_alert', 'rt_alert']
+alert_list = ['max_alert', 'external_alert', 'internal_alert', 'alert_external_num_cases', \
+'alert_internal_num_cases', 'alert_first_case', 'rt_alert']
 for i in alert_list:
     df_alerts[f"{i}_color"] = df_alerts.apply(lambda x: set_color(x[i]), axis=1)
 
@@ -303,7 +314,7 @@ for i in alert_list:
 # df_alerts['external_num_cases_alert_color'] = df_alerts.apply(lambda x: set_color(x.alert_external_num_cases), axis=1)
 # df_alerts['internal_num_cases_alert_color'] = df_alerts.apply(lambda x: set_color(x.alert_internal_num_cases), axis=1)
 # df_alerts['first_case_color_alert'] = df_alerts.apply(lambda x: set_color(x.alert_first_case), axis=1)
-# df_alerts['vulnerability_alert_color'] = df_alerts.apply(lambda x: set_vulnerability_color(x.vulnerability_alert), axis=1)
+df_alerts['vulnerability_alert_color'] = df_alerts.apply(lambda x: set_vulnerability_color(x.vulnerability_alert), axis=1)
 
 # If asked for specific polygons, get subset
 if selected_polygons_boolean:
@@ -353,7 +364,7 @@ if not DONE:
 
 
     # Draw maps
-    for i in ['internal_alert', 'external_alert', 'max_alert']:
+    for i in ['internal_alert', 'external_alert', 'max_alert', 'rt_alert']:
 
         print(ident + '     Drawing {}_map'.format(i))
         color_key = i+"_color"
