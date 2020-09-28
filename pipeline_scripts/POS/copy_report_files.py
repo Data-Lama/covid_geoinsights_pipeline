@@ -109,7 +109,7 @@ for ind, row in df_files.iterrows():
 		if number >= 0:
 			source = start + str(min_num + number) + end
 		else:
-			source = start + str(max_num + number) + end
+			source = start + str(max_num + number + 1) + end
 
 		# Inserts into array
 		sources = [source]

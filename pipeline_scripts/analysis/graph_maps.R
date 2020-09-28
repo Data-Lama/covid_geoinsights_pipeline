@@ -6,7 +6,7 @@ options(warn=-1)
 suppressMessages(library('ggplot2'))
 suppressMessages(library('ggmap'))
 suppressMessages(library("dplyr"))
-
+suppressMessages(library('ggrepel'))
 
 source('pipeline_scripts/functions/constants.R')
 
@@ -44,6 +44,7 @@ if(is.na(selected_polygons_name))
 selected_polygons_name = "entire_location"
 selected_polygons = c()
 map_type = "terrain"
+zoom = 6
 
 }else{
 
@@ -51,6 +52,7 @@ selected_polygons = args[5:length(args)]
 add_labels = TRUE
 selected_polygons = unique(selected_polygons)
 map_type = "terrain-background"
+zoom = 10
 if(length(selected_polygons) == 0)
 {
   stop("If a selected polygons name is given, then at least one polygon id must be given")
@@ -65,6 +67,7 @@ if(length(selected_polygons) == 0)
 width = 8
 height = 8
 perc_margin = 0.08
+dpi = 900
 
 window = 14
 
@@ -168,8 +171,8 @@ right = right + margin
 
 
 cat(paste(ident, '   Downloading Map', '\n', sep = ""))
-map = suppressMessages(get_stamenmap(c(left = left, bottom = bottom, right = right, top = top), maptype = map_type, color = 'bw'))
-# map = suppressMessages(get_map(c(left = left, bottom = bottom, right = right, top = top), maptype = "satellite", color = 'bw'))
+#map = get_stamenmap(c(left = left, bottom = bottom, right = right, top = top), maptype = map_type, color = 'bw', zoom = zoom)
+map = suppressMessages(get_stamenmap(c(left = left, bottom = bottom, right = right, top = top), maptype = map_type, color = 'bw', zoom = zoom))
 
 
 start_day =  min(nodes$day)
@@ -186,7 +189,7 @@ window_nodes_on_day = c()
 window_edges_on_day = c()
 
 # First for non cumulative scenarios (only cases of the day)
-for(day in start_day:end_day)
+for(day in c(start_day,end_day))
 {
   curr_date = nodes[nodes$day == day,]$date_time
   cat(paste(day,' ',sep =""))
@@ -219,7 +222,7 @@ for(day in start_day:end_day)
   p = p + geom_segment(data = current_edges, aes(x = lon.x, y = lat.x, xend = lon.y, yend = lat.y, alpha = movement), color = 'yellow', size = 1.5)
   p = p + geom_point(data = current_graph, aes(x = lon, y = lat, size = inner_movement, color = num_cases))
   if(add_labels){
-    p = p + geom_text(data = locations, aes(label = municipio), fontface = "bold", check_overlap = TRUE, nudge_x = 0.1)
+    p = p + geom_label_repel(data = locations, aes(label = municipio))
   }    
   p = p + scale_color_gradient(low = "darkblue", high = "red", limits=c(cases_min, cases_max))
   p = p + scale_size(limits=c(internal_min, internal_max))
@@ -227,7 +230,7 @@ for(day in start_day:end_day)
   p = p + labs(color = "Casos", alpha = "Mov. Externo", size = "Mov. Interno")
   p = p + ggtitle(paste0('COVID-19 Dinámicas Promedio en el Día: ', day,' (',curr_date,')'))
   
-  ggsave(file.path( export_folder, "maps_on_day", paste0("map_on_",day,".jpeg")), plot = p, width = width, height = height, device = 'jpeg')
+  ggsave(file.path( export_folder, "maps_on_day", paste0("map_on_",day,".jpeg")), plot = p, dpi = dpi, width = width, height = height, device = 'jpeg')
   
   
   # Adds to the results
@@ -271,7 +274,7 @@ cat(paste(ident, '   ', sep = ""))
 window_nodes_by_day = c()
 window_edges_by_day = c()
 
-for(day in start_day:end_day)
+for(day in c(start_day,end_day))
 {   
   curr_date = nodes[nodes$day == day,]$date_time
   
@@ -312,7 +315,7 @@ for(day in start_day:end_day)
   p = p + geom_segment(data = current_edges, aes(x = lon.x, y = lat.x, xend = lon.y, yend = lat.y, alpha = movement), color = 'yellow', size = 1.5)
   p = p + geom_point(data = current_graph, aes(x = lon, y = lat, size = inner_movement, color = num_cases))
   if(add_labels){
-    p = p + geom_text(data = locations, aes(label = municipio), fontface = "bold", check_overlap = TRUE, nudge_x = 0.1)
+    p = p + geom_label_repel(data = locations, aes(label = municipio))
   }      
   p = p + scale_color_gradient(low = "darkblue", high = "red", limits=c(cases_min, cases_max))
   p = p + scale_size(limits=c(internal_min, internal_max))
@@ -320,7 +323,7 @@ for(day in start_day:end_day)
   p = p + labs(color = "Casos", alpha = "Mov. Externo", size = "Mov. Interno")
   p = p + ggtitle(paste0('COVID-19 Dinámicas Promedio al Día: ', day,' (',curr_date,')',' (Casos Acumulados)'))
   
-  ggsave(file.path( export_folder, "maps_by_day", paste0("map_by_",day,".jpeg")), plot = p, width = width, height = height, device = 'jpeg')
+  ggsave(file.path( export_folder, "maps_by_day", paste0("map_by_",day,".jpeg")), plot = p, dpi = dpi, width = width, height = height, device = 'jpeg')
   
   cases = cases + nodes[nodes$day == day,]$num_cases
   
