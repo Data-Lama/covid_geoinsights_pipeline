@@ -19,7 +19,7 @@ analysis_dir = config.get_property('analysis_dir')
 2. polygon_info_timewindow
 3. generate_threshold_alerts
 4. choropleth_maps
-5. general_statistics
+5. general_statisticss
 6. incidence_map
 7. polygon_socio_economic_analysis
 8. movement_range_plots_script

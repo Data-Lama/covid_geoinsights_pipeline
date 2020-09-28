@@ -23,12 +23,21 @@ k = 20
 
 gap_hours = 20
 
-ident = '         '
+ident = '      '
 
 # Import selected polygons
 selected_polygons = pd.read_csv('pipeline_scripts/configuration/selected_polygons.csv')
 
+print(ident + f'Excecuting Prediction for {selected_polygons.shape[0]} locations')
+
+computed = 0
+
 for i in selected_polygons.index:
+
+    computed += 1
+
+    print(ident + f'   Computing {i} of {selected_polygons.shape[0]}')
+
     poly_id = selected_polygons.at[i, "poly_id"]
     location_name = selected_polygons.at[i, "location_name"]
     agglomeration = selected_polygons.at[i, "agglomeration"]
