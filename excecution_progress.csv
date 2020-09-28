@@ -1,13 +1,13 @@
 timestamp,script_name,parameters,result,elapsed_time
-2020-09-28 18:11:41.306175,incidence_map.R,Colombia colombia geometry palmira 76520 76869 76892 73616 76001 76130 76563,256,2
-2020-09-28 18:11:43.127793,graph_maps.R,Colombia colombia geometry palmira 76520 11001 19573 76001 76111 76126 76130 76275 76306 76318 76563 76834 76890 76892,256,2
-2020-09-28 18:11:56.367564,polygon_info_timewindow.py,colombia geometry 5 days palmira 76520 76869 76892 73616 76001 76130 76563,0,13
-2020-09-28 18:12:43.876849,generate_effective_reproductive_number.py,colombia geometry palmira 76520 76869 76892 73616 76001 76130 76563,2,48
-2020-09-28 18:12:43.993852,generate_threshold_alerts.py,colombia geometry min_record palmira 76520 76869 76892 73616 76001 76130 76563,256,0
-2020-09-28 18:12:44.413763,choropleth_maps.py,colombia geometry palmira 76520 76869 76892 73616 76001 76130 76563,2,0
-2020-09-28 18:12:44.772343,general_statistics.py,colombia geometry palmira 76520,256,0
-2020-09-28 18:12:44.872329,polygon_socio_economic_analysis.py,colombia geometry palmira Palmira 76520,256,0
-2020-09-28 18:12:45.170632,movement_range_plots_script_polygons.py,colombia geometry Palmira palmira 76520 76869 76892 73616 76001 76130 76563,256,0
-2020-09-28 18:12:45.276645,movement_range_and_cases_script_polygons.py,colombia geometry Palmira palmira 76520,256,0
-2020-09-28 18:12:45.585864,polygon_union_prediction_wrapper.py,colombia geometry 0.8 20 Palmira palmira 76520,256,0
-2020-09-28 18:12:45.670488,single_polygon_wrapper.py,colombia geometry Palmira palmira 76520,2,83
+2020-09-28 18:14:06.888147,incidence_map.R,Colombia colombia geometry palmira 76520 76869 76892 73616 76001 76130 76563,0,28
+2020-09-28 18:15:02.678275,graph_maps.R,Colombia colombia geometry palmira 76520 11001 19573 76001 76111 76126 76130 76275 76306 76318 76563 76834 76890 76892,0,56
+2020-09-28 18:15:12.322372,polygon_info_timewindow.py,colombia geometry 5 days palmira 76520 76869 76892 73616 76001 76130 76563,0,10
+2020-09-28 18:17:04.497127,generate_effective_reproductive_number.py,colombia geometry palmira 76520 76869 76892 73616 76001 76130 76563,0,112
+2020-09-28 18:17:29.006309,generate_threshold_alerts.py,colombia geometry min_record palmira 76520 76869 76892 73616 76001 76130 76563,0,25
+2020-09-28 18:19:05.814713,choropleth_maps.py,colombia geometry palmira 76520 76869 76892 73616 76001 76130 76563,0,97
+2020-09-28 18:19:11.158536,general_statistics.py,colombia geometry palmira 76520,0,5
+2020-09-28 18:19:15.032162,polygon_socio_economic_analysis.py,colombia geometry palmira Palmira 76520,0,4
+2020-09-28 18:19:39.360917,movement_range_plots_script_polygons.py,colombia geometry Palmira palmira 76520 76869 76892 73616 76001 76130 76563,0,24
+2020-09-28 18:20:04.556676,movement_range_and_cases_script_polygons.py,colombia geometry Palmira palmira 76520,0,25
+2020-09-28 18:20:35.916057,polygon_union_prediction_wrapper.py,colombia geometry 0.8 20 Palmira palmira 76520,0,31
+2020-09-28 18:20:36.987771,single_polygon_wrapper.py,colombia geometry Palmira palmira 76520,0,430
