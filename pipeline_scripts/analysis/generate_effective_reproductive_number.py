@@ -108,18 +108,18 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     ax[0].spines['top'].set_visible(False)
     ax[0].spines['right'].set_visible(False)    
 
-    max_cases_tick = values_cases.max()
-    if 0<max_cases_tick<=10:
-        tick_loc = 2
-    elif 10<max_cases_tick<=50:
-        tick_loc = 10
-    elif 50<max_cases_tick<=200:
-        tick_loc = 30        
-    elif 200<max_cases_tick<=1000:
-        tick_loc = 150 
+    #max_cases_tick = values_cases.max()
+    #if 0<max_cases_tick<=10:
+    #    tick_loc = 2
+    #elif 10<max_cases_tick<=50:
+    #    tick_loc = 10
+    #elif 50<max_cases_tick<=200:
+    #    tick_loc = 30        
+    #elif 200<max_cases_tick<=1000:
+    #    tick_loc = 150 
 
-    else:    
-        tick_loc = np.round( max_cases_tick/100+0.1*100//5 )  
+    #else:    
+    #    tick_loc = np.round( max_cases_tick/100+0.1*100//5 )  
 
     ax[0].yaxis.set_major_locator(ticker.MultipleLocator( ) )
     ax[0].yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.0f}"))
@@ -130,15 +130,13 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     ax[0].margins(0)
     ax[0].grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
 
-
     cases_df = cases_df.iloc[list(cases_df[col_cases_smoothed].cumsum()>1)]
     posteriors, log_likelihood = get_posteriors(cases_df[col_cases_smoothed]+1, sigma=.25)
     posteriors = posteriors[posteriors.keys()[1:]]
     posteriors_cm  = posteriors.dropna(axis=1)
 
-
     # Note that this takes a while to execute - it's not the most efficient algorithm
-    hdis = highest_density_interval(posteriors, p=CI/100)
+    hdis = highest_density_interval( posteriors , p=CI/100 )
     CI = str(CI) 
     most_likely = posteriors.idxmax().rename('ML')
     result = pd.concat([most_likely, hdis], axis=1)
