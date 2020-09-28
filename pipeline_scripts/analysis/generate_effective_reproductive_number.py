@@ -81,8 +81,8 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
         values_cases_sm = cases_df[col_cases_smoothed].values+1
 
     # Plot smoothed cases
-    ax[0].bar(index, values_cases, color='k', alpha=0.3, zorder=1,  label= 'Cases')
-    ax[0].plot(index, values_cases_sm, color='k', zorder=1,  label= '7 day rolling avg.')
+    ax[0].bar(index, values_cases, color='k', alpha=0.3, zorder=1,  label= 'Casos')
+    ax[0].plot(index, values_cases_sm, color='k', zorder=1,  label= 'Promedio movil semanal.')
 
     ax[0].tick_params(axis='both', labelsize=15)
     ax[1].tick_params(axis='both', labelsize=15)
@@ -93,20 +93,35 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     ax[0].xaxis.set_minor_locator(mdates.DayLocator())
     ax[0].xaxis.set_major_locator(mdates.WeekdayLocator())
     ax[0].xaxis.set_major_locator(mdates.MonthLocator())
+
     #ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
     ax[0].set_xlim( min_time-pd.Timedelta( days=1 ), index[-1]+pd.Timedelta(days=1) )
     #ax.tick_params( axis='x',  rotation=90 )
+
     if pop:
-        ax[0].set_ylabel('Incidence per. 100.000', fontsize=15 )
-    ax[0].set_ylabel('Incidence', fontsize=15 )
+        ax[0].set_ylabel('Incidencia por 100.000 hab.', fontsize=15 )
+    ax[0].set_ylabel('Incidencia', fontsize=15 )
 
     #ax.set_title( 'Amazonas', fontsize=15 )
     
     ax[0].legend(fontsize=15, frameon=False)
     ax[0].spines['top'].set_visible(False)
-    ax[0].spines['right'].set_visible(False)
+    ax[0].spines['right'].set_visible(False)    
 
-    ax[0].yaxis.set_major_locator(ticker.MultipleLocator( np.round(values_cases.max()/100+0.1*100//5 ) )  )
+    max_cases_tick = values_cases.max()
+    if 0<max_cases_tick<=10:
+        tick_loc = 2
+    elif 10<max_cases_tick<=50:
+        tick_loc = 10
+    elif 50<max_cases_tick<=200:
+        tick_loc = 30        
+    elif 200<max_cases_tick<=1000:
+        tick_loc = 150 
+
+    else:    
+        tick_loc = np.round( max_cases_tick/100+0.1*100//5 )  
+
+    ax[0].yaxis.set_major_locator(ticker.MultipleLocator( ) )
     ax[0].yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.0f}"))
     #ax.yaxis.tick_right()
     ax[0].spines['left'].set_visible(False)

@@ -65,12 +65,12 @@ TRANSLATE = {'internal_alert':'Alerta interna',
 COLORS = {'ROJO':'#b30000',
 'AMARILLO':'#ffcc00',
 'VERDE':'#006600',
-'N/A': '#d4d4d4'}
+'BLANCO': '#d4d4d4'}
 
 COLORS_ = {'#b30000':'ROJO',
 '#ffcc00':'AMARILLO',
 '#006600':'VERDE',
-'#d4d4d4':'N/A'}
+'#d4d4d4':'BLANCO'}
 
 # Get name of files
 agglomerated_file_path = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', location_folder)
@@ -249,12 +249,12 @@ def get_vulnerability_alert(poly_id):
         alerts.append(">60 ANOS")
     if (eps > NATIONAL_SUBSIDIZED):
         alerts.append("EPS SUBSIDIADO")
-    else: return "-"
+    else: return "--"
     
     return ";".join(alerts)
 
 def set_vulnerability_color(vul_alert):
-    if vul_alert != "-":
+    if vul_alert != "--":
         return "ROJO"
     else: return "VERDE"
 
@@ -292,7 +292,7 @@ df_rt_alert["rt_alert"] = df_rt_alert.apply(lambda x: set_rt_alert_color(x.ML), 
 
 # Merge 
 df_alerts = df_alerts.merge(df_alerts_cases, on="poly_id", how="outer").fillna("VERDE")
-df_alerts = df_alerts.merge(df_rt_alert, on="poly_id", how="outer").fillna("N/A")
+df_alerts = df_alerts.merge(df_rt_alert, on="poly_id", how="outer").fillna("BLANCO")
 df_alerts['max_alert'] = df_alerts.apply(lambda x: get_max_alert([x.internal_alert, x.external_alert, x.alert_first_case, 
                                                                     x.alert_internal_num_cases, x.alert_external_num_cases, x.rt_alert]), axis=1)
 

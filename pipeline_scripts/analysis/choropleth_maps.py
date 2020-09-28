@@ -51,7 +51,8 @@ RIVERS = ['RÍO SINÚ','RÍO MAGDALENA','RÍO CAUCA','RÍO META','RÌO AMAZONAS'
 scheme = "user_defined"
 bins = {'bins':[0, 0.49, 1, 2, 5, 10, 50], 'bins_rt':[0, 0.5, 0.8, 1, 1.5, 2, 5]} 
 colors = [(1, 0.96, 0.94), (0.99, 0.83, 0.76), (0.98, 0.62, 0.51), (0.98, 0.41, 0.29), (0.89, 0.18, 0.15), (0.69, 0.07, 0.09), (0.37, 0.04, 0.1)] 
-colors_rt = [(0.98, 0.99, 0.78), (0.86, 0.94, 0.65), (0.66, 0.85, 0.55), (0.42, 0.75, 0.45), (0.11, 0.49, 0.25), (0, 0.41, 0.21), (0, 0.28, 0.16)] 
+colors_rt = [(0, 0.28, 0.16),(0.66, 0.85, 0.55), (0.86, 0.94, 0.65),(0.98, 0.99, 0.78), (0.89, 0.18, 0.15), (0.69, 0.07, 0.09), (0.37, 0.04, 0.1)]
+# colors_rt = [(0.98, 0.99, 0.78), (0.86, 0.94, 0.65), (0.66, 0.85, 0.55), (0.42, 0.75, 0.45), (0.11, 0.49, 0.25), (0, 0.41, 0.21), (0, 0.28, 0.16)] 
 
 # Get name of files
 movement = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', location_folder, 'movement.csv')
@@ -110,6 +111,7 @@ day_t1 = day_t0 + datetime.timedelta(days = WINDOW_SIZE)
 # RT alerts
 df_rt = df_rt[df_rt["date_time"] >= day_t3]
 df_rt = df_rt.groupby("poly_id").mean()
+
 
 # returns name of river node intersects or nan
 def is_polygon_on_river(node_id, buffer=False):
@@ -260,6 +262,7 @@ plt.title('Promedio de RT para la Última Semana')
 plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_rt.png'.format(location_name)), bbox_inches="tight")
 
 
+
 print(ident+'   Building recent map (15 day window)')
 # Get choropleth map 15-day window
 choropleth_map_recent = geo_df.merge(df_deltas_recent, left_on='Codigo_Dan', right_on='poly_id')
@@ -340,10 +343,13 @@ translate = {'delta_inner_movement':'Incremento flujo dentro del municipio',
             'delta_external_movement':'Incremento flujo hacia el municipio',
             'community_name':'Unidad funcional'}
 
+translate_rt = {'ML':"RT", 'community_name':'Unidad funcional'}
+
 
 # Get darker names in table
 df_highlights_recent = choropleth_map_recent[choropleth_map_recent['delta_external_movement'] > 0.48].fillna(0)
 df_highlights_historic = choropleth_map_historic[choropleth_map_historic['delta_external_movement'] > 1].fillna(0)
+df_rt_detail = gdf_rt[gdf_rt["ML"] > 1].copy()
 
 # Get polygons on river
 # choropleth_map_on_river = choropleth_map_recent[choropleth_map_recent['delta_external_movement'] > 0].fillna(0)
@@ -351,10 +357,17 @@ df_highlights_historic = choropleth_map_historic[choropleth_map_historic['delta_
 # choropleth_map_on_river.to_csv(os.path.join(output_file_path, 'detail_choropleth_recent_rivers.csv'), encoding = 'latin-1', 
 #        index=False, float_format="%.3f", columns=['Departamen', 'Municipio', 'river', 'delta_external_movement'])
 
-
 # Merge with functional_units
 df_highlights_recent = df_highlights_recent.merge(df_functional_units, left_on='poly_id', right_on='poly_id', how='left')
 df_highlights_historic = df_highlights_historic.merge(df_functional_units, left_on='poly_id', right_on='poly_id', how='left')
+df_rt_detail = df_rt_detail.merge(df_functional_units, left_on='poly_id', right_on='poly_id', how='left')
+
+df_rt_detail.drop(columns=['OBJECTID', 'POBT_2018', 'POBH_2018', 'POBM_2018', 'VIVT_2018',
+       'Departamen', 'Pob_Urbana', 'Pob_Rural', 'Total_2018',
+       'No_Bog', 'SabanaBOG', 'Km2', 'Ha', 'Bog', 'Shape_Leng',
+       'Shape_Area', 'geometry', 'community_id', 'poly_name', 'poly_id'], inplace=True)
+
+df_rt_detail.rename(columns=translate_rt, inplace=True)
 
 df_highlights_recent.drop(columns=['OBJECTID', 'POBT_2018', 'POBH_2018', 'POBM_2018', 'VIVT_2018',
        'Departamen', 'Pob_Urbana', 'Pob_Rural', 'Total_2018',
@@ -378,5 +391,8 @@ df_highlights_recent = df_highlights_recent[['Unidad funcional', 'Municipio',
                                         'Incremento flujo dentro del municipio',
                                          'Incremento flujo hacia el municipio']]
 
+df_rt_detail = df_rt_detail[['Unidad funcional', 'Municipio', 'RT']]
+
 df_highlights_recent.to_csv(os.path.join(output_file_path, 'detail_choropleth_recent.csv'), float_format="%.3f", index=False)
 df_highlights_historic.to_csv(os.path.join(output_file_path, 'detail_choropleth_historic.csv'), float_format="%.3f", index=False)
+df_rt_detail.to_csv(os.path.join(output_file_path, "detail_choropleth_rt.csv"), float_format="%.3f", index=False)
