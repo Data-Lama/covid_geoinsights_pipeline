@@ -8,6 +8,7 @@ suppressMessages(library('proxy'))
 suppressMessages(library('ramify'))
 suppressMessages(library('ggplot2'))
 suppressMessages(library('ggmap'))
+suppressMessages(library('ggrepel'))
 
 source('pipeline_scripts/functions/constants.R')
 
@@ -43,12 +44,14 @@ if(is.na(selected_polygons_name))
   selected_polygons_name = "entire_location"
   selected_polygons = c()
   map_type = "terrain"
+  zoom = 6
 
 }else{
   add_labels = TRUE
   selected_polygons = args[5:length(args)]
   selected_polygons = unique(selected_polygons)
   map_type = "terrain-background"
+  zoom = 10
 
   if(length(selected_polygons) == 0)
   {
@@ -60,9 +63,10 @@ if(is.na(selected_polygons_name))
 
 
 # Export options
-width = 10
+width = 8
 height = 8
 perc_margin = 0.02
+dpi = 900
 
 
 
@@ -159,23 +163,25 @@ right = right + margin
 
 
 cat(paste(ident, '   Downloading Map', '\n', sep = ""))
-map = suppressMessages(get_stamenmap(c(left = left, bottom = bottom, right = right, top = top), maptype = map_type, color = 'bw'))
+map = suppressMessages(get_stamenmap(c(left = left, bottom = bottom, right = right, top = top), maptype = map_type, color = 'bw', zoom = zoom))
 # map = suppressMessages(get_map(c(left = left, bottom = bottom, right = right, top = top), maptype = 'satellite', color = 'bw'))
 
 df_plot = polygons[order(polygons$incidence),]
 
 
 
+cat(paste(ident, '   Adjusts Names', '\n', sep = ""))
 # Split poly_name in two for labling
 df_plot <- df_plot %>% tidyr::separate(poly_name, 
                       c("municipio"), extra='drop', sep="-")
 
+cat(paste(ident, '   Plots', '\n', sep = ""))
 p =  ggmap(map)
 p = p + geom_point(data = df_plot, aes(x = poly_lon, y = poly_lat, color = incidence, size = incidence, alpha = incidence, shape = group ))
 p = p + guides(size=FALSE, alpha = FALSE)
 p = p + scale_shape(breaks = labels)
 if(add_labels){
-    p = p + geom_text(data = df_plot, aes(label = municipio), inherit.aes = FALSE, fontface = "bold", check_overlap = TRUE, nudge_x = 0.1)
+    p = p + geom_label_repel(data = df_plot, aes(x = poly_lon, y = poly_lat, label = municipio), point.padding = 0.5)
 }
 p = p + scale_alpha_continuous(range = c(0.4, 1))
 p = p + scale_color_gradient(low = "darkblue", high = "red")
@@ -183,7 +189,7 @@ p = p + labs(color = paste0("Incidencia Acumulada\n(Total Casos por ",per_capita
 p = p + ggtitle(paste0("Incidencia Acumulada por Municipio (Casos por ",per_capita ," Personas)"))
 p
 
-ggsave(file.path( export_folder,"incidence_map.jpeg"), plot = p, width = width, device = 'jpeg')
+ggsave(file.path( export_folder,"incidence_map.jpeg"), plot = p, dpi = dpi, width = width, height = height, device = 'jpeg')
 
 # Saves data
 df_plot = df_plot[, c('poly_id','attr_population', 'municipio', 'poly_lon', 'poly_lat', 'num_cases','incidence','group')]

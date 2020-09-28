@@ -66,6 +66,19 @@ geographic_neighbors = gf.get_geographic_neighbors(poly_id, location_folder, agg
 selected_geographic_neighbors_polygons_parameter = " ".join([poly_id] + geographic_neighbors)
 
 
+
+# Execute incidence_map
+print()
+print("{}Excecuting incidence_map.py for {}".format(ident, polygon_name))
+parameters = "{} {} {} {} {}".format( location_name,
+                                location_folder,  
+                                agglomeration_method,
+                                folder_name,
+                                selected_geographic_neighbors_polygons_parameter)
+
+ef.excecute_script(analysis_scripts_location, "incidence_map.R", "R", parameters)
+
+
 # Execute graph_maps
 print()
 print("{}Excecuting graph_maps.R for {}".format(ident, polygon_name))
@@ -130,16 +143,7 @@ parameters = "{} {} {} {}".format(location_folder,
 
 ef.excecute_script(analysis_scripts_location, "general_statistics.py", "python", parameters)
 
-# Execute incidence_map
-print()
-print("{}Excecuting incidence_map.py for {}".format(ident, polygon_name))
-parameters = "{} {} {} {} {}".format( location_name,
-                                location_folder,  
-                                agglomeration_method,
-                                folder_name,
-                                selected_geographic_neighbors_polygons_parameter)
 
-ef.excecute_script(analysis_scripts_location, "incidence_map.R", "R", parameters)
 
 # polygon_socio_economic_analysis
 print()
