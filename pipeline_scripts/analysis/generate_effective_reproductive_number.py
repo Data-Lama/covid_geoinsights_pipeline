@@ -127,7 +127,7 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     #else:    
     #    tick_loc = np.round( max_cases_tick/100+0.1*100//5 )  
 
-    ax[0].yaxis.set_major_locator(ticker.MultipleLocator( ) )
+    ax[0].yaxis.set_major_locator(ticker.MultipleLocator(tick_loc) )
     ax[0].yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.0f}"))
     #ax.yaxis.tick_right()
     ax[0].spines['left'].set_visible(False)
