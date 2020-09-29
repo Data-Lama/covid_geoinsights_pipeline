@@ -17,9 +17,10 @@ reporte_nacional,Estadisticas Prediccion,analysis,table,colombia/community/predi
 reporte_nacional,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/entire_location/incidence_map.jpeg,incidence_map_geometry.jpeg
 reporte_nacional,Incidence Table,analysis,table,colombia/geometry/incidence_maps/entire_location/incidences.csv,incidences_geometry.csv
 reporte_nacional,Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv
+reporte_nacional,RT Plot,analysis,figure,colombia/geometry/r_t/entire_location/aggregated_Rt.png,aggregated_Rt.png
 reporte_subnacional,Polygon Movement range,analysis,figure,colombia/community/movement_plots/entire_location/movement_range_selected_polygons_colombia.png,internal_movement_selected_polygons_colombia.png
-reporte_subnacional,Neighbor Series barranquilla,analysis,figure,colombia/community/neighbors/*/neighbor_timeseries_*.png,*
-reporte_subnacional,Prediction barranquilla,analysis,figure,colombia/community/prediction/polygons/*/prediction_*.png,*
+reporte_subnacional,Neighbor Series,analysis,figure,colombia/community/neighbors/*/neighbor_timeseries_*.png,*
+reporte_subnacional,Prediction ,analysis,figure,colombia/community/prediction/polygons/*/prediction_*.png,*
 reporte_subnacional,Socio-economic Statistics,analysis,table,colombia/community/socio-economic/*/socio-economic_data_*.csv,*
 reporte_subnacional,RT,analysis,figure,colombia/geometry/r_t/entire_location/*001_Rt.png,*
 reporte_norte_de_santander,Graph Map First Day,analysis,figure,colombia/community/graph_maps/norte_de_santander/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
@@ -78,6 +79,7 @@ reporte_palmira,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/p
 reporte_palmira,Incidence Table,analysis,table,colombia/geometry/incidence_maps/palmira/incidences.csv,incidences_geometry.csv
 reporte_palmira,Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv
 reporte_palmira,RT,analysis,figure,colombia/geometry/r_t/palmira/aggregated_Rt.csv,aggregated_Rt.csv
+reporte_palmira,RT Plot,analysis,figure,colombia/geometry/r_t/palmira/76520_Rt.png,rt_plot.png
 reporte_tolima,Graph Map First Day,analysis,figure,colombia/community/graph_maps/tolima/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
 reporte_tolima,Graph Map Current Day,analysis,figure,colombia/community/graph_maps/tolima/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
 reporte_tolima,Polygon Movement range,analysis,figure,colombia/community/movement_plots/tolima/movement_range_selected_polygons_tolima.png,movement_range_selected_polygons.png
