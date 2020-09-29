@@ -255,12 +255,14 @@ dir.create(file.path(export_folder, 'maps_by_day'))
 cases_max = -1
 nodes = nodes[order(nodes$lon, nodes$lat),]
 cases = rep(0, nrow(locations))
+cases_by_day = list()
 for(day in start_day:end_day)
 {
   temp_nodes = nodes[nodes$day == day,]
   temp_nodes = temp_nodes[order(temp_nodes$lon, temp_nodes$lat),]
   cases = cases + temp_nodes$num_cases
   
+  cases_by_day[[day]] = cases
 }
 
 
@@ -294,7 +296,7 @@ for(day in c(start_day,end_day))
   
   # Adds the cases
   current_graph = current_graph[order(current_graph$lon, current_graph$lat),]
-  current_graph$num_cases = current_graph$num_cases + cases
+  current_graph$num_cases = cases_by_day[[day]]
   #Adjusts to max
   current_graph$num_cases =  sapply( current_graph$num_cases, function(s){min(s, cases_max)})
   
@@ -324,9 +326,7 @@ for(day in c(start_day,end_day))
   p = p + ggtitle(paste0('COVID-19 Dinámicas Promedio al Día: ', day,' (',curr_date,')',' (Casos Acumulados)'))
   
   ggsave(file.path( export_folder, "maps_by_day", paste0("map_by_",day,".jpeg")), plot = p, dpi = dpi, width = width, height = height, device = 'jpeg')
-  
-  cases = cases + nodes[nodes$day == day,]$num_cases
-  
+    
   # Adds to the results
   window_nodes_by_day = rbind(window_nodes_by_day, current_graph )
   window_edges_by_day = rbind(window_edges_by_day, current_edges)
