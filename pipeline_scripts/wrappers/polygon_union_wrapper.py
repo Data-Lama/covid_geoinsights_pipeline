@@ -97,7 +97,7 @@ parameters = "{} {} {} {}".format(location_folder,
                                 
 ef.excecute_script(analysis_scripts_location, "generate_effective_reproductive_number.py", "python", parameters)
 
-Execute generate_threshold_alerts
+# Execute generate_threshold_alerts
 print()
 print("{}Excecuting generate_threshold_alerts.py for {}".format(ident, selected_polygons_name))
 parameters = "{} {} {} {} {}".format(location_folder,  
@@ -118,32 +118,32 @@ parameters = "{} {} {} {}".format(location_folder,
 
 ef.excecute_script(analysis_scripts_location, "choropleth_maps.py", "python", parameters)
 
-# # Excecute general_stats
-# print()
-# print("{}Excecuting general_statistics.py for {}".format(ident, selected_polygons_name))
-# parameters = "{} {} {}".format(location_folder,  
-#                                 agglomeration_method,
-#                                 folder_name + " " +selected_polygons_parameter)
+# Excecute general_stats
+print()
+print("{}Excecuting general_statistics.py for {}".format(ident, selected_polygons_name))
+parameters = "{} {} {}".format(location_folder,  
+                                agglomeration_method,
+                                folder_name + " " +selected_polygons_parameter)
 
-# print(folder_name + " " +selected_polygons_parameter)
-# ef.excecute_script(analysis_scripts_location, "general_statistics.py", "python", parameters)
+print(folder_name + " " +selected_polygons_parameter)
+ef.excecute_script(analysis_scripts_location, "general_statistics.py", "python", parameters)
 
-# # Execute incidence_map
-# print()
-# print("{}Excecuting incidence_map.py for {}".format(ident, selected_polygons_name))
-# parameters = "{} {} {} {} {}".format( location_name,
-#                                 location_folder,  
-#                                 agglomeration_method,
-#                                 folder_name,
-#                                 selected_polygons_parameter)
+# Execute incidence_map
+print()
+print("{}Excecuting incidence_map.py for {}".format(ident, selected_polygons_name))
+parameters = "{} {} {} {} {}".format( location_name,
+                                location_folder,  
+                                agglomeration_method,
+                                folder_name,
+                                selected_polygons_parameter)
 
-# ef.excecute_script(analysis_scripts_location, "incidence_map.R", "R", parameters)
+ef.excecute_script(analysis_scripts_location, "incidence_map.R", "R", parameters)
 
-# # polygon_socio_economic_analysis
-# print()
-# print("{}Excecuting polygon_socio_economic_analysis.py for {}".format(ident, selected_polygons_name))
+# polygon_socio_economic_analysis
+print()
+print("{}Excecuting polygon_socio_economic_analysis.py for {}".format(ident, selected_polygons_name))
 
-# parameters = "{} {} {} {} {}".format(location_folder,  
+parameters = "{} {} {} {} {}".format(location_folder,  
                                 agglomeration_method,
                                 folder_name,
                                 selected_polygons_name,
