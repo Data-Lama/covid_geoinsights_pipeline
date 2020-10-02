@@ -128,4 +128,6 @@ reporte_quindio,Estadisticas Unidad Funcional,analysis,table,colombia/community/
 reporte_quindio,Estadisticas Prediccion,analysis,table,colombia/community/prediction/polygon_unions/quindio/statistics.csv,prediction_statistics.csv
 reporte_quindio,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/quindio/incidence_map.jpeg,incidence_map_geometry.jpeg
 reporte_quindio,Incidence Table,analysis,table,colombia/geometry/incidence_maps/quindio/incidences.csv,incidences_geometry.csv
-reporte_quindio,RT,analysis,figure,colombia/geometry/r_t/quindio/aggregated_Rt.png,aggregated_Rt.png
+reporte_quindio,RT,analysis,figure,colombia/geometry/r_t/quindio/aggregated_Rt.csv,aggregated_Rt.csv
+reporte_quindio,RT Plot,analysis,figure,colombia/geometry/r_t/quindio/aggregated_Rt.png,rt_plot.png
+reporte_quindio,RT Map,analysis,figure,colombia/geometry/alerts/quindio/map_rt_alert.png,map_rt_alert.png

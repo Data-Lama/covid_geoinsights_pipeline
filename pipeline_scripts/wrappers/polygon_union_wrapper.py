@@ -97,7 +97,7 @@ parameters = "{} {} {} {}".format(location_folder,
                                 
 ef.excecute_script(analysis_scripts_location, "generate_effective_reproductive_number.py", "python", parameters)
 
-#Execute generate_threshold_alerts
+# Execute generate_threshold_alerts
 print()
 print("{}Excecuting generate_threshold_alerts.py for {}".format(ident, selected_polygons_name))
 parameters = "{} {} {} {} {}".format(location_folder,  
