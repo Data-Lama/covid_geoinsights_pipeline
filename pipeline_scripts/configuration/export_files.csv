@@ -10,6 +10,8 @@ reporte_nacional,Mapa Alerta General,analysis,figure,colombia/geometry/alerts/en
 reporte_nacional,Mapa Cloropletico Historico,analysis,figure,colombia/geometry/polygon_info_window/entire_location/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
 reporte_nacional,Mapa Cloropletico Reciente,analysis,figure,colombia/geometry/polygon_info_window/entire_location/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
 reporte_nacional,Mapa Cloropletico Reciente,analysis,table,colombia/geometry/polygon_info_window/entire_location/detail_choropleth_recent.csv,detail_choropleth_recent.csv
+reporte_nacional,Mapa Cloropletico RT,analysis,figure,colombia/geometry/polygon_info_window/entire_location/choropleth_map_colombia_rt.png,choropleth_map_colombia_rt.png
+reporte_nacional,Mapa Cloropletico RT,analysis,table,colombia/geometry/polygon_info_window/entire_location/detail_choropleth_rt.csv,detail_choropleth_rt.csv
 reporte_nacional,Alertas Rojas,analysis,table,colombia/geometry/alerts/entire_location/alerts.csv,alerts.csv
 reporte_nacional,Estadisticas Municipio,analysis,table,colombia/geometry/stats/entire_location/general_stats.csv,geometry_statistics.csv
 reporte_nacional,Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/entire_location/general_stats.csv,community_statistics.csv
@@ -34,13 +36,15 @@ reporte_norte_de_santander,Mapa Alerta General,analysis,figure,colombia/geometry
 reporte_norte_de_santander,Mapa Cloropletico Historico,analysis,figure,colombia/geometry/polygon_info_window/norte_de_santander/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
 reporte_norte_de_santander,Mapa Cloropletico Reciente,analysis,figure,colombia/geometry/polygon_info_window/norte_de_santander/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
 reporte_norte_de_santander,Mapa Cloropletico Reciente,analysis,table,colombia/geometry/polygon_info_window/norte_de_santander/detail_choropleth_recent.csv,detail_choropleth_recent.csv
+reporte_norte_de_santander,Mapa Cloropletico RT,analysis,figure,colombia/geometry/polygon_info_window/norte_de_santander/choropleth_map_colombia_rt.png,choropleth_map_colombia_rt.png
+reporte_norte_de_santander,Mapa Cloropletico RT,analysis,table,colombia/geometry/polygon_info_window/norte_de_santander/detail_choropleth_rt.csv,detail_choropleth_rt.csv
 reporte_norte_de_santander,Alertas Rojas,analysis,table,colombia/geometry/alerts/norte_de_santander/alerts.csv,alerts.csv
 reporte_norte_de_santander,Estadisticas Municipio,analysis,table,colombia/geometry/stats/norte_de_santander/general_stats.csv,geometry_statistics.csv
 reporte_norte_de_santander,Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/norte_de_santander/general_stats.csv,community_statistics.csv
 reporte_norte_de_santander,Estadisticas Prediccion,analysis,table,colombia/community/prediction/polygon_unions/norte_de_santander/statistics.csv,prediction_statistics.csv
 reporte_norte_de_santander,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/norte_de_santander/incidence_map.jpeg,incidence_map_geometry.jpeg
 reporte_norte_de_santander,Incidence Table,analysis,table,colombia/geometry/incidence_maps/norte_de_santander/incidences.csv,incidences_geometry.csv
-reporte_norte_de_santander,RT,analysis,figure,colombia/geometry/r_t/norte_de_santander/aggregated_Rt.csv,aggregated_Rt.csv
+reporte_norte_de_santander,RT,analysis,figure,colombia/geometry/r_t/norte_de_santander/aggregated_Rt.png,aggregated_Rt.png
 reporte_popayan,Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv
 reporte_popayan,Graph Map First Day,analysis,figure,colombia/community/graph_maps/popayan/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
 reporte_popayan,Graph Map Current Day,analysis,figure,colombia/community/graph_maps/popayan/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
@@ -53,6 +57,8 @@ reporte_popayan,Mapa Alerta General,analysis,figure,colombia/geometry/alerts/pop
 reporte_popayan,Mapa Cloropletico Historico,analysis,figure,colombia/geometry/polygon_info_window/popayan/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
 reporte_popayan,Mapa Cloropletico Reciente,analysis,figure,colombia/geometry/polygon_info_window/popayan/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
 reporte_popayan,Mapa Cloropletico Reciente,analysis,table,colombia/geometry/polygon_info_window/popayan/detail_choropleth_recent.csv,detail_choropleth_recent.csv
+reporte_popayan,Mapa Cloropletico RT,analysis,figure,colombia/geometry/polygon_info_window/popayan/choropleth_map_colombia_rt.png,choropleth_map_colombia_rt.png
+reporte_popayan,Mapa Cloropletico RT,analysis,table,colombia/geometry/polygon_info_window/popayan/detail_choropleth_rt.csv,detail_choropleth_rt.csv
 reporte_popayan,Alertas Rojas,analysis,table,colombia/geometry/alerts/popayan/alerts.csv,alerts.csv
 reporte_popayan,Estadisticas Municipio,analysis,table,colombia/geometry/stats/popayan/general_stats.csv,geometry_statistics.csv
 reporte_popayan,Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/popayan/general_stats.csv,community_statistics.csv
@@ -60,7 +66,7 @@ reporte_popayan,Estadisticas Prediccion,analysis,table,colombia/community/predic
 reporte_popayan,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/popayan/incidence_map.jpeg,incidence_map_geometry.jpeg
 reporte_popayan,Incidence Table,analysis,table,colombia/geometry/incidence_maps/popayan/incidences.csv,incidences_geometry.csv
 reporte_popayan,Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv
-reporte_popayan,RT,analysis,figure,colombia/geometry/r_t/popayan/aggregated_Rt.csv,aggregated_Rt.csv
+reporte_popayan,RT,analysis,figure,colombia/geometry/r_t/popayan/aggregated_Rt.png,aggregated_Rt.png
 reporte_palmira,Graph Map First Day,analysis,figure,colombia/geometry/graph_maps/palmira/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
 reporte_palmira,Graph Map Current Day,analysis,figure,colombia/geometry/graph_maps/palmira/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
 reporte_palmira,Polygon Movement range,analysis,figure,colombia/geometry/movement_plots/palmira/movement_range_selected_polygons_palmira.png,movement_range_selected_polygons.png
@@ -72,13 +78,15 @@ reporte_palmira,Mapa Alerta General,analysis,figure,colombia/geometry/alerts/pal
 reporte_palmira,Mapa Cloropletico Historico,analysis,figure,colombia/geometry/polygon_info_window/palmira/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
 reporte_palmira,Mapa Cloropletico Reciente,analysis,figure,colombia/geometry/polygon_info_window/palmira/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
 reporte_palmira,Mapa Cloropletico Reciente,analysis,table,colombia/geometry/polygon_info_window/palmira/detail_choropleth_recent.csv,detail_choropleth_recent.csv
+reporte_palmira,Mapa Cloropletico RT,analysis,figure,colombia/geometry/polygon_info_window/palmira/choropleth_map_colombia_rt.png,choropleth_map_colombia_rt.png
+reporte_palmira,Mapa Cloropletico RT,analysis,table,colombia/geometry/polygon_info_window/palmira/detail_choropleth_rt.csv,detail_choropleth_rt.csv
 reporte_palmira,Alertas Rojas,analysis,table,colombia/geometry/alerts/palmira/alerts.csv,alerts.csv
 reporte_palmira,Estadisticas Municipio,analysis,table,colombia/geometry/stats/palmira/general_stats.csv,geometry_statistics.csv
 reporte_palmira,Estadisticas Prediccion,analysis,table,colombia/geometry/prediction/polygon_unions/palmira/statistics.csv,prediction_statistics.csv
 reporte_palmira,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/palmira/incidence_map.jpeg,incidence_map_geometry.jpeg
 reporte_palmira,Incidence Table,analysis,table,colombia/geometry/incidence_maps/palmira/incidences.csv,incidences_geometry.csv
 reporte_palmira,Polygon Community Map ,data,table,data_stages/colombia/agglomerated/community/polygon_community_map.csv,polygon_community_map.csv
-reporte_palmira,RT,analysis,figure,colombia/geometry/r_t/palmira/aggregated_Rt.csv,aggregated_Rt.csv
+reporte_palmira,RT,analysis,figure,colombia/geometry/r_t/palmira/aggregated_Rt.png,aggregated_Rt.png
 reporte_palmira,RT Plot,analysis,figure,colombia/geometry/r_t/palmira/76520_Rt.png,rt_plot.png
 reporte_tolima,Graph Map First Day,analysis,figure,colombia/community/graph_maps/tolima/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
 reporte_tolima,Graph Map Current Day,analysis,figure,colombia/community/graph_maps/tolima/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
@@ -91,13 +99,16 @@ reporte_tolima,Mapa Alerta General,analysis,figure,colombia/geometry/alerts/toli
 reporte_tolima,Mapa Cloropletico Historico,analysis,figure,colombia/geometry/polygon_info_window/tolima/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
 reporte_tolima,Mapa Cloropletico Reciente,analysis,figure,colombia/geometry/polygon_info_window/tolima/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
 reporte_tolima,Mapa Cloropletico Reciente,analysis,table,colombia/geometry/polygon_info_window/tolima/detail_choropleth_recent.csv,detail_choropleth_recent.csv
+reporte_tolima,Mapa Cloropletico RT,analysis,figure,colombia/geometry/polygon_info_window/tolima/choropleth_map_colombia_rt.png,choropleth_map_colombia_rt.png
+reporte_tolima,Mapa Cloropletico RT,analysis,table,colombia/geometry/polygon_info_window/tolima/detail_choropleth_rt.csv,detail_choropleth_rt.csv
 reporte_tolima,Alertas Rojas,analysis,table,colombia/geometry/alerts/tolima/alerts.csv,alerts.csv
 reporte_tolima,Estadisticas Municipio,analysis,table,colombia/geometry/stats/tolima/general_stats.csv,geometry_statistics.csv
 reporte_tolima,Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/tolima/general_stats.csv,community_statistics.csv
 reporte_tolima,Estadisticas Prediccion,analysis,table,colombia/community/prediction/polygon_unions/tolima/statistics.csv,prediction_statistics.csv
 reporte_tolima,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/tolima/incidence_map.jpeg,incidence_map_geometry.jpeg
 reporte_tolima,Incidence Table,analysis,table,colombia/geometry/incidence_maps/tolima/incidences.csv,incidences_geometry.csv
-reporte_tolima,RT,analysis,figure,colombia/geometry/r_t/tolima/aggregated_Rt.csv,aggregated_Rt.csv
+reporte_tolima,RT,analysis,figure,colombia/geometry/r_t/tolima/aggregated_Rt.png,aggregated_Rt.png
+reporte_tolima,RT,analysis,figure,colombia/geometry/r_t/tolima/73001_Rt.png,rt_plot.png
 reporte_quindio,Graph Map First Day,analysis,figure,colombia/community/graph_maps/quindio/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
 reporte_quindio,Graph Map Current Day,analysis,figure,colombia/community/graph_maps/quindio/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
 reporte_quindio,Polygon Movement range,analysis,figure,colombia/community/movement_plots/quindio/movement_range_selected_polygons_quindio.png,movement_range_selected_polygons.png
@@ -109,10 +120,12 @@ reporte_quindio,Mapa Alerta General,analysis,figure,colombia/geometry/alerts/qui
 reporte_quindio,Mapa Cloropletico Historico,analysis,figure,colombia/geometry/polygon_info_window/quindio/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
 reporte_quindio,Mapa Cloropletico Reciente,analysis,figure,colombia/geometry/polygon_info_window/quindio/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
 reporte_quindio,Mapa Cloropletico Reciente,analysis,table,colombia/geometry/polygon_info_window/quindio/detail_choropleth_recent.csv,detail_choropleth_recent.csv
+reporte_quindio,Mapa Cloropletico RT,analysis,figure,colombia/geometry/polygon_info_window/quindio/choropleth_map_colombia_rt.png,choropleth_map_colombia_rt.png
+reporte_quindio,Mapa Cloropletico RT,analysis,table,colombia/geometry/polygon_info_window/quindio/detail_choropleth_rt.csv,detail_choropleth_rt.csv
 reporte_quindio,Alertas Rojas,analysis,table,colombia/geometry/alerts/quindio/alerts.csv,alerts.csv
 reporte_quindio,Estadisticas Municipio,analysis,table,colombia/geometry/stats/quindio/general_stats.csv,geometry_statistics.csv
 reporte_quindio,Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/quindio/general_stats.csv,community_statistics.csv
 reporte_quindio,Estadisticas Prediccion,analysis,table,colombia/community/prediction/polygon_unions/quindio/statistics.csv,prediction_statistics.csv
 reporte_quindio,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/quindio/incidence_map.jpeg,incidence_map_geometry.jpeg
 reporte_quindio,Incidence Table,analysis,table,colombia/geometry/incidence_maps/quindio/incidences.csv,incidences_geometry.csv
-reporte_quindio,RT,analysis,figure,colombia/geometry/r_t/quindio/aggregated_Rt.csv,aggregated_Rt.csv
+reporte_quindio,RT,analysis,figure,colombia/geometry/r_t/quindio/aggregated_Rt.png,aggregated_Rt.png

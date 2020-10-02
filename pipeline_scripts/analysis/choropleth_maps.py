@@ -16,6 +16,9 @@ from pipeline_scripts.functions.general_functions import load_README
 # Constants
 WINDOW_SIZE = 7 # in days
 edgecolor = None
+RT_MISSING = 1000000
+LEGEND_SIZE = "large"
+
 
 # Direcotries
 from global_config import config
@@ -52,6 +55,7 @@ scheme = "user_defined"
 bins = {'bins':[0, 0.49, 1, 2, 5, 10, 50], 'bins_rt':[0, 0.5, 0.8, 1, 1.5, 2, 5]} 
 colors = [(1, 0.96, 0.94), (0.99, 0.83, 0.76), (0.98, 0.62, 0.51), (0.98, 0.41, 0.29), (0.89, 0.18, 0.15), (0.69, 0.07, 0.09), (0.37, 0.04, 0.1)] 
 colors_rt = [(0, 0.28, 0.16),(0.66, 0.85, 0.55), (0.86, 0.94, 0.65),(0.98, 0.99, 0.78), (0.89, 0.18, 0.15), (0.69, 0.07, 0.09), (0.37, 0.04, 0.1)]
+grey = (0.83,0.83,0.83)
 # colors_rt = [(0.98, 0.99, 0.78), (0.86, 0.94, 0.65), (0.66, 0.85, 0.55), (0.42, 0.75, 0.45), (0.11, 0.49, 0.25), (0, 0.41, 0.21), (0, 0.28, 0.16)] 
 
 # Get name of files
@@ -112,7 +116,6 @@ day_t1 = day_t0 + datetime.timedelta(days = WINDOW_SIZE)
 df_rt = df_rt[df_rt["date_time"] >= day_t3]
 df_rt = df_rt.groupby("poly_id").mean()
 
-
 # returns name of river node intersects or nan
 def is_polygon_on_river(node_id, buffer=False):
        geometry = geo_df.set_index('Codigo_Dan').at[node_id, 'geometry']
@@ -133,6 +136,8 @@ def calculate_delta(t_0, t_1):
        return df_delta
 
 def set_color(x, bins, colors):
+       if np.isnan(x):
+              return grey, "Sin RT"
        index = 0
        for i in range(len(bins)):
               if x <= bins[i]:
@@ -153,7 +158,6 @@ def construct_legend(bins):
               else:
                      label = "({}, {}]".format(bins[i-1], bins[i])
               l.append(label)
-
        return l
 
 # Get deltas
@@ -234,13 +238,16 @@ else :
 
 print(ident+"   Building choropleth map for last week's RT")
 # Plot rt_choroplet
-gdf_rt = geo_df.merge(df_rt, left_on='Codigo_Dan', right_on="poly_id") 
-gdf_rt.rename(columns={"Codigo_Dan":"poly_id"}, inplace=True)
+
+gdf_rt = geo_df.merge(df_rt.reset_index(), left_on='Codigo_Dan', right_on="poly_id", how="outer")
+if selected_polygons_boolean:
+       gdf_rt = gdf_rt[gdf_rt["Codigo_Dan"].isin(selected_polygons)]
 gdf_rt.to_crs(epsg=3857, inplace=True)
 gdf_rt["color"], gdf_rt["label"] = zip(*gdf_rt.apply(lambda x: set_color(x.ML, bins["bins_rt"], colors_rt), axis=1))
-ax = gdf_rt.fillna(0).plot(figsize=(30,18), color=gdf_rt['color'], label=gdf_rt['label'] \
-       , linewidth=0.5, edgecolor=edgecolor)
-# ax = gdf_rt.fillna(0).plot(figsize=(30,18), column="ML", cmap='YlGn', scheme='quantiles', alpha=0.7, linewidth=0.5, edgecolor=edgecolor, legend=True)
+# print(gdf_rt.head(20))
+# print(gdf_rt.columns)
+# raise Exception("DONE")
+ax = gdf_rt.plot(figsize=(30,18), color=gdf_rt['color'], label=gdf_rt['label'], linewidth=0.5, edgecolor=edgecolor)
 ax.set_axis_off()
 
 if selected_polygons_boolean:
@@ -257,7 +264,8 @@ rivers_df.plot(ax=ax, alpha=0.1)
 legend = construct_legend(bins["bins_rt"])
 for i in range(len(legend)):
     plt.scatter([], [], color=colors_rt[i], label=str(legend[i]))
-plt.legend(scatterpoints=1, frameon=False, labelspacing=1, title='RT')
+plt.scatter([], [], color=grey, label=str("Sin RT"))
+plt.legend(scatterpoints=1, frameon=False, labelspacing=1, title='RT', fontsize=LEGEND_SIZE)
 plt.title('Promedio de RT para la Última Semana')
 plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_rt.png'.format(location_name)), bbox_inches="tight")
 
@@ -291,7 +299,7 @@ rivers_df.plot(ax=ax, alpha=0.1)
 legend = construct_legend(bins["bins"])
 for i in range(len(legend)):
     plt.scatter([], [], color=colors[i], label=str(legend[i]))
-plt.legend(scatterpoints=1, frameon=False, labelspacing=1, title='Movimiento')
+plt.legend(scatterpoints=1, frameon=False, labelspacing=1, title='Movimiento', fontsize=LEGEND_SIZE)
 
 plt.title('Comparativo entre el último Viernes y 15 días atrás')
 plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_15-day-window.png'.format(location_name)), bbox_inches="tight")
@@ -329,7 +337,7 @@ rivers_df.plot(ax=ax, alpha=0.1)
 # Here we create a legend: The convoluted way
 for i in range(len(legend)):
     plt.scatter([], [], color=colors[i], label=str(legend[i]))
-plt.legend(scatterpoints=1, frameon=False, labelspacing=1, title='Movimiento')
+plt.legend(scatterpoints=1, frameon=False, labelspacing=1, title='Movimiento', fontsize=LEGEND_SIZE)
 
 plt.title('Comparativo entre el último Viernes y los primeros 15 días de Abril')
 plt.savefig(os.path.join(output_file_path, 'choropleth_map_{}_historic.png'.format(location_name)), bbox_inches="tight")
