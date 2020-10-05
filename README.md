@@ -3,4 +3,4 @@
 
 Mobility pipeline based on Facebook's GeoInsights Data.
 
-Part of DataLama Team -- :) :(
+Part of DataLama Team. 2020
