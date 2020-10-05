@@ -194,3 +194,5 @@ parameters = "{} {} {} {} {} {} {}".format(location_folder,
                                 poly_id)
 
 ef.excecute_script(wrapper_scripts_location, "polygon_union_prediction_wrapper.py", "python", parameters)
+
+##DONE
