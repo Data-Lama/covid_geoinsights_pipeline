@@ -106,7 +106,7 @@ print(ident + 'Excecuting Movement Analysis for {} with {} Agglomeration Over {}
 print(ident + '   Extracts the movement and cases for {}'.format(selected_polygons_name))
 
 # Reads Polygons
-polygons = pd.read_csv(os.path.join(agglomerated_folder_location, 'polygons.csv'))
+polygons 	     = pd.read_csv(os.path.join(agglomerated_folder_location, 'polygons.csv'))
 polygons.poly_id = polygons.poly_id.astype(str)
 
 # For the national average
@@ -159,9 +159,6 @@ if pop_attr in polygons.columns:
 	# Final Variable
 	df_mov_range_all['value'] = df_mov_range_all['prod']/df_mov_range_all[pop_attr]
 
-	
-
-
 else:
 	df_mov.rename(columns = {'movement_change':'value'}, inplace = True)
 	df_mov_range_all.rename(columns = {'movement_change':'value'}, inplace = True)
@@ -186,7 +183,7 @@ df_cases_all = df_cases_all[df_cases_all.poly_id.isin(selected_polygons)]
 df_cases = df_cases_all[['date_time','value']].groupby('date_time').sum().reset_index()
 
 # Smooths 
-df_cases['value'] = gf.smooth_curve(df_cases['value'], con.smooth_days )
+df_cases['value'] = gf.smooth_curve( df_cases['value'], con.smooth_days )
 df_cases['type'] = 'cases'
 df_cases['Tipo'] = 'Casos' 
 
