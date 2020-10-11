@@ -113,8 +113,10 @@ polygons 	     = pd.read_csv(os.path.join(agglomerated_folder_location, 'polygon
 # For the national average
 polygons_all = polygons.copy()
 
+# Polgons to be considered.
 polygons = polygons[polygons.poly_id.isin(selected_polygons)].copy()
 
+# Read movement data-range file
 df_mov_range = pd.read_csv(movement_range_file, parse_dates = ['date_time'])
 df_mov_range.poly_id = df_mov_range.poly_id.astype(str)
 
@@ -122,7 +124,6 @@ df_mov_range.poly_id = df_mov_range.poly_id.astype(str)
 df_mov_range_all = df_mov_range.copy()
 
 df_mov_range = df_mov_range[df_mov_range.poly_id.isin(selected_polygons)]
-
 
 # Loads the movement range
 df_mov = df_mov_range.copy()
@@ -173,7 +174,7 @@ df_mov_range_all = df_mov_range_all[['date_time','value']].copy()
 df_mov_range_all['type'] = 'movement'
 df_mov_range_all['Tipo'] = 'Movimiento Global'
 
-
+# Movimiento local is "inter_polygon" movement Movimiento globla is "outer_polygon" movement (importation/exportation process)
 df_mov_plot = pd.concat((df_mov[['date_time','value','type','Tipo']], df_mov_range_all[['date_time','value','type','Tipo']]), ignore_index = True)
 
 # Loads cases
@@ -181,14 +182,16 @@ df_cases_raw = pd.read_csv(os.path.join(agglomerated_folder_location, 'cases.csv
 df_cases_all = df_cases_raw.rename(columns = {'num_cases':'value'})
 df_cases_all = df_cases_all[['date_time','value', 'poly_id']].copy()
 df_cases_all = df_cases_all[df_cases_all.poly_id.isin(selected_polygons)]
+
+# here date_time is given by FECHA DE DIAGNÓSTICO
 df_cases = df_cases_all[['date_time','value']].groupby('date_time').sum().reset_index()
 
 # Smooths 
-df_cases['value'] = gf.smooth_curve( df_cases['value'], con.smooth_days )
+df_cases['smoothed_value'] = gf.smooth_curve( df_cases['value'], con.smooth_days )
 df_cases['type'] = 'cases'
 df_cases['Tipo'] = 'Casos' 
 
-df_cases_plot = df_cases[['date_time','value','type','Tipo']].copy()
+df_cases_plot = df_cases[['date_time', 'smoothed_value', 'value','type','Tipo']].copy()
 
 
 df = pd.concat((df_mov_plot, df_cases_plot), ignore_index = True)
@@ -196,39 +199,44 @@ df = pd.concat((df_mov_plot, df_cases_plot), ignore_index = True)
 print(ident + '   Plots movement for {} (All)'.format(selected_polygons_name))
 
 # Global Movmeent Plot
-df_plot = df
+df_plot = df.copy().set_index('date_time')
 
+####### change plots #######
+fig, ax = plt.subplots(2,1,figsize=fig_size)
 
-g = sns.relplot(x="date_time", y="value",row="type", hue = 'Tipo',
-            height=height, aspect=aspect, facet_kws=dict(sharey=False),
-            kind="line", data=df_plot)
+ax[0].plot(df_plot.query("Tipo == 'Movimiento Local'").value, label='Movimiento Local', color='r', linewidth=2)
+ax[0].plot(df_plot.query("Tipo == 'Movimiento Global'").value, label='Movimiento Global', color='k', linewidth=2)
 
+ax[1].bar(df_plot.query("Tipo == 'Casos'").value.index, df_plot.query("Tipo == 'Casos'").value.values, label='Casos', facecolor='grey', edgecolor='white')
+ax[1].plot(df_plot.query("Tipo == 'Casos'").smoothed_value.index, df_plot.query("Tipo == 'Casos'").smoothed_value.values, label='Promedio movil semanal', color='k')
 
 # Axis
-g.set_axis_labels("Fecha", "")
-g.axes[0,0].set_ylabel('Proporción (0-1)')
-g.axes[1,0].set_ylabel('Número Casos')
+ax[1].axes.set_xlabel( "Fecha" )
+ax[0].axes.set_ylabel('%')
+ax[1].axes.set_ylabel('Casos')
 
 # Titles
-g.axes[0,0].set_title(f'Cambio Porcentual en el Movimiento en {selected_polygons_name}')
-g.axes[1,0].set_title(f'Casos Diarios en {selected_polygons_name}')
-
+ax[0].set_title(f'Cambio Porcentual en el Movimiento en {selected_polygons_name}')
+ax[1].set_title(f'Casos Diarios en {selected_polygons_name}')
+ax[0].legend()
+ax[1].legend()
 
 # Adds the horizontal line
-g.axes[0,0].axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
+#g.axes[0,0].axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
 
-min_dat, max_date = g.axes[0,0].get_xlim()
+min_date, max_date = ax[0].axes.get_xlim()
+ax[1].axes.set_xlim((min_date, max_date))
 
-tick = np.round(min_dat) + 4
-ticks = []
-while tick  < max_date:
-	ticks.append(tick)
-	tick += jump
+#tick = np.round(min_date) + 4
+#ticks = []
+#while tick  < max_date:
+#	ticks.append(tick)
+#	tick += jump
 
+#ax[0].axes.xaxis.set_ticks(ticks)
 
-
-g.axes[1,0].xaxis.set_ticks(ticks)
-g.savefig(os.path.join(export_folder_location, f'mov_range_{selected_polygons_folder_name}.png'))
+plt.show()
+fig.savefig(os.path.join(export_folder_location, f'mov_range_{selected_polygons_folder_name}.png'))
 
 
 
