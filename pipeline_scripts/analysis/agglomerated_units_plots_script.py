@@ -1,5 +1,4 @@
 # Movement Plots for selected polygons
-
 # Other imports
 import os, sys
 
@@ -134,7 +133,6 @@ for agglomeration_method in agglomeration_methods:
 	fig.savefig(os.path.join(export_folder_location,'external_movement_selected_polygons_{}.png'.format(location_folder)))
 
 
-
 	# Plots Cases
 	print(ident + '      Plots Cases')
 
@@ -142,16 +140,13 @@ for agglomeration_method in agglomeration_methods:
 	df_plot = df_cases[['date_time','poly_name', 'num_cases']].groupby(['date_time','poly_name']).sum().reset_index()
 	df_plot['num_cases'] = df_plot['num_cases'].rolling(4, min_periods=1).mean()
 	ax = sns.lineplot(data = df_plot, x = 'date_time', y = 'num_cases', hue = 'poly_name')
+	
 	ax.set_title('Número de Casos en Unidades de Control para {}'.format(location_name), fontsize=suptitle_font_size)
 	ax.set_xlabel('Fecha', fontsize=axis_font_size)
 	ax.set_ylabel('Número de Casos', fontsize=axis_font_size)
 	ax.legend().texts[0].set_text("Unidad de Control")
 
 	fig.savefig(os.path.join(export_folder_location,'cases_selected_polygons_{}.png'.format(location_folder)))
-
-
-
-
 
 	# Plots Cases
 	print(ident + '      Plots Accumulative Cases')
