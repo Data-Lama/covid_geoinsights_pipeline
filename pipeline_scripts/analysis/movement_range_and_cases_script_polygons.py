@@ -186,8 +186,19 @@ df_cases_all = df_cases_all[df_cases_all.poly_id.isin(selected_polygons)]
 # here date_time is given by FECHA DE DIAGNÓSTICO
 df_cases = df_cases_all[['date_time','value']].groupby('date_time').sum().reset_index()
 
+
+
+#idx_start = np.searchsorted(daily_cases['Smoothed_'+col], cutoff)
+#daily_cases['Smoothed_'+col] = daily_cases['Smoothed_'+col].iloc[idx_start:]
+
+
+
 # Smooths 
-df_cases['smoothed_value'] = gf.smooth_curve( df_cases['value'], con.smooth_days )
+df_cases['smoothed_value'] = df_cases['value'].rolling(7,
+	win_type='gaussian',
+	min_periods=1,
+	center=True).mean(std=2).round()
+
 df_cases['type'] = 'cases'
 df_cases['Tipo'] = 'Casos' 
 
@@ -201,43 +212,78 @@ print(ident + '   Plots movement for {} (All)'.format(selected_polygons_name))
 # Global Movmeent Plot
 df_plot = df.copy().set_index('date_time')
 
+from matplotlib.dates import date2num, num2date
+from matplotlib import dates as mdates
+from matplotlib import ticker
+from matplotlib.colors import ListedColormap
+from matplotlib.patches import Patch
+
 ####### change plots #######
-fig, ax = plt.subplots(2,1,figsize=fig_size)
+fig, ax = plt.subplots(2, 1, figsize=fig_size)
+ax[0].plot( df_plot.query("Tipo == 'Movimiento Local'").value.index.values, df_plot.query("Tipo == 'Movimiento Local'").value, label='Movimiento Local', color='r', linewidth=2)
+ax[0].plot( df_plot.query("Tipo == 'Movimiento Local'").value.index.values, df_plot.query("Tipo == 'Movimiento Global'").value, label='Movimiento Global', color='k', linewidth=2)
 
-ax[0].plot(df_plot.query("Tipo == 'Movimiento Local'").value, label='Movimiento Local', color='r', linewidth=2)
-ax[0].plot(df_plot.query("Tipo == 'Movimiento Global'").value, label='Movimiento Global', color='k', linewidth=2)
-
-ax[1].bar(df_plot.query("Tipo == 'Casos'").value.index, df_plot.query("Tipo == 'Casos'").value.values, label='Casos', facecolor='grey', edgecolor='white')
-ax[1].plot(df_plot.query("Tipo == 'Casos'").smoothed_value.index, df_plot.query("Tipo == 'Casos'").smoothed_value.values, label='Promedio movil semanal', color='k')
-
-# Axis
-ax[1].axes.set_xlabel( "Fecha" )
-ax[0].axes.set_ylabel('%')
-ax[1].axes.set_ylabel('Casos')
-
-# Titles
-ax[0].set_title(f'Cambio Porcentual en el Movimiento en {selected_polygons_name}')
-ax[1].set_title(f'Casos Diarios en {selected_polygons_name}')
-ax[0].legend()
-ax[1].legend()
+ax[1].bar(  df_plot.query("Tipo == 'Casos'").value.index.values, df_plot.query("Tipo == 'Casos'").value.values, label='Casos', color='k', alpha=0.3, zorder=1)
+ax[1].plot( df_plot.query("Tipo == 'Casos'").smoothed_value.index.values, df_plot.query("Tipo == 'Casos'").smoothed_value.values, label='Promedio movil semanal', color='k', linewidth=2)
 
 # Adds the horizontal line
 #g.axes[0,0].axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
+min_date = df_plot.query("Tipo == 'Movimiento Global'").index.values[0]
+max_date = df_plot.query("Tipo == 'Movimiento Global'").index.values[-1]
 
-min_date, max_date = ax[0].axes.get_xlim()
-ax[1].axes.set_xlim((min_date, max_date))
+#ax1xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
+ax[0].set_xlim( min_date-pd.Timedelta( days=2 ), max_date+pd.Timedelta(days=2) )
+ax[1].set_xlim( min_date-pd.Timedelta( days=2 ), max_date+pd.Timedelta(days=2) )
 
-#tick = np.round(min_date) + 4
-#ticks = []
-#while tick  < max_date:
-#	ticks.append(tick)
-#	tick += jump
+# Axis
+ax[1].axes.set_xlabel( "Fecha" )
+ax[0].axes.set_ylabel('Cambio Porcentual')
+ax[1].axes.set_ylabel('Numero de Casos')
 
-#ax[0].axes.xaxis.set_ticks(ticks)
+# Titles
+ax[0].set_title(f'Cambio Porcentual en el Movimiento en {selected_polygons_name}')
+#ax[1].set_title(f'Casos Diarios en {selected_polygons_name}')
+ax[0].legend(frameon=False)
+ax[1].legend(frameon=False)
+ax[0].set_xticks([])        
+#ax[0].spines['left'].set_visible(False)
+#ax[0].spines['bottom'].set_visible(False)
+#ax[0].spines['right'].set_visible(False)
+ax[1].grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
+ax[0].grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
+
+#ax[1].spines['left'].set_visible(False)
+ax[1].spines['bottom'].set_visible(False)
+#ax[1].spines['right'].set_visible(False)
+
+
+ax[1].xaxis.set_major_locator(mdates.MonthLocator())
+#ax[1].xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
+
+
+ax[1].xaxis.set_minor_locator(mdates.DayLocator())
+ax[1].xaxis.set_major_locator(mdates.WeekdayLocator())
+ax[1].xaxis.set_major_locator(mdates.MonthLocator())
+ax[1].xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+
+ax[0].xaxis.set_minor_locator(mdates.DayLocator())
+ax[0].xaxis.set_major_locator(mdates.WeekdayLocator())
+ax[0].xaxis.set_major_locator(mdates.MonthLocator())
+ax[0].xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+
+#ax[1].yaxis.set_major_locator(ticker.MultipleLocator(1))
+#ax[1].yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.0f}"))
+
+#ax[1].spines['right'].set_visible(False)
+plt.tight_layout()
+#ax[1].grid(None)
+#ax[0] = ax[1].twinx()
 
 plt.show()
+
+
+
+
 fig.savefig(os.path.join(export_folder_location, f'mov_range_{selected_polygons_folder_name}.png'))
-
-
 
 print(ident + 'Done')
