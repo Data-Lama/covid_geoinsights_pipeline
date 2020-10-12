@@ -3,6 +3,9 @@
 # Other imports
 import os, sys
 
+#sys.path
+sys.path.append('pipeline_scripts/functions/')
+
 from pathlib import Path
 
 import pandas as pd
@@ -23,7 +26,6 @@ analysis_dir = config.get_property('analysis_dir')
 
 
 def clean_name(s):
-
 	d = {}
 	d['Santaf- de Bogot-'] = 'Bogotá'
 	d['Medell-n'] = 'Medellín'
@@ -49,7 +51,12 @@ aspect= 5
 num_ticks = 6
 
 # Reads the parameters from excecution
-location_name  =  sys.argv[1] # location name
+# FOR running and example uncomment
+location_name   = 'Colombia'
+location_folder = 'colombia'
+agglomeration_method_parameter ='community'
+
+location_name  =  sys.argv[1] # location name  
 location_folder =  sys.argv[2] # locatio folder name
 agglomeration_method_parameter = sys.argv[3] # Aglomeration name
 
@@ -113,10 +120,6 @@ for agglomeration_method in agglomeration_methods:
 	# Loads the movement range
 	df_mov = df_mov_range.copy()
 
-
-
-
-
 	# Merges with polygons
 	pop_attr = "attr_population"
 
@@ -143,8 +146,11 @@ for agglomeration_method in agglomeration_methods:
 	df_mov = df_mov[['date_time','value']].copy()
 	df_mov['type'] = 'movement'
 	df_mov['Tipo'] = 'Movimiento'
+	df_mov['smoothed_value'] = df_mov['value'].rolling(7, center=True).mean(std=2).fillna(0)
+	df_mov['smoothed_value'].loc[df_mov['smoothed_value']==0] = df_mov['value'].loc[df_mov['smoothed_value']==0]
 
-	df_mov_plot = df_mov[['date_time','value','type','Tipo']].copy()
+
+	df_mov_plot = df_mov[['date_time','value','smoothed_value','type','Tipo']].copy()
 
 	# Loads cases
 	df_cases_raw = pd.read_csv(os.path.join(unified_folder_location, 'cases.csv'), parse_dates = ['date_time'])
@@ -154,18 +160,21 @@ for agglomeration_method in agglomeration_methods:
 
 
 	# Somooths
-	df_cases['value'] = gf.smooth_curve(df_cases['value'], con.smooth_days )
+	df_cases['smoothed_value'] =df_cases['value'].rolling(7,
+		win_type='gaussian',
+		min_periods=1,
+		center=True).mean(std=2).round()
+
+
 	df_cases['type'] = 'cases'
 	df_cases['Tipo'] = 'Casos (Fecha Diagnóstico)' 
 
 	# Extracts the max date
 	max_date = df_cases.date_time.max()
-
-	df_cases_plot = df_cases[['date_time','value','type','Tipo']].copy()
+	df_cases_plot = df_cases[['date_time','smoothed_value','value','type','Tipo']].copy()
 
 
 	if location_name == 'Colombia':
-
 
 		# First Date
 		date = 'fecha reporte web'
@@ -180,11 +189,16 @@ for agglomeration_method in agglomeration_methods:
 		df_cases_other_date = df_cases_other_date[df_cases_other_date.date_time <= max_date].copy()		
 
 
+		df_cases_other_date['smoothed_value'] = 1
 		df_cases_other_date['value'] = 1
+
 		df_cases_other_date = df_cases_other_date[['date_time','value']].groupby('date_time').sum().reset_index()
 
 		# Somooths
-		#df_cases_other_date['value'] = gf.smooth_curve(df_cases_other_date['value'], 2 )
+		df_cases_other_date['smoothed_value'] = df_cases_other_date['value'].rolling(7,
+			win_type='gaussian',
+			min_periods=1,
+			center=True).mean(std=2).round()
 
 		# Type
 		df_cases_other_date['Tipo'] = 'Casos (Fecha Reporte Web)' 
@@ -210,8 +224,11 @@ for agglomeration_method in agglomeration_methods:
 		df_cases_other_date['value'] = 1
 		df_cases_other_date = df_cases_other_date[['date_time','value']].groupby('date_time').sum().reset_index()
 
-		# Somooths
-		df_cases_other_date['value'] = gf.smooth_curve(df_cases_other_date['value'], 5 )
+		# Somooths #######
+		df_cases_other_date['smoothed_value'] = df_cases_other_date['value'].rolling(7,
+			win_type='gaussian',
+			min_periods=1,
+			center=True).mean(std=2).round()
 
 		# Type
 		df_cases_other_date['Tipo'] = 'Casos (Inicio Síntomas)' 
@@ -237,8 +254,6 @@ for agglomeration_method in agglomeration_methods:
 		df_miles_exp = df_miles_exp[['Num.','Medidas adoptadas COVID-19','Fecha','Documento Soporte']]
 		df_miles_exp.to_csv(os.path.join(export_folder_location,'milestones.csv'), index = False)
 
-
-
 	df = pd.concat((df_mov_plot, df_cases_plot), ignore_index = True)
 
 
@@ -247,33 +262,26 @@ for agglomeration_method in agglomeration_methods:
 
 	# Only movement
 	# --------------------------------------------
-
 	#df_mov_plot.to_csv('temp.csv', index = False)
-
 	fig = plt.figure(figsize=(19,8))
 	ax = sns.lineplot(x = "date_time",y = "value", data = df_mov_plot)
-
+	sns.lineplot(ax=ax, x = "date_time",y = "smoothed_value", data = df_mov_plot)
 
 	ax.set_title('Cambio Porcentual en el Movimiento a Nivel Nacional')
 	ax.set_xlabel('Fecha', fontsize=axis_font_size)
 	ax.set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
-
 
 	#Adds milestones
 	if df_miles is not None:
 		limits = ax.get_ylim()
 		top_pos = limits[1] - (limits[1] - limits[0])*0.05
 
-
 		for ind, row in df_miles.iterrows():
 			ax.text(row.date_time - timedelta(hours = 12), top_pos, str(ind))
 			ax.axvline( row.date_time, color=miles_stones_color, linestyle='--', lw=miles_stones_width, ymin = 0.0,  ymax = 0.9)
 			ax.axvline( row.date_time, color=miles_stones_color, linestyle='--', lw=miles_stones_width, ymin = 0.0,  ymax = 1)
-
-
 	# Adds the horizontal line
 	ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
-
 	min_dat, max_date = ax.get_xlim()
 
 	tick = np.round(min_dat) + 4
@@ -282,9 +290,6 @@ for agglomeration_method in agglomeration_methods:
 	while tick  < max_date:
 		ticks.append(tick)
 		tick += jump
-
-
-
 	ax.xaxis.set_ticks(ticks)
 	fig.savefig(os.path.join(export_folder_location, f'only_mov_range_{location_folder}.png'))
 
@@ -356,6 +361,7 @@ for agglomeration_method in agglomeration_methods:
 
 	fig = plt.figure(figsize=(19,8))
 
+
 	ax = sns.lineplot(data = df_plot, x = 'date_time', y = 'movement_change', hue = 'poly_name')
 	ax.set_title('Cambio Porcentual en Movilidad en Unidades {} para {}'.format(unit_type_prural, location_name), fontsize=suptitle_font_size)
 	ax.set_xlabel('Fecha', fontsize=axis_font_size)
@@ -371,10 +377,6 @@ for agglomeration_method in agglomeration_methods:
 	# Saves data
 	print(ident + f'      Saving Data. Size: {df_plot.shape}')	
 	df_plot.to_csv(os.path.join(export_folder_location, f'movement_range_selected_polygons_{location_folder}_data.csv'), index = False)
-
-
-	
-
 
 
 print(ident + 'Done')

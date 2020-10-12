@@ -186,13 +186,6 @@ df_cases_all = df_cases_all[df_cases_all.poly_id.isin(selected_polygons)]
 # here date_time is given by FECHA DE DIAGNÓSTICO
 df_cases = df_cases_all[['date_time','value']].groupby('date_time').sum().reset_index()
 
-
-
-#idx_start = np.searchsorted(daily_cases['Smoothed_'+col], cutoff)
-#daily_cases['Smoothed_'+col] = daily_cases['Smoothed_'+col].iloc[idx_start:]
-
-
-
 # Smooths 
 df_cases['smoothed_value'] = df_cases['value'].rolling(7,
 	win_type='gaussian',
@@ -278,11 +271,6 @@ ax[0].xaxis.set_major_formatter(mdates.DateFormatter('%b'))
 plt.tight_layout()
 #ax[1].grid(None)
 #ax[0] = ax[1].twinx()
-
-plt.show()
-
-
-
 
 fig.savefig(os.path.join(export_folder_location, f'mov_range_{selected_polygons_folder_name}.png'))
 
