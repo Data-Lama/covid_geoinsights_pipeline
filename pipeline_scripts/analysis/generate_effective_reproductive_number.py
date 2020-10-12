@@ -243,6 +243,7 @@ if selected_polygons_boolean:
     #pdb.set_trace()
     df_all = df_cases.copy()
     print(indent + indent + f"Calculating individual polygon rt.")
+    polys_not = []
     for idx, poly_id in enumerate( list( df_all['poly_id'].unique()) ):
         print(indent + indent + indent + f" {poly_id}.")
         computed_polygons.append(poly_id)
@@ -261,14 +262,14 @@ if selected_polygons_boolean:
             #pdb.set_trace()
             (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
             result.to_csv(os.path.join(export_folder_location, str(poly_id)+'_Rt.csv'))
+            plt.close()
         else:
             skipped_polygons.append(poly_id)
-            print('\nWARNING: for poly_id {} Rt was not computed...'.format(poly_id))
-            print('\tpoly_id: {} has only {} cases must be greater than 100\n'.format(poly_id, all_cases))
+    print('\nWARNING: Rt was not computed for polygons: {}'.format([str(p)+', ' for p in skipped_polygons] ))
 
 df_all = df_cases.copy()
 df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
-df_all = df_all.groupby('date_time').sum()[['num_cases']]
+df_all    = df_all.groupby('date_time').sum()[['num_cases']]
 all_cases = df_all['num_cases'].sum()
 
 print(indent + indent + f"Calculating aggregated rt.")
