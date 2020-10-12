@@ -48,7 +48,6 @@ NATIONAL_SUBSIDIZED = 53
 RED_RT = 1
 YELLOW_RT = 0.8
 
-
 DONE = False
 
 TRANSLATE = {'internal_alert':'Alerta interna',
@@ -79,12 +78,32 @@ cases = os.path.join(agglomerated_file_path, 'cases.csv')
 movement = os.path.join(agglomerated_file_path, 'movement.csv')
 socioecon = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'socio_economic', 'estadisticas_por_municipio.csv')
 
+# Geofiles
+community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', "community", "polygon_community_map.csv")
+poly_locations = os.path.join(agglomerated_file_path, 'polygons.csv')
+shape_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'geo', 'Municpios_Dane_2017.shp')
+
+# If polygon_union_wrapper
 if selected_polygons_boolean:
-    rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", selected_polygon_name)
+    rt = os.path.join(analysis_dir, location_name, "community", "r_t", selected_polygon_name)
+    time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', selected_polygon_name)
 else:
-    rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", "entire_location")
+    time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', "entire_location")
+    rt = os.path.join(analysis_dir, location_name, "community", "r_t", "entire_location")
+
+total_window = os.path.join(time_window_file_path, 'deltas_forward_window_5days.csv')
+
+# Load df_movement_threshold
+df_movment_threshold = None
 
 # Load r_t
+def expand_rt_to_geometry(poly_id, df):
+    
+    if poly_id in df.index:
+        return df.at[poly_id, "ML"]
+    else: return np.nan
+    
+
 files = os.listdir(rt)
 r_t_files = []
 
@@ -104,20 +123,6 @@ for i in r_t_files:
     df_tmp.rename(columns={"date": "date_time"}, inplace=True)
     df_tmp["poly_id"] = poly_id
     df_rt = pd.concat([df_rt, df_tmp])
-
-# If polygon_union_wrapper
-if selected_polygons_boolean:
-    time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', selected_polygon_name)
-else:
-    time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', "entire_location")
-
-total_window = os.path.join(time_window_file_path, 'deltas_forward_window_5days.csv')
-
-
-# Geofiles
-community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', 'community', 'polygon_community_map.csv')
-poly_locations = os.path.join(agglomerated_file_path, 'polygons.csv')
-shape_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'geo', 'Municpios_Dane_2017.shp')
 
 # Check if folder exists
 if not os.path.isdir(output_file_path):
@@ -146,6 +151,7 @@ df_total_window = pd.read_csv(total_window)
 
 
 # Set window size
+#TODO replace "today" with last date of data availability
 first_day = pd.Timestamp('today') - datetime.timedelta(days = WINDOW_SIZE)
 
 # Get socio-economic variables
@@ -173,8 +179,7 @@ df_external_movement.rename(columns={"movement":"external_movement", "start_poly
 df_external_movement.drop(columns=["end_poly_id"], inplace=True)
 
 df_movement_recent = df_inner_movement.merge(df_external_movement, on=["poly_id", "date_time"], how="outer").fillna(0)
-
-# print(df_movement_recent.sort_values("poly_id").head(10))
+    
 
 # Get overtime stats
 df_mean_movement_stats = get_mean_movement_stats_overtime(df_movement).reset_index()
@@ -259,6 +264,8 @@ def set_vulnerability_color(vul_alert):
     else: return "VERDE"
 
 def set_rt_alert_color(rt):
+    if np.isnan(rt):
+        return "BLANCO"
     if rt >= RED_RT:
         return "ROJO"
     if rt >= YELLOW_RT:
@@ -269,10 +276,18 @@ def set_rt_alert_color(rt):
 # ---------- calculate alerts ------------ #
 # ---------------------------------------- #
 
-# Movement alerts 
-df_alerts = calculate_alerts_record(df_movement_stats, df_movement_recent).reset_index()
-df_alerts.drop(columns=["points_inner_movement", "points_external_movement"])
+# Community agglomeration
 
+
+# Movement alerts 
+if df_movment_threshold != None:
+    df_movement_recent = df_movement_recent.merge(df_movment_threshold, on="poly_id", how="outer")
+    df_movement_recent["internal_alert"] = df_movement_recent.apply(lambda x: "ROJO" if (x.inner_movement >= x.threshold) else "VERDE", axis=1)
+    df_movement_recent["external_alert"] = df_movement_recent.apply(lambda x: "ROJO" if (x.external_movement >= x.threshold) else "VERDE", axis=1)
+    df_alerts = df_movement_recent.copy()
+else:    
+    df_alerts = calculate_alerts_record(df_movement_stats, df_movement_recent).reset_index()
+    df_alerts.drop(columns=["points_inner_movement", "points_external_movement"])
 
 # Num cases alerts
 df_alerts_cases = df_total_window.copy()
@@ -288,11 +303,19 @@ df_alerts.drop(columns=["points_inner_movement", "points_external_movement"], in
 # RT alerts
 df_rt = df_rt[df_rt["date_time"] >= first_day]
 df_rt_alert = df_rt.groupby("poly_id").mean()
+
+# Expand rt to geometries
+if location_folder == "geometry":
+    df_rt_geometry = pd.DataFrame({"poly_id":df_community["poly_id"]})
+    df_community.set_index("poly_id", inplace=True)
+    df_rt_geometry["ML"] = df_rt_geometry.apply(lambda x: expand_rt_to_geometry(df_community.at[x.poly_id, "community_id"], df_rt_alert), axis=1)
+    df_rt_alert = df_rt_geometry
+
 df_rt_alert["rt_alert"] = df_rt_alert.apply(lambda x: set_rt_alert_color(x.ML), axis=1)
+df_alerts = df_alerts.merge(df_rt_alert, how="outer", on="poly_id")
 
 # Merge 
 df_alerts = df_alerts.merge(df_alerts_cases, on="poly_id", how="outer").fillna("VERDE")
-df_alerts = df_alerts.merge(df_rt_alert, on="poly_id", how="outer").fillna("BLANCO")
 df_alerts['max_alert'] = df_alerts.apply(lambda x: get_max_alert([x.internal_alert, x.external_alert, x.alert_first_case, 
                                                                     x.alert_internal_num_cases, x.alert_external_num_cases, x.rt_alert]), axis=1)
 
@@ -308,12 +331,6 @@ alert_list = ['max_alert', 'external_alert', 'internal_alert', 'alert_external_n
 for i in alert_list:
     df_alerts[f"{i}_color"] = df_alerts.apply(lambda x: set_color(x[i]), axis=1)
 
-# df_alerts['max_alert_color'] = df_alerts.apply(lambda x: set_color(x.max_alert), axis=1)
-# df_alerts['external_alert_color'] = df_alerts.apply(lambda x: set_color(x.external_alert), axis=1)
-# df_alerts['internal_alert_color'] = df_alerts.apply(lambda x: set_color(x.internal_alert), axis=1)
-# df_alerts['external_num_cases_alert_color'] = df_alerts.apply(lambda x: set_color(x.alert_external_num_cases), axis=1)
-# df_alerts['internal_num_cases_alert_color'] = df_alerts.apply(lambda x: set_color(x.alert_internal_num_cases), axis=1)
-# df_alerts['first_case_color_alert'] = df_alerts.apply(lambda x: set_color(x.alert_first_case), axis=1)
 df_alerts['vulnerability_alert_color'] = df_alerts.apply(lambda x: set_vulnerability_color(x.vulnerability_alert), axis=1)
 
 # If asked for specific polygons, get subset
@@ -337,7 +354,7 @@ if not DONE:
     else: 
         red_alerts = df_alerts.loc[(df_alerts['max_alert'] == 'ROJO')].copy()
     # Write alerts table
-    
+
     # red_alerts = red_alerts.merge(df_age, how="outer", left_on="poly_id", right_on="node_id").dropna()
     # red_alerts = red_alerts.merge(df_ipm, how="outer", left_on="poly_id", right_on="node_id").dropna()
     red_alerts.sort_values(by=['Departamento','Municipio'], inplace=True)
