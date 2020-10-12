@@ -265,7 +265,7 @@ if selected_polygons_boolean:
             plt.close()
         else:
             skipped_polygons.append(poly_id)
-    print('\nWARNING: Rt was not computed for polygons: {}'.format([str(p)+', ' for p in skipped_polygons] ))
+    print('\nWARNING: Rt was not computed for polygons: {}'.format(''.join([str(p)+', ' for p in skipped_polygons]) ))
 
 df_all = df_cases.copy()
 df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
