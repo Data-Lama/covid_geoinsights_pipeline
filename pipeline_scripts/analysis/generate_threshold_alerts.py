@@ -57,6 +57,7 @@ TRANSLATE = {'internal_alert':'Alerta interna',
             'node_name':'Municipio',
             'community_name': 'Unidad funcional',
             'max_alert': 'Alertas generales',
+            'movement_alert': 'Alerta por Movimiento',
             'rt_alert': 'Alertas por RT'}
 
 
@@ -75,8 +76,10 @@ COLORS_ = {'#b30000':'ROJO',
 agglomerated_file_path = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', location_folder)
 output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'alerts')
 cases = os.path.join(agglomerated_file_path, 'cases.csv')
-movement = os.path.join(agglomerated_file_path, 'movement.csv')
+movement = os.path.join(agglomerated_file_path, 'movement_range.csv')
 socioecon = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'socio_economic', 'estadisticas_por_municipio.csv')
+readme = os.path.join(agglomerated_file_path, "README.txt")
+threshold = os.path.join(agglomerated_file_path, "mock_threshold.csv")
 
 # Geofiles
 community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', "community", "polygon_community_map.csv")
@@ -94,11 +97,14 @@ else:
 total_window = os.path.join(time_window_file_path, 'deltas_forward_window_5days.csv')
 
 # Load df_movement_threshold
-df_movment_threshold = None
+# This dataframe must have the following columns:
+#    - poly_id
+#    - threshold
+
+df_movement_threshold = pd.read_csv(threshold)
 
 # Load r_t
 def expand_rt_to_geometry(poly_id, df):
-    
     if poly_id in df.index:
         return df.at[poly_id, "ML"]
     else: return np.nan
@@ -149,10 +155,11 @@ geo_df = gpd.read_file(shape_file_path)
 # Load time-windows
 df_total_window = pd.read_csv(total_window)
 
-
 # Set window size
-#TODO replace "today" with last date of data availability
-first_day = pd.Timestamp('today') - datetime.timedelta(days = WINDOW_SIZE)
+readme_dict = gf.load_README(readme)
+max_date = readme_dict["Movement"].split(",")[1].strip()
+max_date = max_date.split(" ")[1].strip()
+first_day = pd.Timestamp(datetime.datetime.strptime(max_date, '%Y-%m-%d')) - datetime.timedelta(days = WINDOW_SIZE)
 
 # Get socio-economic variables
 df_socioecon = pd.read_csv(socioecon)
@@ -166,33 +173,37 @@ df_ipm.set_index("node_id", inplace=True)
 df_age.set_index("node_id", inplace=True)
 df_eps.set_index("node_id", inplace=True)
 
-# Get polygons
+# Implementation for movement range change
 df_movement_recent = df_movement.loc[df_movement['date_time'] >= first_day].copy()
-df_inner_movement = df_movement_recent[df_movement_recent['start_poly_id'] == df_movement_recent['end_poly_id']].copy()
-df_external_movement = df_movement_recent[df_movement_recent['start_poly_id'] != df_movement_recent['end_poly_id']].copy()
-df_external_movement = df_external_movement.groupby(["start_poly_id", "date_time"]).sum()
-df_external_movement.reset_index(inplace=True)
+df_movement_recent = df_movement_recent.groupby("poly_id").mean()
 
-df_inner_movement.rename(columns={"movement":"inner_movement", "start_poly_id":"poly_id"}, inplace=True)
-df_inner_movement.drop(columns=["end_poly_id"], inplace=True)
-df_external_movement.rename(columns={"movement":"external_movement", "start_poly_id":"poly_id"}, inplace=True)
-df_external_movement.drop(columns=["end_poly_id"], inplace=True)
+# Get polygons
+# df_movement_recent = df_movement.loc[df_movement['date_time'] >= first_day].copy()
+# df_inner_movement = df_movement_recent[df_movement_recent['start_poly_id'] == df_movement_recent['end_poly_id']].copy()
+# df_external_movement = df_movement_recent[df_movement_recent['start_poly_id'] != df_movement_recent['end_poly_id']].copy()
+# df_external_movement = df_external_movement.groupby(["start_poly_id", "date_time"]).sum()
+# df_external_movement.reset_index(inplace=True)
 
-df_movement_recent = df_inner_movement.merge(df_external_movement, on=["poly_id", "date_time"], how="outer").fillna(0)
+# df_inner_movement.rename(columns={"movement":"inner_movement", "start_poly_id":"poly_id"}, inplace=True)
+# df_inner_movement.drop(columns=["end_poly_id"], inplace=True)
+# df_external_movement.rename(columns={"movement":"external_movement", "start_poly_id":"poly_id"}, inplace=True)
+# df_external_movement.drop(columns=["end_poly_id"], inplace=True)
+
+# df_movement_recent = df_inner_movement.merge(df_external_movement, on=["poly_id", "date_time"], how="outer").fillna(0)
     
 
 # Get overtime stats
-df_mean_movement_stats = get_mean_movement_stats_overtime(df_movement).reset_index()
-df_mean_movement_stats.rename(columns={"inner_movement":"mean_inner_movement", "external_movement":"mean_external_movement"}, inplace=True)
-df_std_movement_stats = get_std_movement_stats_overtime(df_movement).reset_index()
-df_std_movement_stats.rename(columns={"inner_movement":"std_inner_movement", "external_movement":"std_external_movement"}, inplace=True)
+# df_mean_movement_stats = get_mean_movement_stats_overtime(df_movement).reset_index()
+# df_mean_movement_stats.rename(columns={"inner_movement":"mean_inner_movement", "external_movement":"mean_external_movement"}, inplace=True)
+# df_std_movement_stats = get_std_movement_stats_overtime(df_movement).reset_index()
+# df_std_movement_stats.rename(columns={"inner_movement":"std_inner_movement", "external_movement":"std_external_movement"}, inplace=True)
 
-df_movement_stats = df_mean_movement_stats.merge(df_std_movement_stats, on="poly_id", how="outer")
-df_movement_stats["one_std_over_mean_inner_movement"] = df_movement_stats["mean_inner_movement"].add(df_movement_stats["std_inner_movement"])
-df_movement_stats["one-half_std_over_mean_inner_movement"] = df_movement_stats["one_std_over_mean_inner_movement"].add(df_movement_stats["std_inner_movement"].divide(2))
-df_movement_stats["one_std_over_mean_external_movement"] = df_movement_stats["mean_external_movement"].add(df_movement_stats["std_external_movement"])
-df_movement_stats["one-half_std_over_mean_external_movement"] = df_movement_stats["one_std_over_mean_external_movement"].add(df_movement_stats["std_external_movement"].divide(2))
-df_movement_stats.set_index("poly_id", inplace=True)
+# df_movement_stats = df_mean_movement_stats.merge(df_std_movement_stats, on="poly_id", how="outer")
+# df_movement_stats["one_std_over_mean_inner_movement"] = df_movement_stats["mean_inner_movement"].add(df_movement_stats["std_inner_movement"])
+# df_movement_stats["one-half_std_over_mean_inner_movement"] = df_movement_stats["one_std_over_mean_inner_movement"].add(df_movement_stats["std_inner_movement"].divide(2))
+# df_movement_stats["one_std_over_mean_external_movement"] = df_movement_stats["mean_external_movement"].add(df_movement_stats["std_external_movement"])
+# df_movement_stats["one-half_std_over_mean_external_movement"] = df_movement_stats["one_std_over_mean_external_movement"].add(df_movement_stats["std_external_movement"].divide(2))
+# df_movement_stats.set_index("poly_id", inplace=True)
 
 
 def set_mov_alert(points):
@@ -276,18 +287,23 @@ def set_rt_alert_color(rt):
 # ---------- calculate alerts ------------ #
 # ---------------------------------------- #
 
-# Community agglomeration
+# # Movement alerts 
+# if not df_movement_threshold.empty:
+#     df_movement_recent = df_movement_recent.merge(df_movement_threshold, on="poly_id", how="outer")
+#     df_movement_recent["internal_alert"] = df_movement_recent.apply(lambda x: "ROJO" if (x.inner_movement >= x.inner_mov_threshold) else "VERDE", axis=1)
+#     df_movement_recent["external_alert"] = df_movement_recent.apply(lambda x: "ROJO" if (x.external_movement >= x.external_mov_threshold) else "VERDE", axis=1)
+#     df_alerts = df_movement_recent.copy()
+# else:    
+#     df_alerts = calculate_alerts_record(df_movement_stats, df_movement_recent).reset_index()
+#     df_alerts.drop(columns=["points_inner_movement", "points_external_movement"])
 
 
-# Movement alerts 
-if df_movment_threshold != None:
-    df_movement_recent = df_movement_recent.merge(df_movment_threshold, on="poly_id", how="outer")
-    df_movement_recent["internal_alert"] = df_movement_recent.apply(lambda x: "ROJO" if (x.inner_movement >= x.threshold) else "VERDE", axis=1)
-    df_movement_recent["external_alert"] = df_movement_recent.apply(lambda x: "ROJO" if (x.external_movement >= x.threshold) else "VERDE", axis=1)
-    df_alerts = df_movement_recent.copy()
-else:    
-    df_alerts = calculate_alerts_record(df_movement_stats, df_movement_recent).reset_index()
-    df_alerts.drop(columns=["points_inner_movement", "points_external_movement"])
+df_movement_recent = df_movement_recent.merge(df_movement_threshold, on="poly_id", how="outer")
+df_movement_recent["movement_alert"] = df_movement_recent.apply(lambda x: "ROJO" if (x.movement_change >= x.threshold) else "VERDE", axis=1)
+df_alerts = df_movement_recent.copy()
+
+# df_alerts = calculate_alerts_record(df_movement_stats, df_movement_recent).reset_index()
+# df_alerts.drop(columns=["points_inner_movement", "points_external_movement"])
 
 # Num cases alerts
 df_alerts_cases = df_total_window.copy()
@@ -305,7 +321,7 @@ df_rt = df_rt[df_rt["date_time"] >= first_day]
 df_rt_alert = df_rt.groupby("poly_id").mean()
 
 # Expand rt to geometries
-if location_folder == "geometry":
+if location_folder == "geometry" and not selected_polygons_boolean:
     df_rt_geometry = pd.DataFrame({"poly_id":df_community["poly_id"]})
     df_community.set_index("poly_id", inplace=True)
     df_rt_geometry["ML"] = df_rt_geometry.apply(lambda x: expand_rt_to_geometry(df_community.at[x.poly_id, "community_id"], df_rt_alert), axis=1)
@@ -316,7 +332,9 @@ df_alerts = df_alerts.merge(df_rt_alert, how="outer", on="poly_id")
 
 # Merge 
 df_alerts = df_alerts.merge(df_alerts_cases, on="poly_id", how="outer").fillna("VERDE")
-df_alerts['max_alert'] = df_alerts.apply(lambda x: get_max_alert([x.internal_alert, x.external_alert, x.alert_first_case, 
+# df_alerts['max_alert'] = df_alerts.apply(lambda x: get_max_alert([x.internal_alert, x.external_alert, x.alert_first_case, 
+#                                                                     x.alert_internal_num_cases, x.alert_external_num_cases, x.rt_alert]), axis=1)
+df_alerts['max_alert'] = df_alerts.apply(lambda x: get_max_alert([x.movement_alert, x.alert_first_case, 
                                                                     x.alert_internal_num_cases, x.alert_external_num_cases, x.rt_alert]), axis=1)
 
 df_alerts = df_alerts.merge(df_community.drop(columns=["community_id"], axis=1), on='poly_id', how='outer')
@@ -326,7 +344,9 @@ df_alerts = df_alerts.fillna("VERDE")
 df_alerts['vulnerability_alert'] = df_alerts.apply(lambda x: get_vulnerability_alert(x.poly_id), axis=1)
 
 # set_colors
-alert_list = ['max_alert', 'external_alert', 'internal_alert', 'alert_external_num_cases', \
+# alert_list = ['max_alert', 'external_alert', 'internal_alert', 'alert_external_num_cases', \
+# 'alert_internal_num_cases', 'alert_first_case', 'rt_alert']
+alert_list = ['max_alert', 'movement_alert', 'alert_external_num_cases', \
 'alert_internal_num_cases', 'alert_first_case', 'rt_alert']
 for i in alert_list:
     df_alerts[f"{i}_color"] = df_alerts.apply(lambda x: set_color(x[i]), axis=1)
@@ -358,15 +378,26 @@ if not DONE:
     # red_alerts = red_alerts.merge(df_age, how="outer", left_on="poly_id", right_on="node_id").dropna()
     # red_alerts = red_alerts.merge(df_ipm, how="outer", left_on="poly_id", right_on="node_id").dropna()
     red_alerts.sort_values(by=['Departamento','Municipio'], inplace=True)
-    red_alerts.rename(columns={'internal_alert': 'Alerta interna (movimiento)', 'community_name':'Unidad funcional',
-    'external_alert':'Alerta externa (movimiento)', 'alert_first_case':'Alerta de primer caso detectado', 
+    # red_alerts.rename(columns={'internal_alert': 'Alerta interna (movimiento)', 'community_name':'Unidad funcional',
+    # 'external_alert':'Alerta externa (movimiento)', 'alert_first_case':'Alerta de primer caso detectado', 
+    # "alert_external_num_cases":"Alerta numero de casos en municipios vecinos", "alert_internal_num_cases":"Alerta numero de casos",
+    # "vulnerability_alert":"Alerta de vulnerabilidad", "rt_alert":"Alerta por RT"}, inplace=True)
+    red_alerts.rename(columns={'movement_alert': 'Alerta por movimiento', 'community_name':'Unidad funcional','alert_first_case':'Alerta de primer caso detectado', 
     "alert_external_num_cases":"Alerta numero de casos en municipios vecinos", "alert_internal_num_cases":"Alerta numero de casos",
     "vulnerability_alert":"Alerta de vulnerabilidad", "rt_alert":"Alerta por RT"}, inplace=True)
+    # red_alerts.to_csv(os.path.join(output_file_path, 'alerts.csv'), columns=['Departamento', 'Municipio', 'Unidad funcional',                                           
+    #                                         'Alerta interna (movimiento)',
+    #                                         'Alerta numero de casos',
+    #                                         'Alerta de primer caso detectado',
+    #                                         'Alerta externa (movimiento)', 
+    #                                         'Alerta numero de casos en municipios vecinos',
+    #                                         'Alerta por RT',
+    #                                         'vulnerability_alert_color',
+    #                                         'Alerta de vulnerabilidad'], index=False, float_format='%.3f', sep=",")
     red_alerts.to_csv(os.path.join(output_file_path, 'alerts.csv'), columns=['Departamento', 'Municipio', 'Unidad funcional',                                           
-                                            'Alerta interna (movimiento)',
+                                            'Alerta por movimiento',
                                             'Alerta numero de casos',
                                             'Alerta de primer caso detectado',
-                                            'Alerta externa (movimiento)', 
                                             'Alerta numero de casos en municipios vecinos',
                                             'Alerta por RT',
                                             'vulnerability_alert_color',
@@ -381,7 +412,7 @@ if not DONE:
 
 
     # Draw maps
-    for i in ['internal_alert', 'external_alert', 'max_alert', 'rt_alert']:
+    for i in ['movement_alert', 'max_alert', 'rt_alert']:
 
         print(ident + '     Drawing {}_map'.format(i))
         color_key = i+"_color"
