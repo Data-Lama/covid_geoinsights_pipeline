@@ -314,7 +314,7 @@ df_alerts_cases.drop(columns=["delta_num_cases", "delta_external_num_cases"], in
 # Internal alerts for num_cases based on first reported case
 new_cases = gf.new_cases(df_cases, WINDOW_SIZE)
 df_alerts['alert_first_case'] = df_alerts.apply(lambda x: set_cases_alert_firstcase(new_cases, x.poly_id), axis=1)
-df_alerts.drop(columns=["points_inner_movement", "points_external_movement"], inplace=True)
+# df_alerts.drop(columns=["points_inner_movement", "points_external_movement"], inplace=True)
 
 # RT alerts
 df_rt = df_rt[df_rt["date_time"] >= first_day]

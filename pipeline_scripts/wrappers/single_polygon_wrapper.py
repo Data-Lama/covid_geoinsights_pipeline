@@ -109,6 +109,15 @@ parameters = "{} {} {} {}".format(location_folder,
                                 agglomeration_method,
                                 folder_name, 
                                 selected_geographic_neighbors_polygons_parameter)
+
+# effective_reproductive_number for community for alert calculations
+if agglomeration_method == "geometry":
+    print()
+    print("{}Excecuting generate_effective_reproductive_number.py for {} at a community level".format(ident, poly_id))
+    parameters = "{} {} {} {}".format(location_folder,  
+                                    "community",
+                                    folder_name, 
+                                    selected_geographic_neighbors_polygons_parameter)
                                 
 ef.excecute_script(analysis_scripts_location, "generate_effective_reproductive_number.py", "python", parameters)
 
