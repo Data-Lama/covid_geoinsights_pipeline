@@ -239,13 +239,14 @@ if not os.path.isdir(export_folder_location):
 
 skipped_polygons = []
 computed_polygons = []
+from tqdm import tqdm
 if selected_polygons_boolean:
     #pdb.set_trace()
     df_all = df_cases.copy()
     print(indent + indent + f"Calculating individual polygon rt.")
     polys_not = []
-    for idx, poly_id in enumerate( list( df_all['poly_id'].unique()) ):
-        print(indent + indent + indent + f" {poly_id}.")
+    for idx, poly_id in tqdm( enumerate(list( df_all['poly_id'].unique()) )):
+        print(indent + indent + indent + f" {poly_id}.", end="\r")
         computed_polygons.append(poly_id)
         df_poly_id = df_all[df_all['poly_id'] == poly_id ].copy()
 
