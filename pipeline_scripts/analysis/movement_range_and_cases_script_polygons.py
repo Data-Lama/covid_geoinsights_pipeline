@@ -67,7 +67,6 @@ while i < len(sys.argv):
 	selected_polygons.append(sys.argv[i])
 	i += 1
 
-
 miles_stones_color = 'lightblue'
 miles_stones_width = 1
 
@@ -75,10 +74,9 @@ cut_line_color = 'red'
 cut_stones_width = 1
 
 
-
 unit_type, unit_type_prural = gf.get_agglomeration_names(agglomeration_method)
 
-# Agglomerated folder location
+# Agglomerated folder location n
 agglomerated_folder_location = os.path.join(data_dir, 'data_stages', location_folder, 'agglomerated', agglomeration_method)
 
 # Unified folder location

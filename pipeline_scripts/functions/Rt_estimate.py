@@ -30,7 +30,7 @@ def get_posteriors(sr, sigma=0.15):
     GAMMA = 1/5.5
 
     # (1) Calculate Lambda
-    lam = sr[:-1].values * np.exp(GAMMA * (r_t_range[:, None] - 1))
+    lam = sr[:-1].values * np.exp( GAMMA * (r_t_range[:, None] - 1 ))
 
     # (2) Calculate each day's likelihood
     likelihoods = pd.DataFrame(
@@ -58,7 +58,7 @@ def get_posteriors(sr, sigma=0.15):
         columns=sr.index,
         data={sr.index[0]: prior0}
     )
-    
+
     # We said we'd keep track of the sum of the log of the probability
     # of the data for maximum likelihood calculation.
     log_likelihood = 0.0
@@ -66,13 +66,13 @@ def get_posteriors(sr, sigma=0.15):
     # (5) Iteratively apply Bayes' rule
     for previous_day, current_day in zip(sr.index[:-1], sr.index[1:]):
 
-        #(5a) Calculate the new prior
+        # (5a) Calculate the new prior
         current_prior = process_matrix @ posteriors[previous_day]
         
-        #(5b) Calculate the numerator of Bayes' Rule: P(k|R_t)P(R_t)
+        # (5b) Calculate the numerator of Bayes' Rule: P(k|R_t)P(R_t)
         numerator = likelihoods[current_day] * current_prior
         
-        #(5c) Calcluate the denominator of Bayes' Rule P(k)
+        # (5c) Calcluate the denominator of Bayes' Rule P(k)
         denominator = np.sum(numerator)
         
         # Execute full Bayes' Rule
