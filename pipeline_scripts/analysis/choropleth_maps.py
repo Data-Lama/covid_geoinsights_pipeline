@@ -65,7 +65,7 @@ community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomera
 shape_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'geo', 'Municpios_Dane_2017.shp')
 river_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'geo', 'river_lines', 'River_lines.shp')
 output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window')
-readme = os.path.join(agglomerated_file_path, "README.txt")
+readme = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', "geometry","README.txt")
 
 if selected_polygons_boolean:
     rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", selected_polygon_name)
