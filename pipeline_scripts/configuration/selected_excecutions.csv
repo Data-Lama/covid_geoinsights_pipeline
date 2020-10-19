@@ -2,8 +2,8 @@ location_name,locations_folder,stage,folder_location,position,excecute,script_na
 All,,PRE,PRE,1,YES,download_facebook,python,
 ALL,,PRE,extractors,1,YES,johns_hopkins_extractor,python,
 USA,usa,PRE,extractors,2,NO,usa_extractor,python,
-Colombia,colombia,extract,extractors,1,NO,single_file_download_extractor,python,Colombia colombia 2020-10-02
-Colombia,colombia,unify,unifiers,1,NO,universal_generic_unifier,python,Colombia colombia
+Colombia,colombia,extract,extractors,1,NO,single_file_download_extractor,python,Colombia colombia 
+Colombia,colombia,unify,unifiers,1,NO,universal_generic_unifier,python,Colombia colombia 2020-16-02
 Colombia,colombia,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Colombia colombia 10
 Colombia,colombia,agglomerate,agglomerators,2,NO,universal_community_agglomerate,r,Colombia colombia
 Colombia,colombia,agglomerate,agglomerators,1,NO,universal_geometry_agglomerate,python,Colombia colombia False
