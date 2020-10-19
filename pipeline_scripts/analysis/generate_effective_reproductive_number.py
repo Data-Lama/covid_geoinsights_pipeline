@@ -24,8 +24,8 @@ data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
 # Reads the parameters from excecution
-location_folder   =  sys.argv[1]    # location name
-agglomeration_method =  sys.argv[2] # agglomeration method
+location_folder   =  sys.argv[1]    # location name  ### Colombia 
+agglomeration_method =  sys.argv[2] # agglomeration method ### Colombia for example
 
 if len(sys.argv) <= 3:
 	selected_polygons_boolean = False
