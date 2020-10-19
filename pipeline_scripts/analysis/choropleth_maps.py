@@ -65,11 +65,12 @@ community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomera
 shape_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'geo', 'Municpios_Dane_2017.shp')
 river_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'geo', 'river_lines', 'River_lines.shp')
 output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window')
+readme = os.path.join(agglomerated_file_path, "README.txt")
 
 if selected_polygons_boolean:
     rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", selected_polygon_name)
 else:
-    rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", "entire_location")
+    rt = os.path.join(analysis_dir, location_name, "community", "r_t", "entire_location")
 
 # Load r_t
 files = os.listdir(rt)
@@ -108,7 +109,11 @@ except:
 df_functional_units = pd.read_csv(community_file)
 
 # Get windows
-day_t3 = pd.Timestamp('today') - datetime.timedelta(days = WINDOW_SIZE)
+# Set window size
+readme_dict = gf.load_README(readme)
+max_date = readme_dict["Movement"].split(",")[1].strip()
+max_date = max_date.split(" ")[1].strip()
+day_t3 = pd.Timestamp(datetime.datetime.strptime(max_date, '%Y-%m-%d')) - datetime.timedelta(days = WINDOW_SIZE)
 day_t2 = day_t3 - datetime.timedelta(days = WINDOW_SIZE)
 day_t0 = pd.Timestamp(datetime.datetime.strptime("2020-04-02", '%Y-%m-%d'))
 day_t1 = day_t0 + datetime.timedelta(days = WINDOW_SIZE)
