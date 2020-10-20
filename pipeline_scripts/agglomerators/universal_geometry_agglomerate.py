@@ -28,6 +28,7 @@ method_name = 'geometry'
 # Reads the parameters from excecution
 location_name  = sys.argv[1] # location namme
 location_folder_name  = sys.argv[2] # location folder name
+
 if len(sys.argv) > 3:
 	calculate_intersections = sys.argv[3].upper() == 'TRUE'
 else:

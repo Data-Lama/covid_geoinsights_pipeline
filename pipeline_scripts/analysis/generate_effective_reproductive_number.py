@@ -20,6 +20,7 @@ indent = "\t"
 
 # Direcotries
 from global_config import config
+
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
@@ -42,7 +43,7 @@ else :
 agglomerated_folder_location = os.path.join(data_dir, 'data_stages', location_folder, 'agglomerated', agglomeration_method, "cases.csv")
 
 # Get cases
-df_cases = pd.read_csv(agglomerated_folder_location)
+df_cases = pd.read_csv( agglomerated_folder_location )
 
 if selected_polygons_boolean:
     print(indent + f"Calculating rt for {len(selected_polygons)} polygons in {selected_polygon_name}")
@@ -240,6 +241,7 @@ if not os.path.isdir(export_folder_location):
 skipped_polygons = []
 computed_polygons = []
 from tqdm import tqdm
+
 if selected_polygons_boolean:
     #pdb.set_trace()
     df_all = df_cases.copy()
@@ -267,6 +269,7 @@ if selected_polygons_boolean:
         else:
             skipped_polygons.append(poly_id)
     print('\nWARNING: Rt was not computed for polygons: {}'.format(''.join([str(p)+', ' for p in skipped_polygons]) ))
+
 
 df_all = df_cases.copy()
 df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
