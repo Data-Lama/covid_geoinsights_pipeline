@@ -45,6 +45,13 @@ agglomerated_folder_location = os.path.join(data_dir, 'data_stages', location_fo
 # Get cases
 df_cases = pd.read_csv( agglomerated_folder_location )
 
+## add time delta
+# df_polygons = pd.read_csv(os.path.join(agglomerated_folder,  "polygons.csv"))
+# df_time_delay = pd.read_csv(os.path.join(data_dir, 'data_stages', location_folder, "unified", "cases_diag.csv"))
+# df_time_delay["attr_time-delay_union"] = df_time_delay.apply(lambda x: np.fromstring(x["attr_time-delay_union"], sep="|"), axis=1)
+# df_time_delay.set_index("geo_id", inplace=True)
+# df_polygons["attr_time_delay"] = df_polygons.apply(lambda x: df_time_delay.at[x.poly_id, "attr_time-delay_union"][0], axis=1)
+
 if selected_polygons_boolean:
     print(indent + f"Calculating rt for {len(selected_polygons)} polygons in {selected_polygon_name}")
     # Set polygons to int
