@@ -130,3 +130,23 @@ reporte_quindio,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/q
 reporte_quindio,Incidence Table,analysis,table,colombia/geometry/incidence_maps/quindio/incidences.csv,incidences_geometry.csv
 reporte_quindio,RT,analysis,figure,colombia/geometry/r_t/quindio/aggregated_Rt.csv,aggregated_Rt.csv
 reporte_quindio,RT Plot,analysis,figure,colombia/geometry/r_t/quindio/aggregated_Rt.png,rt_plot.png
+reporte_santander,Graph Map First Day,analysis,figure,colombia/community/graph_maps/santander/maps_by_day/map_by_[0].jpeg,map_by_start.jpeg
+reporte_santander,Graph Map Current Day,analysis,figure,colombia/community/graph_maps/santander/maps_by_day/map_by_[-1].jpeg,map_by_current.jpeg
+reporte_santander,Polygon Movement range,analysis,figure,colombia/community/movement_plots/santander/movement_range_selected_polygons_santander.png,movement_range_selected_polygons.png
+reporte_santander,Polygon Movement range,analysis,figure,colombia/community/movement_plots/santander/movement_range_selected_polygons_santander_split.png,movement_range_selected_polygons_split.png
+reporte_santander,Movement FB,analysis,figure,colombia/community/movement_plots/santander/mov_range_santander.png,mov_range.png
+reporte_santander,Prediction ,analysis,figure,colombia/community/prediction/polygon_unions/santander/prediction_santander.png,prediction.png
+reporte_santander,Simulacion ,analysis,figure,colombia/community/prediction/polygon_unions/santander/simulations_santander.png,simulations.png
+reporte_santander,Mapa Alerta General,analysis,figure,colombia/geometry/alerts/santander/map_max_alert.png,map_max_alert.png
+reporte_santander,Mapa Cloropletico Historico,analysis,figure,colombia/geometry/polygon_info_window/santander/choropleth_map_colombia_historic.png,choropleth_map_colombia_historic.png
+reporte_santander,Mapa Cloropletico Reciente,analysis,figure,colombia/geometry/polygon_info_window/santander/choropleth_map_colombia_15-day-window.png,choropleth_map_colombia_15-day-window.png
+reporte_santander,Mapa Cloropletico Reciente,analysis,table,colombia/geometry/polygon_info_window/santander/detail_choropleth_recent.csv,detail_choropleth_recent.csv
+reporte_santander,Mapa Cloropletico RT,analysis,figure,colombia/geometry/polygon_info_window/santander/choropleth_map_colombia_rt.png,choropleth_map_colombia_rt.png
+reporte_santander,Mapa Cloropletico RT,analysis,table,colombia/geometry/polygon_info_window/santander/detail_choropleth_rt.csv,detail_choropleth_rt.csv
+reporte_santander,Alertas Rojas,analysis,table,colombia/geometry/alerts/santander/alerts.csv,alerts.csv
+reporte_santander,Estadisticas Municipio,analysis,table,colombia/geometry/stats/santander/general_stats.csv,geometry_statistics.csv
+reporte_santander,Estadisticas Unidad Funcional,analysis,table,colombia/community/stats/santander/general_stats.csv,community_statistics.csv
+reporte_santander,Estadisticas Prediccion,analysis,table,colombia/community/prediction/polygon_unions/santander/statistics.csv,prediction_statistics.csv
+reporte_santander,Incidence Map,analysis,figure,colombia/geometry/incidence_maps/santander/incidence_map.jpeg,incidence_map_geometry.jpeg
+reporte_santander,Incidence Table,analysis,table,colombia/geometry/incidence_maps/santander/incidences.csv,incidences_geometry.csv
+reporte_santander,RT,analysis,figure,colombia/geometry/r_t/santander/aggregated_Rt.png,aggregated_Rt.png
