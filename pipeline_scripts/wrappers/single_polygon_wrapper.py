@@ -115,7 +115,7 @@ if agglomeration_method == "geometry":
     print()
     print("{}Excecuting generate_effective_reproductive_number.py for {} at a community level".format(ident, poly_id))
     parameters = "{} {} {} {}".format(location_folder,  
-                                    "community",
+                                    agglomeration_method,
                                     folder_name, 
                                     selected_geographic_neighbors_polygons_parameter)
                                 
