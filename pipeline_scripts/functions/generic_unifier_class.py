@@ -114,8 +114,27 @@ class GenericUnifier():
 		pass
 
 
-	
+	def get_generic_attr_agglomeration_scheme(self):
+		'''
+		Method that builds the csv that describes the agglomeration function needed per attribute code
+		'''
+		
+		aggl_scheme = {"^attr.*sum$": ["attr_addition", "",""],
+						"^attr.*sub$": ["attr_substraction", "", ""],
+						"^attr.*union$": ["attr_union", "", "sep=','"],
+						"^attr.*union_int$": ["attr_union_int", "", "sep=','"],
+						"^attr.*intersect$": ["attr_intersection", "", "sep=','"],
+						"^attr.*avg$": ["attr_average", "", ""]}
+ 
+		
+		return aggl_scheme
 
+		
+	def attr_agglomeration_scheme(self):
+		'''
+		Defines agglomeration scheme
+		'''
+		return self.get_generic_attr_agglomeration_scheme()
 
 	def generic_build_cases_geo(self, country):
 		'''

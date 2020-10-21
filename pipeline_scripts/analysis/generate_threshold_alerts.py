@@ -79,7 +79,7 @@ cases = os.path.join(agglomerated_file_path, 'cases.csv')
 # movement = os.path.join(agglomerated_file_path, 'movement_range.csv')
 movement = os.path.join(agglomerated_file_path, 'movement.csv')
 socioecon = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'socio_economic', 'estadisticas_por_municipio.csv')
-readme = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', "geometry","README.txt")
+readme = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', "geometry", "README.txt")
 threshold = os.path.join(agglomerated_file_path, "mock_threshold.csv")
 
 # Geofiles

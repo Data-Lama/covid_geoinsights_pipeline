@@ -4,6 +4,7 @@
 # Imports all the necesary functions
 import fb_functions as fb
 import general_functions as gf
+import attr_agglomeration_functions as attr_agg
 
 
 # Other imports
@@ -59,6 +60,26 @@ print()
 
 
 print(ident + 'Builds Datasets:')
+
+# ----------------
+# -- Agg_scheme --
+# ----------------
+print(ident + '   Agglomeration scheme')
+aggl_scheme = unifier.attr_agglomeration_scheme()
+
+# Checks if the required functions are defined
+for function in aggl_scheme.values():
+	if function[0] in dir(attr_agg.AttrAgglomerator): 
+		continue
+	else: 
+		raise Exception(f"{function} is not defined. Please add necessary logic to attr_agglomeration_functions.py")
+
+# Writes aggl_scheme
+df_aggl_scheme = pd.DataFrame.from_dict(aggl_scheme, orient="index", columns=["aggl_function", "secondary_attr", "aggl_parameters"]).reset_index()
+df_aggl_scheme.rename(columns={"index":"attr_name"}, inplace=True)
+df_aggl_scheme.to_csv(os.path.join(unified_dir, 'aggl_scheme.csv'), index = False)
+df_aggl_scheme = pd.read_csv(os.path.join(unified_dir, 'aggl_scheme.csv'))
+
 
 # ----------------
 # ---- Cases -----

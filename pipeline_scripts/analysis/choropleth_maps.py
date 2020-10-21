@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
 from pipeline_scripts.functions.general_functions import load_README
+from pipeline_scripts.functions import general_functions as gf
 # import polygon_info_timewindow 
 
 # Constants
@@ -65,7 +66,7 @@ community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomera
 shape_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'geo', 'Municpios_Dane_2017.shp')
 river_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'geo', 'river_lines', 'River_lines.shp')
 output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window')
-readme = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', "geometry","README.txt")
+readme = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', "geometry", "README.txt")
 
 if selected_polygons_boolean:
     rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", selected_polygon_name)
@@ -114,6 +115,7 @@ readme_dict = gf.load_README(readme)
 max_date = readme_dict["Movement"].split(",")[1].strip()
 max_date = max_date.split(" ")[1].strip()
 day_t3 = pd.Timestamp(datetime.datetime.strptime(max_date, '%Y-%m-%d')) - datetime.timedelta(days = WINDOW_SIZE)
+print(ident + f"Using {day_t3} as base for window")
 day_t2 = day_t3 - datetime.timedelta(days = WINDOW_SIZE)
 day_t0 = pd.Timestamp(datetime.datetime.strptime("2020-04-02", '%Y-%m-%d'))
 day_t1 = day_t0 + datetime.timedelta(days = WINDOW_SIZE)
