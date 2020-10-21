@@ -27,7 +27,6 @@ class Unifier(GenericUnifier):
 		GenericUnifier.__init__(self, 'Colombia', 'colombia')
 
 
-
 	def build_cases_geo(self):
 
 		'''
@@ -137,6 +136,12 @@ class Unifier(GenericUnifier):
 
 		return(polygons_final)
 
+	def attr_agglomeration_scheme(self):
+		aggl_scheme = self.get_generic_attr_agglomeration_scheme()
+ 
+		aggl_scheme["^attr.*wvg-pop$"] = ["attr_weighted_average", "attr_pop_sum",""]
+
+		return aggl_scheme
 
 
 		
