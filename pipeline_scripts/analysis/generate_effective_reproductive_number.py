@@ -77,6 +77,24 @@ def prepare_cases(daily_cases, col='Cases', cutoff=0):
 
     return daily_cases
 
+def confirmed_to_onset(confirmed, p_delay, min_onset_date=None):
+    min_onset_date = pd.to_datetime(min_onset_date)
+    # Reverse cases so that we convolve into the past
+    convolved = np.convolve(np.squeeze(confirmed.iloc[::-1].values), p_delay)
+
+    # Calculate the new date range
+    dr = pd.date_range(end=confirmed.index[-1],
+                        periods=len(convolved))
+    # Flip the values and assign the date range
+    onset = pd.Series(np.flip(convolved), index=dr, name='num_cases')
+    if min_onset_date:
+        onset = np.round(onset.loc[min_onset_date:])
+    else: 
+        onset = np.round(onset.iloc[onset.values>=1])
+
+    onset.index.name = 'date_time'
+    return pd.DataFrame(onset)
+    
 def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min_time=pd.to_datetime('2020-02-26'), state=None, path_to_save=None):
     fig, ax = plt.subplots(2,1, figsize=(12.5, 10) )
 
@@ -256,8 +274,9 @@ if selected_polygons_boolean:
 
     df_all = df_cases.copy()
     df_all = df_time_delay[['date_time', 'location', 'num_cases']].copy().reset_index().rename(columns={'geo_id': 'poly_id'})
-    df_polygons = df_polygons[['poly_id', 'attr_time_delay']]
-
+    df_polygons = df_polygons[['poly_id', 'attr_time_delay']].set_index('poly_id')
+    df_polygons = df_polygons.dropna()
+    #df_polygons[df_polygons==-1]=df_polygons.loc[11001].to_numpy()[0]
 
     print(indent + indent + f"Calculating individual polygon rt.")
     polys_not = []
@@ -269,8 +288,15 @@ if selected_polygons_boolean:
         df_poly_id['date_time'] = pd.to_datetime( df_poly_id['date_time'] )
         df_poly_id = df_poly_id.groupby('date_time').sum()[['num_cases']]
         all_cases = df_poly_id['num_cases'].sum()
+        p_delay = df_polygons.loc[poly_id].to_numpy()[0]
+        
+        if p_delay.shape[0]<30:
+            # if delay is not enough assume is like bogta delay
+            p_delay = df_polygons.loc[11001].to_numpy()[0]
+
         if all_cases > 100:
             df_poly_id = df_poly_id.reset_index().set_index('date_time').resample('D').sum().fillna(0)
+            df_poly_id = confirmed_to_onset(df_poly_id, p_delay, min_onset_date=None)
 
             df_poly_id = prepare_cases(df_poly_id, col='num_cases', cutoff=0)
             min_time = df_poly_id.index[0]
@@ -293,6 +319,18 @@ all_cases = df_all['num_cases'].sum()
 print(indent + indent + f"Calculating aggregated rt.")
 if all_cases > 100:
     df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
+    df_polygons_agg = df_polygons.copy()
+
+    df_polygons_agg = df_polygons_agg.iloc[df_polygons_agg.values==0]
+    df_polygons_agg['cum_p'] = df_polygons_agg.apply(lambda x: np.sum([x['attr_time_delay']]).sum(), axis=1)
+    df_polygons_agg = df_polygons_agg[df_polygons_agg['cum_p']>0.6]
+    df_polygons_agg['attr_time_delay'] = df_polygons_agg.apply(lambda x: list(x['attr_time_delay']), axis=1 )
+    df_polygons_agg['len'] = df_polygons_agg.apply(lambda x: len(x['attr_time_delay']), axis=1)
+    df_polygons_agg = df_polygons_agg[df_polygons_agg['len']==61]
+    p_delay = np.array( list(df_polygons_agg.attr_time_delay) ).mean(0)
+
+    df_all = confirmed_to_onset(df_all, p_delay, min_onset_date=None)
+
     df_all = prepare_cases(df_all, col='num_cases', cutoff=0)
     min_time = df_all.index[0]
     FIS_KEY = 'date_time'
