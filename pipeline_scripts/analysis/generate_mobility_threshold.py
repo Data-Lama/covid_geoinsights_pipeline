@@ -183,6 +183,7 @@ if selected_polygons_boolean:
             mt  = mt.rolling(7).mean(std=2).fillna(0)
             mt[mt==0]     = mt_resampled[mt==0] 
             mt = (mt-mt.values.min())/( mt.values.max()-mt.values.min()  )
+            
             with pm.Model() as Rt_mobility_model:
                 
                 # Create the alpha and beta parameters
@@ -213,10 +214,8 @@ if selected_polygons_boolean:
 
             min_time = df_poly_id_cases.index[0]
             FIS_KEY = 'date_time'
-            path_to_save = os.path.join(export_folder_location, str(poly_id)+'_Rt.png')
+
             #pdb.set_trace()
-            (_, _, result) = plot_cases_rt(df_poly_id_cases, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
-            result.to_csv(os.path.join(export_folder_location, str(poly_id)+'_Rt.csv'))
             plt.close()
         else:
             skipped_polygons.append(poly_id)
