@@ -40,17 +40,18 @@ else :
     selected_polygon_name = selected_polygons.pop(0)
 
 # Agglomerated folder location
-agglomerated_folder_location = os.path.join(data_dir, 'data_stages', location_folder, 'agglomerated', agglomeration_method, "cases.csv")
+agglomerated_folder = os.path.join(data_dir, 'data_stages', location_folder, 'agglomerated', agglomeration_method )
 
 # Get cases
-df_cases = pd.read_csv( agglomerated_folder_location )
+df_cases = pd.read_csv( os.path.join( agglomerated_folder, 'cases.csv' ) )
 
 ## add time delta
-# df_polygons = pd.read_csv(os.path.join(agglomerated_folder,  "polygons.csv"))
-# df_time_delay = pd.read_csv(os.path.join(data_dir, 'data_stages', location_folder, "unified", "cases_diag.csv"))
-# df_time_delay["attr_time-delay_union"] = df_time_delay.apply(lambda x: np.fromstring(x["attr_time-delay_union"], sep="|"), axis=1)
-# df_time_delay.set_index("geo_id", inplace=True)
-# df_polygons["attr_time_delay"] = df_polygons.apply(lambda x: df_time_delay.at[x.poly_id, "attr_time-delay_union"][0], axis=1)
+df_polygons   = pd.read_csv(os.path.join(agglomerated_folder,  "polygons.csv"))
+df_time_delay = pd.read_csv(os.path.join(data_dir, 'data_stages', location_folder, "unified", "cases_diag.csv"))
+df_time_delay["attr_time-delay_union"] = df_time_delay.apply(lambda x: np.fromstring(x["attr_time-delay_union"], sep="|"), axis=1)
+df_time_delay.set_index("geo_id", inplace=True)
+df_polygons["attr_time_delay"] = df_polygons.apply(lambda x: list(df_time_delay.loc[x.poly_id]["attr_time-delay_union"])[0], axis=1)
+
 
 if selected_polygons_boolean:
     print(indent + f"Calculating rt for {len(selected_polygons)} polygons in {selected_polygon_name}")
@@ -251,7 +252,13 @@ from tqdm import tqdm
 
 if selected_polygons_boolean:
     #pdb.set_trace()
+
+
     df_all = df_cases.copy()
+    df_all = df_time_delay[['date_time', 'location', 'num_cases']].copy().reset_index().rename(columns={'geo_id': 'poly_id'})
+    df_polygons = df_polygons[['poly_id', 'attr_time_delay']]
+
+
     print(indent + indent + f"Calculating individual polygon rt.")
     polys_not = []
     for idx, poly_id in tqdm( enumerate(list( df_all['poly_id'].unique()) )):
@@ -286,7 +293,6 @@ all_cases = df_all['num_cases'].sum()
 print(indent + indent + f"Calculating aggregated rt.")
 if all_cases > 100:
     df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
-
     df_all = prepare_cases(df_all, col='num_cases', cutoff=0)
     min_time = df_all.index[0]
     FIS_KEY = 'date_time'
