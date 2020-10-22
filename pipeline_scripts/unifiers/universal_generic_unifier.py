@@ -91,15 +91,14 @@ df_cases = unifier.build_cases_geo()
 if max_date is not None:
 	df_cases = df_cases[df_cases.date_time < max_date]
 
-
 # Extracts date
 cases_date = df_cases.date_time.max()
 
 # Saves
 if not encrypted:
-    df_cases.to_csv(os.path.join(unified_dir, 'cases.csv'), index = False)
+	df_cases.to_csv(os.path.join(unified_dir, 'cases.csv'), index = False)
 else:
-    gf.encrypt_df(df_cases, os.path.join(unified_dir, 'cases.csv'), key_string)
+	gf.encrypt_df(df_cases, os.path.join(unified_dir, 'cases.csv'), key_string)
 
 
 # -------------------

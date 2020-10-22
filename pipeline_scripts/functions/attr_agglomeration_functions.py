@@ -2,15 +2,33 @@ import os
 import re
 import numpy as np
 import pandas as pd
+import scipy.stats as stats    
+
+#Directories
+from global_config import config
+data_dir = config.get_property('data_dir')
 
 class AttrAgglomerator():
 
     # Identation variable
     ident = '            '
 
-    def __init__(self, aggl_scheme):
-        
+    # def __init__(self, aggl_scheme):
+
+    #     self.aggl_scheme = aggl_scheme
+
+    def __init__(self, location_folder, stage_folder, aggl_scheme):
+
+        self.location_folder = location_folder
+        self.stage_folder = stage_folder
         self.aggl_scheme = aggl_scheme
+        self.log = []
+
+    def write_agglomeration_log(self):
+        out_path = os.path.join(data_dir, "data_stages",self.location_folder, self.stage_folder, "aggl.log")
+        with open(out_path, 'w') as f:
+            for line in self.log:
+                f.write(line + "\n")
 
     def agglomerate_attrs(self):
     
@@ -32,9 +50,9 @@ class AttrAgglomerator():
         agglomerated_attr_values = {}
 
         for col in self.df.columns:
-            if "attr" not in col:
+            if not ("attr" in col):
                 continue
-
+            # print(f"\tAggregating {col}")
             attr_name = col
             matches = []
             for name in self.aggl_scheme.attr_name:
@@ -67,6 +85,7 @@ class AttrAgglomerator():
     def get_agglomerated_attrs(self, df):
         self.df = df
         aggl_result = self.agglomerate_attrs()
+        self.write_agglomeration_log()
         return pd.Series(aggl_result)
 
     def attr_addition(self, attr_name):
@@ -93,6 +112,13 @@ class AttrAgglomerator():
         attrs = list(self.df[attr_name].dropna())
         attrs_list = self.attr_append(attr_name, sep=sep)
         attrs_list_int = [int(i) for i in attrs_list]
+
+        return attrs_list
+
+    def attr_append_float(self, attr_name, sep=","):
+        attrs = list(self.df[attr_name].dropna())
+        attrs_list = self.attr_append(attr_name, sep=sep)
+        attrs_list_int = [float(i) for i in attrs_list]
 
         return attrs_list
 
@@ -162,4 +188,18 @@ class AttrAgglomerator():
             if parameters == "": return True
         if isinstance(parameters, float):
             if np.isnan(parameters): return True
+        
+    def estimate_gamma_delay(self, attr_name):
+        try:
+            fit_alpha, fit_loc, fit_beta = stats.gamma.fit(self.df[attr_name], floc = -1)
+        except ValueError:
+            self.log.append(f"WARNING: estimate_gamma_delay failed to agglomerate {self.df.geo_id.unique()[0]}")
+            return np.nan
+        mean_g =  fit_alpha*fit_beta
+        var_g  = fit_alpha*fit_beta**2
+
+        x = np.linspace(-1, self.df[attr_name].max(), 61)
+        pdf_fitted = stats.gamma.pdf(x, *(fit_alpha, fit_loc, fit_beta))
+        pdf_list = [str(i) for i in pdf_fitted.tolist()]
+        return "|".join(pdf_list)
         

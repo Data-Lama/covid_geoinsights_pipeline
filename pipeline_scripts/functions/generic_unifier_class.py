@@ -121,9 +121,11 @@ class GenericUnifier():
 		
 		aggl_scheme = {"^attr.*sum$": ["attr_addition", "",""],
 						"^attr.*sub$": ["attr_substraction", "", ""],
-						"^attr.*union$": ["attr_union", "", "sep=','"],
-						"^attr.*union_int$": ["attr_union_int", "", "sep=','"],
-						"^attr.*intersect$": ["attr_intersection", "", "sep=','"],
+						"^attr.*append": ["attr_append", "", "sep='|'"],
+						"^attr.*append_float": ["attr_append_float", "", "sep='|'"],
+						"^attr.*union$": ["attr_union", "", "sep='|'"],
+						"^attr.*union_int$": ["attr_union_int", "", "sep='|'"],
+						"^attr.*intersect$": ["attr_intersection", "", "sep='|'"],
 						"^attr.*avg$": ["attr_average", "", ""]}
  
 		

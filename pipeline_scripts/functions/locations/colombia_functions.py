@@ -2,17 +2,19 @@
 # Script for Colombia 
 
 # Necesary imports
-import pandas as pd
-import numpy as np
 import os
-import geo_functions as geo
-import geopandas as geopandas
-from shapely import wkt
 import json
 import time 
+import datetime
+import numpy as np
+import pandas as pd
+from shapely import wkt
+import geo_functions as geo
+import geopandas as geopandas
 
 # Generic Unifier
 from generic_unifier_class import GenericUnifier
+import attr_agglomeration_functions as attr_agg
 
 
 
@@ -51,17 +53,17 @@ class Unifier(GenericUnifier):
 		cols['País de procedencia'] = 'country'
 		cols['FIS'] = 'FIS'
 		cols['Fecha de muerte'] = 'date_death'
-		cols['Fecha diagnostico'] = 'date_time'
+		cols['Fecha diagnostico'] = 'DIAG'
 		cols['Fecha recuperado'] = 'date_recovered'
 		cols['Fecha reporte web'] = 'date_reported_web'
 
 		df = pd.read_csv(file_name, parse_dates = ['Fecha diagnostico','FIS','Fecha de muerte','Fecha recuperado'], date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
 		df = df.rename(columns=cols)
 
-		df.dropna(subset = ['date_time', 'attention'], inplace = True)
+		df.dropna(subset = ['FIS', 'attention'], inplace = True)
 
 		# Rounds to day
-		df['date_time'] = df['date_time'].dt.round('D')
+		df['date_time'] = df['FIS'].dt.round('D')
 		df.geo_id = df.geo_id.apply(str).astype(str)
 
 		df['num_cases'] = 1
@@ -87,6 +89,75 @@ class Unifier(GenericUnifier):
 		df = df[['date_time','geo_id','location','lon','lat', 'num_cases', 'num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house']]
 
 		return(df)	
+
+	# def build_cases_geo(self):
+
+	# 	'''
+	# 	Loads the cases downloaded from: https://www.datos.gov.co/
+	# 	https://www.datos.gov.co/api/views/gt2j-8ykr/rows.csv?accessType=DOWNLOAD
+	# 	'''
+	# 	aggl_scheme = pd.read_csv(os.path.join(self.unified_folder, "aggl_scheme.csv"))
+	# 	file_name = os.path.join(self.raw_folder, 'cases', self.get('cases_file_name'))
+		
+	# 	# Columns names for convertion
+	# 	cols = {}
+	# 	cols['ID de caso'] = 'ID' 
+	# 	cols['Fecha de notificación'] = 'notification_time'
+	# 	cols['Código DIVIPOLA'] = 'geo_id'
+	# 	cols['Ciudad de ubicación'] = 'city'
+	# 	cols['Departamento o Distrito '] = 'state'
+	# 	cols['atención'] = 'attention'
+	# 	cols['Edad'] = 'age'
+	# 	cols['Sexo'] = 'sex'
+	# 	cols['Tipo'] = 'type'
+	# 	cols['Estado'] = 'status'
+	# 	cols['País de procedencia'] = 'country'
+	# 	cols['FIS'] = 'FIS'
+	# 	cols['Fecha de muerte'] = 'date_death'
+	# 	cols['Fecha diagnostico'] = 'DIAG'
+	# 	cols['Fecha recuperado'] = 'date_recovered'
+	# 	cols['Fecha reporte web'] = 'date_reported_web'
+
+	# 	df = pd.read_csv(file_name, parse_dates = ['Fecha diagnostico','FIS','Fecha de muerte','Fecha recuperado'], date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
+	# 	df = df.rename(columns=cols)
+
+	# 	# Add delay
+	# 	agglomerator = attr_agg.AttrAgglomerator('colombia', 'unified', aggl_scheme)
+	# 	df["attr_time_delay"] = df["DIAG"] - df["FIS"]
+	# 	df.dropna(subset = ['DIAG', 'attention', 'attr_time_delay'], inplace = True)
+	# 	df["attr_time_delay"] = df["attr_time_delay"].astype('timedelta64[D]').astype(int)
+	# 	df = df.loc[(df["attr_time_delay"] > 0) & (df["attr_time_delay"] <= 60)].copy()
+
+	# 	# Rounds to day
+	# 	df['date_time'] = df['DIAG'].dt.round('D')
+	# 	df.geo_id = df.geo_id.apply(str).astype(str)
+
+	# 	df['num_cases'] = 1
+	# 	df.loc[df.attention == 'Fallecido', 'num_diseased'] = 1
+	# 	df.loc[df.attention == 'Recuperado', 'num_recovered'] = 1
+	# 	df.loc[(df.attention == 'Hospital') | (df.attention == 'Hospital UCI'), 'num_infected_in_hospital'] = 1
+	# 	df.loc[df.attention == 'Casa', 'num_infected_in_house'] = 1
+	# 	df.fillna(0, inplace = True)
+	# 	df['num_infected'] = df.num_infected_in_hospital + df.num_infected_in_house
+
+	# 	# Unifies
+	# 	df = df[['date_time', 'geo_id','num_cases','num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house', 'attr_time_delay']].copy()
+	# 	df_aggr = df.groupby(['geo_id']).apply(agglomerator.get_agglomerated_attrs).reset_index()
+	# 	df = df.groupby(['date_time', 'geo_id']).sum().reset_index()
+	# 	df.drop(columns="attr_time_delay", inplace=True)
+	# 	df = df.merge(df_aggr, on=['geo_id'], how="outer")
+	# 	df.rename(columns={"attr_time_delay": "attr_time-delay_union"}, inplace=True)
+
+	# 	# Adds lat and lon from the polyfons of the shapefile
+	# 	polygons_final = self.build_polygons()
+	# 	polygons_final = polygons_final[['poly_id', 'poly_lon', 'poly_lat', 'poly_name']].rename(columns = {'poly_id':'geo_id', 'poly_lon':'lon', 'poly_lat':'lat', 'poly_name':'location'})
+
+	# 	df = df.merge(polygons_final, on = 'geo_id', how = 'right')
+	# 	df.loc[df.date_time.isna(), 'date_time'] = df.date_time.min()
+	# 	df.fillna(0, inplace = True)
+	# 	df = df[['date_time','geo_id','location','lon','lat', 'num_cases', 'num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house', 'attr_time-delay_union']]
+
+	# 	return(df)	
 
 
 
@@ -140,6 +211,8 @@ class Unifier(GenericUnifier):
 		aggl_scheme = self.get_generic_attr_agglomeration_scheme()
  
 		aggl_scheme["^attr.*wvg-pop$"] = ["attr_weighted_average", "attr_pop_sum",""]
+		aggl_scheme["^num.*"] = ["attr_addition", "",""]
+		aggl_scheme["^attr.*time_delay$"] = ["estimate_gamma_delay", "", ""]
 
 		return aggl_scheme
 
