@@ -191,7 +191,7 @@ window_edges_on_day = c()
 # First for non cumulative scenarios (only cases of the day)
 for(day in c(start_day,end_day))
 {
-  curr_date = nodes[nodes$day == day,]$date_time
+  curr_date = nodes[nodes$day == day,]$date_time[1]
   cat(paste(day,' ',sep =""))
   
   #Sliding
@@ -201,19 +201,24 @@ for(day in c(start_day,end_day))
   current_graph = current_graph[current_graph$day >= day - minus,]
   
   current_graph = current_graph %>% 
-    group_by(municipio, lon, lat) %>% 
+    group_by(dept, municipio, lon, lat) %>% 
     summarise(inner_movement = mean(inner_movement), num_cases = mean(num_cases),  .groups = "keep") %>%
     ungroup()
+  
+  current_graph$day = day
+  current_graph$date_time = curr_date
   
   current_edges = edges[edges$day <= day + plus,]
   current_edges = current_edges[current_edges$day >= day - minus,]
   
   current_edges = current_edges %>% 
-    group_by(lon.x, lat.x, lon.y, lat.y) %>% 
+    group_by(start_id, municipio.x, dept.x, lon.x, lat.x, end_id, municipio.y, dept.y, lon.y, lat.y) %>% 
     summarise(movement = mean(movement), .groups = "keep") %>%
     ungroup()
 
-
+  current_edges$day = day
+  current_edges$date_time = curr_date
+  
   # Only plots the one with at least one case
   current_graph = current_graph[current_graph$num_cases > 0, ]
   
@@ -278,7 +283,7 @@ window_edges_by_day = c()
 
 for(day in c(start_day,end_day))
 {   
-  curr_date = nodes[nodes$day == day,]$date_time
+  curr_date = nodes[nodes$day == day,]$date_time[1]
   
   cat(paste(day,' ',sep =""))
   
@@ -290,7 +295,7 @@ for(day in c(start_day,end_day))
   current_graph = as.tbl(current_graph)
   
   current_graph = current_graph %>% 
-    group_by(municipio, lon, lat) %>% 
+    group_by(dept, municipio, lon, lat) %>% 
     summarise(inner_movement = mean(inner_movement), num_cases = mean(num_cases), .groups = "keep") %>%
     ungroup()
   
@@ -300,14 +305,20 @@ for(day in c(start_day,end_day))
   #Adjusts to max
   current_graph$num_cases =  sapply( current_graph$num_cases, function(s){min(s, cases_max)})
   
+  current_graph$day = day
+  current_graph$date_time = curr_date
+  
   
   current_edges = edges[edges$day <= day + plus,]
   current_edges = current_edges[current_edges$day >= day - minus,]
   
   current_edges = current_edges %>% 
-    group_by(lon.x, lat.x, lon.y, lat.y) %>% 
+    group_by(start_id, municipio.x, dept.x, lon.x, lat.x, end_id, municipio.y, dept.y, lon.y, lat.y) %>% 
     summarise(movement = mean(movement), .groups = "keep") %>%
     ungroup()
+  
+  current_edges$day = day
+  current_edges$date_time = curr_date
   
   # Only plots the one with at least one case
   current_graph = current_graph[current_graph$num_cases > 0, ]

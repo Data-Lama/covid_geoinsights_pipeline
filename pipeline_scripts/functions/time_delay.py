@@ -33,7 +33,7 @@ def estimate_gamma_delay(df, agglomeration_type, polys_ids):
     mean_g =  fit_alpha*fit_beta
     var_g  = fit_alpha*fit_beta**2
 
-    x = np.linspace(-1, df['time_between_FIS_DIAG_int'].max(), df['time_between_FIS_DIAG_int'].max()+1)
+    x = np.linspace(-1, 6, df['time_between_FIS_DIAG_int'].max()+1)
     pdf_fitted = gamma.pdf(x, *(fit_alpha, fit_loc, fit_beta))
 
     bins, counts = np.unique(df['time_between_FIS_DIAG_int'], return_counts=True)
