@@ -94,7 +94,29 @@ def confirmed_to_onset(confirmed, p_delay, min_onset_date=None):
 
     onset.index.name = 'date_time'
     return pd.DataFrame(onset)
+
+######## this might work but CAREFULL
+def adjust_onset_for_right_censorship(onset, p_delay, col_name='Cases'):
+    onset_df =  onset[col_name]
+    cumulative_p_delay = p_delay.cumsum()
     
+    # Calculate the additional ones needed so shapes match
+    ones_needed = len(onset) - len(cumulative_p_delay)
+    padding_shape = (0, ones_needed)
+    
+    # Add ones and flip back
+    cumulative_p_delay = np.pad(
+        cumulative_p_delay,
+        padding_shape,
+        constant_values=1)
+    cumulative_p_delay = np.flip(cumulative_p_delay)
+    
+    # Adjusts observed onset values to expected terminal onset values
+    onset[col_name+'_adjusted'] = onset_df / cumulative_p_delay
+    
+    return onset, cumulative_p_delay
+
+ 
 def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min_time=pd.to_datetime('2020-02-26'), state=None, path_to_save=None):
     fig, ax = plt.subplots(2,1, figsize=(12.5, 10) )
 
@@ -152,6 +174,7 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
         tick_loc = 3000 
     elif 15000<max_cases_tick<=30000:
         tick_loc = 5000 
+
 
     #else:    
     #    tick_loc = np.round( max_cases_tick/100+0.1*100//5 )  
@@ -247,7 +270,7 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     ax[1].spines['right'].set_visible(False)
     ax[1].margins(0)
     ax[1].grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
-    ax[1].set_ylabel(r'Rt', size=15)
+    ax[1].set_ylabel(r'$R_t$', size=15)
     ax[0].set_title(state, size=15)
     # plt.show()
 
@@ -270,8 +293,6 @@ from tqdm import tqdm
 
 if selected_polygons_boolean:
     #pdb.set_trace()
-
-
     df_all = df_cases.copy()
     df_all = df_time_delay[['date_time', 'location', 'num_cases']].copy().reset_index().rename(columns={'geo_id': 'poly_id'})
     df_polygons = df_polygons[['poly_id', 'attr_time_delay']].set_index('poly_id')
@@ -281,6 +302,7 @@ if selected_polygons_boolean:
     print(indent + indent + f"Calculating individual polygon rt.")
     polys_not = []
     for idx, poly_id in tqdm( enumerate(list( df_all['poly_id'].unique()) )):
+
         print(indent + indent + indent + f" {poly_id}.", end="\r")
         computed_polygons.append(poly_id)
         df_poly_id = df_all[df_all['poly_id'] == poly_id ].copy()
@@ -321,22 +343,25 @@ if all_cases > 100:
     df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
     df_polygons_agg = df_polygons.copy()
 
-    df_polygons_agg = df_polygons_agg.iloc[df_polygons_agg.values==0]
     df_polygons_agg['cum_p'] = df_polygons_agg.apply(lambda x: np.sum([x['attr_time_delay']]).sum(), axis=1)
     df_polygons_agg = df_polygons_agg[df_polygons_agg['cum_p']>0.6]
     df_polygons_agg['attr_time_delay'] = df_polygons_agg.apply(lambda x: list(x['attr_time_delay']), axis=1 )
     df_polygons_agg['len'] = df_polygons_agg.apply(lambda x: len(x['attr_time_delay']), axis=1)
     df_polygons_agg = df_polygons_agg[df_polygons_agg['len']==61]
+
     p_delay = np.array( list(df_polygons_agg.attr_time_delay) ).mean(0)
 
     df_all = confirmed_to_onset(df_all, p_delay, min_onset_date=None)
+    df_all, _ = adjust_onset_for_right_censorship(df_all, p_delay, col_name='num_cases')
+    df_all['num_cases_adjusted'] = np.round(df_all['num_cases_adjusted'])
 
-    df_all = prepare_cases(df_all, col='num_cases', cutoff=0)
+    df_all = prepare_cases(df_all, col='num_cases_adjusted', cutoff=0)
     min_time = df_all.index[0]
     FIS_KEY = 'date_time'
 
     path_to_save = os.path.join(export_folder_location, 'aggregated_Rt.png')
-    (_, _, result) = plot_cases_rt(df_all, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+    (_, _, result) = plot_cases_rt(df_all+1, 'num_cases_adjusted', 'num_cases_adjusted' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+
     result.to_csv(os.path.join(export_folder_location,'aggregated_Rt.csv'))
 
 else:

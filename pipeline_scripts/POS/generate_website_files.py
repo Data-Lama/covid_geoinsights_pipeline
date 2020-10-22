@@ -183,6 +183,4 @@ file_location = os.path.join(analysis_dir,'colombia/community/prediction/polygon
 df = pd.read_csv(file_location)
 save_pandas(df, 'simulations_entire_location_data.csv', 'nacional/figura_8/')
 
-
-
 print(ident + '   Done!')
