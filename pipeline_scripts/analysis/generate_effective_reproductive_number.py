@@ -362,7 +362,6 @@ if all_cases > 100:
     path_to_save = os.path.join(export_folder_location, 'aggregated_Rt.png')
     df_all.iloc[-2:]['num_cases_adjusted'] = df_all.iloc[-2:]['Smoothed_num_cases_adjusted']
     (_, _, result) = plot_cases_rt(df_all, 'num_cases_adjusted', 'num_cases_adjusted' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
-
     result.to_csv(os.path.join(export_folder_location,'aggregated_Rt.csv'))
 
 else:

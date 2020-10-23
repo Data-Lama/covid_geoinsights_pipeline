@@ -59,11 +59,6 @@ print('   Done')
 print('')
 
 
-
-
-
-
-
 print('Excecuting for Each Location')
 
 # Extracts locations

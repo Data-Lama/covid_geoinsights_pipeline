@@ -12,7 +12,7 @@ import json
 from scipy import stats as sps
 from scipy.interpolate import interp1d
 from pipeline_scripts.functions.Rt_estimate import get_posteriors, highest_density_interval
-
+import pymc3 as pm
 import sys
 
 # Constants
@@ -183,7 +183,7 @@ if selected_polygons_boolean:
             mt  = mt.rolling(7).mean(std=2).fillna(0)
             mt[mt==0]     = mt_resampled[mt==0] 
             mt = (mt-mt.values.min())/( mt.values.max()-mt.values.min()  )
-            
+
             with pm.Model() as Rt_mobility_model:
                 
                 # Create the alpha and beta parameters
