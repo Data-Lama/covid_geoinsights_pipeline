@@ -310,7 +310,7 @@ if selected_polygons_boolean:
         df_poly_id['date_time'] = pd.to_datetime( df_poly_id['date_time'] )
         df_poly_id = df_poly_id.groupby('date_time').sum()[['num_cases']]
         all_cases = df_poly_id['num_cases'].sum()
-        p_delay = df_polygons.loc[poly_id].to_numpy()[0]
+        p_delay = df_polygons.loc[11001].to_numpy()[0]
         
         if p_delay.shape[0]<30:
             # if delay is not enough assume is like bogta delay
