@@ -105,3 +105,8 @@ def highest_density_interval(pmf, p=.9, debug=False):
     return pd.Series([low, high],
                      index=[f'Low_{p*100:.0f}',
                             f'High_{p*100:.0f}'])
+
+def calculate_threshold(Beta, R0):
+    if Beta == 0 :
+        return None
+    return (1 - (np.log(R0) / Beta))
