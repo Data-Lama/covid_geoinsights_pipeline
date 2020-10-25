@@ -144,9 +144,9 @@ df_time_delay.set_index("poly_id", inplace=True)
 for poly_id in df_time_delay.index.unique():
     # If the time delay distribution is not long enough, use bogota
     if len(df_time_delay.at[poly_id, "attr_time_delay"]) < 30:
-        time_delays[poly_id] = df_time_delay.at[DEFAULT_DELAY_DIST, "attr_time_delay"][0]
+        time_delays[poly_id] = df_time_delay.loc[[DEFAULT_DELAY_DIST], "attr_time_delay"].values[0]
     else:
-        time_delays[poly_id] = df_time_delay.at[poly_id, "attr_time_delay"][0]
+        time_delays[poly_id] = df_time_delay.loc[[poly_id], "attr_time_delay"].values[0]
 
 # Loop over polygons to run model and calculate thresholds
 print(f"    Runs model and calculates mobility thresholds")
