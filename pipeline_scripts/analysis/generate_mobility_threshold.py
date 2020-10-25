@@ -209,7 +209,7 @@ if selected_polygons_boolean:
                     # Draw the specified number of samples
                     N_SAMPLES = 10000
                     # Using Metropolis-Hastings Sampling 
-                    step = pm.Metropolis(vars=[Rt_mobility_model.R0, Rt_mobility_model.beta] , S = np.array([ (100+100)**2 , 9 ]) )
+                    step     = pm.Metropolis(vars=[Rt_mobility_model.beta, Rt_mobility_model.R0] , S = np.array([ (100+100)**2 , 9 ]) )
                     Rt_trace = pm.sample( N_SAMPLES, tune=1000, chains=40, step=step )
 
             min_time = df_poly_id_cases.index[0]
