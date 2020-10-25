@@ -1,22 +1,15 @@
-from matplotlib.dates import date2num, num2date
-from matplotlib import dates as mdates
-from matplotlib import ticker
-from matplotlib.colors import ListedColormap
-from matplotlib.patches import Patch
-from matplotlib import pyplot as plt
-import pandas as pd
-import numpy as np
 import os
-import pdb
-import json
-from scipy import stats as sps
-from scipy.interpolate import interp1d
-from pipeline_scripts.functions.Rt_estimate import get_posteriors, highest_density_interval
-import pymc3 as pm
 import sys
+import asyncio
+import numpy as np
+import pymc3 as pm
+import pandas as pd
+import scipy.stats as stats    
+from scipy.stats import gamma  
 
-# Constants
-indent = "\t"
+# Local functions 
+import pipeline_scripts.functions.Rt_estimate
+from  pipeline_scripts.functions.Rt_estimate import calculate_threshold as mov_th
 
 # Direcotries
 from global_config import config
@@ -24,9 +17,13 @@ from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
+# Contants
+DEFAULT_DELAY_DIST = 11001
+MAX_DATE = pd.to_datetime("2020-10-20")
+
 # Reads the parameters from excecution
-location_folder   =  sys.argv[1]    # location name  ### Colombia 
-agglomeration_method =  sys.argv[2] # agglomeration method ### Colombia for example
+location_name  =  sys.argv[1] # location name
+agglomeration_folder =  sys.argv[2] # agglomeration folder
 
 if len(sys.argv) <= 3:
 	selected_polygons_boolean = False
@@ -39,49 +36,45 @@ else :
         i += 1
     selected_polygon_name = selected_polygons.pop(0)
 
-# Agglomerated folder location
-agglomerated_folder = os.path.join(data_dir, 'data_stages', location_folder, 'agglomerated', agglomeration_method )
+# Data paths
+agglomerated_path  = os.path.join(data_dir, "data_stages", location_name, "agglomerated", agglomeration_folder)
+cases_path = os.path.join(agglomerated_path, 'cases.csv')
+mov_range_path = os.path.join(agglomerated_path, 'movement_range.csv')
+polygons_path = os.path.join(agglomerated_path, 'polygons.csv')
 
-# Get cases
-df_cases = pd.read_csv( os.path.join( agglomerated_folder, 'cases.csv' ), parse_dates=['date_time'])
-df_movement = pd.read_csv( os.path.join( agglomerated_folder, 'movement_range.csv' ), parse_dates=['date_time'])
-df_movement['date_time'] = pd.to_datetime(df_movement['date_time'])
+# TODO must generate cases_diag automatically !!! AND Agglomerate properly 
+time_delay_path = os.path.join(data_dir, "data_stages", location_name, "unified", "cases_diag.csv")
+df_time_delay = pd.read_csv(time_delay_path, parse_dates=["date_time"])
+df_time_delay.rename(columns={"geo_id":"poly_id", "num_cases":"num_cases_diag"}, inplace=True)
+df_cases_diag = df_time_delay[["date_time", "poly_id", "num_cases_diag"]]
 
-mov_df_plot   = df_movement[['poly_id', 'date_time', 'movement_change']]
+# Load dataframes
+df_mov_ranges = pd.read_csv(mov_range_path, parse_dates=["date_time"])
+df_cases = pd.read_csv(cases_path, parse_dates=["date_time"])
+df_polygons = pd.read_csv(polygons_path)
 
-## add time delta
-df_polygons   = pd.read_csv(os.path.join(agglomerated_folder,  "polygons.csv"))
-df_time_delay = pd.read_csv(os.path.join(data_dir, 'data_stages', location_folder, "unified", "cases_diag.csv"))
-df_time_delay["attr_time-delay_union"] = df_time_delay.apply(lambda x: np.fromstring(x["attr_time-delay_union"], sep="|"), axis=1)
-df_time_delay.set_index("geo_id", inplace=True)
-df_polygons["attr_time_delay"] = df_polygons.apply(lambda x: list(df_time_delay.loc[x.poly_id]["attr_time-delay_union"])[0], axis=1)
+# Add polygon names
+df_mov_ranges = df_mov_ranges.merge(df_polygons[["poly_name", "poly_id"]], on="poly_id", how="outer").dropna()
 
+# Crop to max_date
+df_mov_ranges = df_mov_ranges[df_mov_ranges["date_time"] <= MAX_DATE]
+df_cases = df_cases[df_cases["date_time"] <= MAX_DATE]
+df_cases_diag = df_cases_diag[df_cases_diag["date_time"] <= MAX_DATE]
 
 if selected_polygons_boolean:
-    print(indent + f"Calculating rt for {len(selected_polygons)} polygons in {selected_polygon_name}")
-    # Set polygons to int
-    selected_polygons = [int(x) for x in selected_polygons]
-    selected_polygons_folder_name = selected_polygon_name
-    df_cases = df_cases[df_cases["poly_id"].isin(selected_polygons)].copy()
-
+    df_mov_ranges = df_mov_ranges[df_mov_ranges["poly_id"].isin(selected_polygons)]
+    df_cases = df_cases[df_cases["poly_id"].isin(selected_polygons)]
+    df_polygons = df_polygons[df_polygons["poly_id"].isin(selected_polygons)]
+    output_folder = os.path.join(analysis_dir, location_name, agglomeration_folder, "r_t", selected_polygon_name)
 else:
-    print(indent + f"Calculating rt for {location_folder} entire location.")
-    selected_polygons_folder_name = "entire_location"
-    selected_polygons_boolean = True
+    output_folder = os.path.join(analysis_dir, location_name, agglomeration_folder, "r_t", "entire_location")
 
+# Check if folder exists
+if not os.path.isdir(output_folder):
+        os.makedirs(output_folder)
 
-def prepare_cases(daily_cases, col='Cases', cutoff=0):
-    daily_cases['Smoothed_'+col] = daily_cases[col].rolling(7,
-        win_type='gaussian',
-        min_periods=1,
-        center=True).mean(std=2).round()
-
-    idx_start = np.searchsorted(daily_cases['Smoothed_'+col], cutoff)
-    daily_cases['Smoothed_'+col] = daily_cases['Smoothed_'+col].iloc[idx_start:]
-
-    return daily_cases
-
-def confirmed_to_onset(confirmed, p_delay, min_onset_date=None):
+# Define functions for model
+def confirmed_to_onset(confirmed, p_delay, col_name, min_onset_date=None):
     min_onset_date = pd.to_datetime(min_onset_date)
     # Reverse cases so that we convolve into the past
     convolved = np.convolve(np.squeeze(confirmed.iloc[::-1].values), p_delay)
@@ -90,17 +83,18 @@ def confirmed_to_onset(confirmed, p_delay, min_onset_date=None):
     dr = pd.date_range(end=confirmed.index[-1],
                         periods=len(convolved))
     # Flip the values and assign the date range
-    onset = pd.Series(np.flip(convolved), index=dr, name='num_cases')
+    onset = pd.Series(np.flip(convolved), index=dr, name=col_name)
     if min_onset_date:
         onset = np.round(onset.loc[min_onset_date:])
     else: 
         onset = np.round(onset.iloc[onset.values>=1])
 
-    onset.index.name = 'date_time'
+    onset.index.name = 'date'
     return pd.DataFrame(onset)
 
+
 ######## this might work but CAREFULL
-def adjust_onset_for_right_censorship(onset, p_delay, col_name='Cases'):
+def adjust_onset_for_right_censorship(onset, p_delay, col_name='num_cases'):
     onset_df =  onset[col_name]
     cumulative_p_delay = p_delay.cumsum()
     
@@ -120,110 +114,173 @@ def adjust_onset_for_right_censorship(onset, p_delay, col_name='Cases'):
     
     return onset, cumulative_p_delay
 
-# Export folder location
-export_folder_location = os.path.join(analysis_dir, location_folder, agglomeration_method, 'r_t', selected_polygons_folder_name)
+# Smooths cases using a rolling window and gaussian sampling
+def prepare_cases(daily_cases, col='num_cases', cutoff=0):
+    daily_cases['smoothed_'+col] = daily_cases[col].rolling(7,
+        win_type='gaussian',
+        min_periods=1,
+        center=True).mean(std=2).round()
 
-# Check if folder exists
-if not os.path.isdir(export_folder_location):
-        os.makedirs(export_folder_location)
+    idx_start = np.searchsorted(daily_cases['smoothed_'+col], cutoff)
+    daily_cases['smoothed_'+col] = daily_cases['smoothed_'+col].iloc[idx_start:]
 
-skipped_polygons = []
-computed_polygons = []
-from tqdm import tqdm
+    return daily_cases
+
+def df_from_model(rt_trace):
+    
+    r_t = rt_trace
+    mean = np.mean(r_t, axis=0)
+    median = np.median(r_t, axis=0)
+    hpd_90 = pm.stats.hpd(r_t, hdi_prob=.9)
+    hpd_50 = pm.stats.hpd(r_t, hdi_prob=.5)
+    
+
+    df = pd.DataFrame(data=np.c_[mean, median, hpd_90, hpd_50],
+                 columns=['mean', 'median', 'lower_90', 'upper_90', 'lower_50','upper_50'])
+    return df
 
 
-if selected_polygons_boolean:
-    #pdb.set_trace()
-    df_all = df_cases.copy()
-    df_all = df_time_delay[['date_time', 'location', 'num_cases']].copy().reset_index().rename(columns={'geo_id': 'poly_id'})
-    df_polygons = df_polygons[['poly_id', 'attr_time_delay']].set_index('poly_id')
-    df_polygons = df_polygons.dropna()
-    #df_polygons[df_polygons==-1]=df_polygons.loc[11001].to_numpy()[0]
+def estimate_mov_th(mobility_data, cases_onset_data, poly_id):
+    onset = cases_onset_data 
+    mt = mobility_data
 
-    print(indent + indent + f"Calculating individual polygon rt.")
-    polys_not = []
-    for idx, poly_id in tqdm( enumerate(list( df_all['poly_id'].unique()) )):
+    with pm.Model() as Rt_mobility_model:            
+        # Create the alpha and beta parameters
+        # Assume a normal distribution
+        beta  = pm.Uniform('beta', lower=-100, upper=100)
+        Ro = pm.Uniform('R0', lower=2, upper=5)
 
-        print(indent + indent + indent + f" {poly_id}.", end="\r")
-        computed_polygons.append(poly_id)
-        df_poly_id_cases = df_all[df_all['poly_id'] == poly_id ].copy()
-        df_mov_poly_id = mov_df_plot[mov_df_plot['poly_id'] == poly_id ].copy()
-        df_mov_poly_id = df_mov_poly_id.groupby('date_time').mean()
+        # The effective reproductive number is given by:
+        Rt = pm.Deterministic('Rt', Ro*pm.math.exp(-beta*(1+mt[:-1].values)))
+        serial_interval = pm.Gamma('serial_interval', alpha=6, beta=1.5)
+        GAMMA = 1/serial_interval
+        lam = onset[:-1].values * pm.math.exp( GAMMA * (Rt- 1))
+        observed = onset.round().values[1:]
 
-        df_poly_id_cases['date_time'] = pd.to_datetime( df_poly_id_cases['date_time'] )
-        df_poly_id_cases = df_poly_id_cases.groupby('date_time').sum()[['num_cases']]
-        all_cases = df_poly_id_cases['num_cases'].sum()
-        p_delay = df_polygons.loc[poly_id].to_numpy()[0]
+        # Likelihood
+        cases = pm.Poisson('cases', mu=lam, observed=observed)
+
+        with Rt_mobility_model:
+            # Draw the specified number of samples
+            N_SAMPLES = 10000
+
+            # Using Metropolis Hastings Sampling
+            step     = pm.Metropolis(vars=[ Rt_mobility_model.beta, Rt_mobility_model.R0 ], S = np.array([ (100+100)**2 , (5-2)**2 ]) )
+            Rt_trace = pm.sample( N_SAMPLES, tune=1000, chains=20, step=step )
+
+        BURN_IN = 2000
+        rt_info = df_from_model(Rt_trace.get_values(burn=BURN_IN,varname='Rt'))
+
+        R0_dist   = Rt_trace.get_values(burn=BURN_IN, varname='R0')
+        beta_dist = Rt_trace.get_values(burn=BURN_IN,varname='beta')
+        mb_th = mov_th(beta_dist.mean(), R0_dist.mean())
+
+        return {'poly_id': poly_id, 'R0':R0_dist.mean(), 'beta':beta_dist.mean(), 'mob_th':mb_th }
+
+    
+# Get time delay
+print(f"    Extracts time delay per polygon")
+time_delays = {}
+df_time_delay["attr_time_delay"] = df_time_delay.apply(lambda x: np.fromstring(x["attr_time-delay_union"], sep="|"), axis=1)
+df_time_delay.set_index("poly_id", inplace=True)
+for poly_id in df_time_delay.index.unique():
+    # If the time delay distribution is not long enough, use bogota
+    if len(df_time_delay.at[poly_id, "attr_time_delay"]) < 30:
+        time_delays[poly_id] = df_time_delay.loc[[DEFAULT_DELAY_DIST], "attr_time_delay"].values[0]
+    else:
+        time_delays[poly_id] = df_time_delay.loc[[poly_id], "attr_time_delay"].values[0]
+
+# Loop over polygons to run model and calculate thresholds
+print(f"    Runs model and calculates mobility thresholds")
+
+df_mov_thresholds = pd.DataFrame(columns =['poly_id', 'R0', 'Beta', 'mob_th'])
+df_mov_thresholds['poly_id'] = list(df_mov_ranges.poly_id.unique())+['aggregated']
+df_mov_thresholds = df_mov_thresholds.set_index('poly_id')
+
+for poly_id in df_mov_ranges.poly_id.unique():
+
+    df_mov_poly_id = df_mov_ranges[df_mov_ranges['poly_id'] == poly_id][["date_time", "poly_id", "movement_change"]].sort_values("date_time").copy()
+    df_cases_diag_id = df_cases_diag[df_cases_diag["poly_id"] == poly_id][["date_time", "num_cases_diag"]]
+
+    all_cases_id = df_cases_diag_id.num_cases_diag.sum()
+    p_delay = time_delays[poly_id]
+    
+    if all_cases_id > 100:
+        print(f"        Running model for {poly_id}")
+        df_mov_poly_id.set_index("date_time", inplace=True)
+        df_cases_diag_id.set_index("date_time", inplace=True)
         
+        df_cases_diag_id = df_cases_diag_id.resample('D').sum().fillna(0)
+        df_cases_diag_id = confirmed_to_onset(df_cases_diag_id, p_delay, "num_cases_diag", min_onset_date=None)
+
+        min_date = max(min(df_mov_poly_id.index.values), min(df_cases_diag_id.index.values))
+        max_date = min(max(df_mov_poly_id.index.values), max(df_cases_diag_id.index.values))
+
+        df_onset_mcmc = df_cases_diag_id.loc[min_date:max_date]['num_cases_diag']
+        df_mov_df_mcmc = df_mov_poly_id.loc[min_date:max_date]['movement_change']
+        df_mcmc = pd.Series(df_cases_diag_id['num_cases_diag'], name='num_cases_diag')
+
+        # Smooths cases rolilng window
+        df_cases_diag_id = prepare_cases(df_cases_diag_id, col='num_cases_diag', cutoff=0)
+
+        onset = df_onset_mcmc
+        mt_resampled = df_mov_df_mcmc.resample('1D').sum()
+        mt = mt_resampled.rolling(7).mean(std=2).fillna(0)
+        mt[mt==0] = mt_resampled[mt==0] 
+        mt = mt.rolling(7).mean(std=2).fillna(0)
+        mt[mt==0] = mt_resampled[mt==0] 
+        mt = (mt-mt.values.min())/(mt.values.max()-mt.values.min())
+
+        dict_result = estimate_mov_th(mt, onset, poly_id)
+            
+        df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
+        df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
+        df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']
+    else:
+        df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
+        df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
+        df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
 
 
+df_mov_poly_id = df_mov_ranges[["date_time", "poly_id", "movement_change"]].sort_values("date_time").copy()
+df_cases_diag_id = df_cases_diag[["date_time", "num_cases_diag"]]
 
+all_cases_id = df_cases_diag_id.num_cases_diag.sum()
+p_delay = time_delays[poly_id]
 
-        if p_delay.shape[0]<30:
-            # if delay is not enough assume is like bogta delay
-            p_delay = df_polygons.loc[11001].to_numpy()[0]
-        if all_cases > 100:
+if all_cases_id > 100:
+    df_mov_poly_id.set_index("date_time", inplace=True)
+    df_cases_diag_id.set_index("date_time", inplace=True)
+    
+    df_cases_diag_id = df_cases_diag_id.resample('D').sum().fillna(0)
+    df_cases_diag_id = confirmed_to_onset(df_cases_diag_id, p_delay, "num_cases_diag", min_onset_date=None)
 
-            df_poly_id_cases = df_poly_id_cases.reset_index().set_index('date_time').resample('D').sum().fillna(0)
-            df_poly_id_cases = confirmed_to_onset(df_poly_id_cases, p_delay, min_onset_date=None)
+    min_date = max(min(df_mov_poly_id.index.values), min(df_cases_diag_id.index.values))
+    max_date = min(max(df_mov_poly_id.index.values), max(df_cases_diag_id.index.values))
 
-            min_date = np.maximum( df_mov_poly_id.index.values[0], df_poly_id_cases.index.values[0])
-            max_date = np.minimum( df_mov_poly_id.index.values[-1], df_poly_id_cases.index.values[-1])
+    df_onset_mcmc = df_cases_diag_id.loc[min_date:max_date]['num_cases_diag']
+    df_mov_df_mcmc = df_mov_poly_id.loc[min_date:max_date]['movement_change']
+    df_mcmc = pd.Series(df_cases_diag_id['num_cases_diag'], name='num_cases_diag')
 
-            df_onset_mcmc  = df_poly_id_cases.loc[min_date:max_date]['num_cases']
-            df_mov_df_mcmc = df_mov_poly_id.loc[min_date:max_date]['movement_change']
-            df_mcmc = pd.Series(df_poly_id_cases['num_cases'], name='num_cases')
+    # Smooths cases rolilng window
+    df_cases_diag_id = prepare_cases(df_cases_diag_id, col='num_cases_diag', cutoff=0)
 
-            df_poly_id_cases = prepare_cases(df_poly_id_cases, col='num_cases', cutoff=0)
+    onset = df_onset_mcmc
+    mt_resampled = df_mov_df_mcmc.resample('1D').sum()
+    mt = mt_resampled.rolling(7).mean(std=2).fillna(0)
+    mt[mt==0] = mt_resampled[mt==0] 
+    mt = mt.rolling(7).mean(std=2).fillna(0)
+    mt[mt==0] = mt_resampled[mt==0] 
+    mt = (mt-mt.values.min())/(mt.values.max()-mt.values.min())
 
-            onset = df_onset_mcmc
-            mt_resampled = df_mov_df_mcmc.resample('1D').sum()
-            mt           = mt_resampled.rolling(7).mean(std=2).fillna(0)
-            mt[mt==0] = mt_resampled[mt==0] 
-            mt  = mt.rolling(7).mean(std=2).fillna(0)
-            mt[mt==0]     = mt_resampled[mt==0] 
-            mt = (mt-mt.values.min())/( mt.values.max()-mt.values.min()  )
+    dict_result = estimate_mov_th(mt, onset, 'aggregated')
+        
+    df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
+    df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
+    df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']
+else:
+    df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
+    df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
+    df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
 
-            with pm.Model() as Rt_mobility_model:
-                
-                # Create the alpha and beta parameters
-                # Assume a uniform distribution
-                Ro    = pm.Uniform('R0', lower=3, upper=6)
-                beta  = pm.Uniform('beta', lower=-10, upper=10)
-
-                serial_interval = pm.Gamma('serial_interval', alpha=6, beta=1.5)
-                # rt = ro*exp(-beta*(1-mt))
-
-                # The effective reproductive number is given by:
-                Rt = pm.Deterministic('Rt', Ro*pm.math.exp(-beta*(1-mt[1:].values)))
-                
-                GAMMA = 1/serial_interval
-
-                observed = onset.round().values[:-1] 
-                expected_today = observed * pm.math.exp( GAMMA * (Rt-1) )
-                expected_today = pm.math.maximum(1, expected_today)
-                # Likelihood
-                cases    = pm.Poisson('cases', mu=expected_today, observed=observed)
-
-                with Rt_mobility_model:
-                    # Draw the specified number of samples
-                    N_SAMPLES = 10000
-                    # Using Metropolis-Hastings Sampling 
-                    step     = pm.Metropolis(vars=[Rt_mobility_model.beta, Rt_mobility_model.R0] , S = np.array([ (100+100)**2 , 9 ]) )
-                    Rt_trace = pm.sample( N_SAMPLES, tune=1000, chains=40, step=step )
-
-            min_time = df_poly_id_cases.index[0]
-            FIS_KEY = 'date_time'
-
-            # pdb.set_trace()
-            plt.close()
-
-        else:
-            skipped_polygons.append(poly_id)
-    print('\nWARNING: Rt was not computed for polygons: {}'.format(''.join([str(p)+', ' for p in skipped_polygons]) ))
-
-df_all = df_cases.copy()
-df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
-df_all    = df_all.groupby('date_time').sum()[['num_cases']]
-all_cases = df_all['num_cases'].sum()
-
+df_mov_thresholds.to_csv( os.path.join(output_folder,'mobility_thresholds.csv'))
