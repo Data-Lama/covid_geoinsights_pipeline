@@ -232,6 +232,12 @@ for poly_id in df_mov_ranges.poly_id.unique():
         mt[mt==0] = mt_resampled[mt==0] 
         mt = (mt-mt.values.min())/(mt.values.max()-mt.values.min())
 
+        min_date = max(min(mt.index.values), min(onset.index.values))
+        max_date = min(max(mt.index.values), max(onset.index.values))
+        
+        onset = onset.loc[min_date:max_date]
+        mt = mt.loc[min_date:max_date]
+
         dict_result = estimate_mov_th(mt, onset+1, poly_id)
             
         df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
@@ -242,6 +248,7 @@ for poly_id in df_mov_ranges.poly_id.unique():
         df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
         df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
         df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
+
 
 
 df_mov_poly_id = df_mov_ranges[["date_time", "poly_id", "movement_change"]].sort_values("date_time").copy()
@@ -287,4 +294,4 @@ else:
     df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
     df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
 
-df_mov_thresholds.to_csv( os.path.join(output_folder,'mobility_thresholds.csv'))
+df_mov_thresholds.to_csv( os.path.join( output_folder ,'mobility_thresholds.csv'))
