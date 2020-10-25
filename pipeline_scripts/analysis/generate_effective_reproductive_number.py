@@ -26,7 +26,7 @@ analysis_dir = config.get_property('analysis_dir')
 
 # Reads the parameters from excecution
 location_folder   =  sys.argv[1]    # location name  ### Colombia 
-agglomeration_method =  sys.argv[2] # agglomeration method ### Colombia for example
+agglomeration_method =  sys.argv[2] # agglomeration method ### geometry for example
 
 if len(sys.argv) <= 3:
 	selected_polygons_boolean = False
@@ -326,6 +326,7 @@ if selected_polygons_boolean:
             path_to_save = os.path.join(export_folder_location, str(poly_id)+'_Rt.png')
             #pdb.set_trace()
             (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+            
             result.to_csv(os.path.join(export_folder_location, str(poly_id)+'_Rt.csv'))
             plt.close()
         else:
@@ -333,6 +334,8 @@ if selected_polygons_boolean:
     print('\nWARNING: Rt was not computed for polygons: {}'.format(''.join([str(p)+', ' for p in skipped_polygons]) ))
 
 
+poly_norte_santander = [54001, 54261, 54673, 54874, 54051, 54099, 54599, 54109, 54128, 54172, 54174, 54223, 54239, 54245, 54250, 54313, 54344, 54347, 54377, 54405, 54418, 54003, 54206, 54398, 54498, 54518, 54125, 54480, 54520, 54553, 54660, 54670, 54680, 54720, 54743, 54800, 54810, 54820, 54871]
+df_cases = df_cases[df_cases['poly_id'].isin(poly_norte_santander)]
 df_all = df_cases.copy()
 df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
 df_all    = df_all.groupby('date_time').sum()[['num_cases']]
@@ -354,14 +357,17 @@ if all_cases > 100:
     df_all = confirmed_to_onset(df_all, p_delay, min_onset_date=None)
     df_all, _ = adjust_onset_for_right_censorship(df_all, p_delay, col_name='num_cases')
     df_all['num_cases_adjusted'] = np.round(df_all['num_cases_adjusted'])
+    df_all = df_all.iloc[:-10]
 
     df_all = prepare_cases(df_all, col='num_cases_adjusted', cutoff=0)
     min_time = df_all.index[0]
     FIS_KEY = 'date_time'
-
+    export_folder_location = '/Users/chaosdonkey06/Dropbox/covid_fb/report/reporte_norte_de_santander/report_figure_folder'
     path_to_save = os.path.join(export_folder_location, 'aggregated_Rt.png')
-    df_all.iloc[-2:]['num_cases_adjusted'] = df_all.iloc[-2:]['Smoothed_num_cases_adjusted']
+    df_all.iloc[-10:]['num_cases_adjusted'] = df_all.iloc[-10:]['Smoothed_num_cases_adjusted']
+
     (_, _, result) = plot_cases_rt(df_all, 'num_cases_adjusted', 'num_cases_adjusted' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+    
     result.to_csv(os.path.join(export_folder_location,'aggregated_Rt.csv'))
 
 else:
