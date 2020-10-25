@@ -161,6 +161,10 @@ for poly_id in df_mov_ranges.poly_id.unique():
     all_cases_id = df_cases_diag_id.num_cases_diag.sum()
     p_delay = time_delays[poly_id]
     
+    df_mov_thresholds = pd.DataFrame(columns =['poly_id', 'R0', 'Beta', 'mov_th'])
+    df_mov_thresholds['poly_id'] = list(df_mov_ranges.poly_id.unique())
+    df_mov_thresholds = df_mov_thresholds.set_index('poly_id')
+
     if all_cases_id > 100:
         print(f"        Running model for {poly_id}")
         df_mov_poly_id.set_index("date_time", inplace=True)
@@ -210,6 +214,7 @@ for poly_id in df_mov_ranges.poly_id.unique():
             with Rt_mobility_model:
                 # Draw the specified number of samples
                 N_SAMPLES = 10000
+
                 # Using Metropolis Hastings Sampling
                 step     = pm.Metropolis(vars=[ Rt_mobility_model.beta, Rt_mobility_model.R0 ] , S = np.array([ (100+100)**2 , 9 ]) )
                 Rt_trace = pm.sample( N_SAMPLES, tune=1000, chains=20, step=step )
@@ -219,6 +224,12 @@ for poly_id in df_mov_ranges.poly_id.unique():
 
             R0_dist   = Rt_trace.get_values(burn=BURN_IN, varname='R0')
             beta_dist = Rt_trace.get_values(burn=BURN_IN,varname='beta')
-            mov_th(beta_dist.mean(), R0_dist.mean())
-            
+            mv_th = mov_th(beta_dist.mean(), R0_dist.mean())
+            df_mov_thresholds.loc[poly_id]['R0']     = R0_dist.mean()
+            df_mov_thresholds.loc[poly_id]['Beta']   = beta_dist.mean()
+            df_mov_thresholds.loc[poly_id]['mov_th'] = mv_th
+    else:
+        df_mov_thresholds.loc[poly_id]['R0']     = np.nan
+        df_mov_thresholds.loc[poly_id]['Beta']   = np.nan
+        df_mov_thresholds.loc[poly_id]['mov_th'] = np.nan
 
