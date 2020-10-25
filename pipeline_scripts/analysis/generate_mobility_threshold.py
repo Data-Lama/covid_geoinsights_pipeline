@@ -237,6 +237,7 @@ for poly_id in df_mov_ranges.poly_id.unique():
         df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
         df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']
     else:
+        dict_result = {'poly_id': poly_id}
         df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
         df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
         df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
@@ -279,6 +280,8 @@ if all_cases_id > 100:
     df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
     df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']
 else:
+    dict_result = {'poly_id': poly_id}
+
     df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
     df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
     df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
