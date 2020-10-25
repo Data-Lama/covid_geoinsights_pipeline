@@ -9,15 +9,18 @@ from scipy.stats import gamma
 
 # Local functions 
 import pipeline_scripts.functions.Rt_estimate
+import pipeline_scripts.functions.Rt_estimate.calculate_threshold as mov_th
 
 # Direcotries
 from global_config import config
+
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
 # Contants
 DEFAULT_DELAY_DIST = 11001
 MAX_DATE = pd.to_datetime("2020-10-20")
+
 # Reads the parameters from excecution
 location_name  =  sys.argv[1] # location name
 agglomeration_folder =  sys.argv[2] # agglomeration folder
@@ -67,8 +70,8 @@ else:
     output_folder = os.path.join(analysis_dir, location_name, agglomeration_folder, "r_t", "entire_location")
 
 # Check if folder exists
-    if not os.path.isdir(output_folder):
-            os.makedirs(output_folder)
+if not os.path.isdir(output_folder):
+        os.makedirs(output_folder)
 
 # Define functions for model
 def confirmed_to_onset(confirmed, p_delay, col_name, min_onset_date=None):
@@ -189,8 +192,8 @@ for poly_id in df_mov_ranges.poly_id.unique():
             
             # Create the alpha and beta parameters
             # Assume a normal distribution
-            Ro = pm.Uniform('R0', lower=2, upper=5)
             beta  = pm.Uniform('beta', lower=-100, upper=100)
+            Ro = pm.Uniform('R0', lower=2, upper=5)
 
             # The effective reproductive number is given by:
             Rt = pm.Deterministic('Rt', Ro*pm.math.exp(-beta*(1+mt[:-1].values)))
@@ -208,14 +211,14 @@ for poly_id in df_mov_ranges.poly_id.unique():
                 # Draw the specified number of samples
                 N_SAMPLES = 10000
                 # Using Metropolis Hastings Sampling
-                step     = pm.Metropolis(vars=[Rt_mobility_model.beta, Rt_mobility_model.R0] , S = np.array([ (100+100)**2 , 9 ]) )
-                Rt_trace = pm.sample(N_SAMPLES, chains=20, step=step)
+                step     = pm.Metropolis(vars=[ Rt_mobility_model.beta, Rt_mobility_model.R0 ] , S = np.array([ (100+100)**2 , 9 ]) )
                 Rt_trace = pm.sample( N_SAMPLES, tune=1000, chains=20, step=step )
 
             BURN_IN = 2000
             rt_info = df_from_model(Rt_trace.get_values(burn=BURN_IN,varname='Rt'))
 
-            R0_dist = Rt_trace.get_values(burn=BURN_IN,varname='R0')
+            R0_dist   = Rt_trace.get_values(burn=BURN_IN, varname='R0')
             beta_dist = Rt_trace.get_values(burn=BURN_IN,varname='beta')
+            mov_th(beta_dist.mean(), R0_dist.mean())
             
 

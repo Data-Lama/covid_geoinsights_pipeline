@@ -215,8 +215,9 @@ if selected_polygons_boolean:
             min_time = df_poly_id_cases.index[0]
             FIS_KEY = 'date_time'
 
-            #pdb.set_trace()
+            # pdb.set_trace()
             plt.close()
+
         else:
             skipped_polygons.append(poly_id)
     print('\nWARNING: Rt was not computed for polygons: {}'.format(''.join([str(p)+', ' for p in skipped_polygons]) ))
