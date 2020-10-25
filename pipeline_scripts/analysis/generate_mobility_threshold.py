@@ -213,7 +213,7 @@ for poly_id in df_mov_ranges.poly_id.unique():
         df_cases_diag_id = df_cases_diag_id.resample('1D').sum().fillna(0)
         df_cases_diag_id = confirmed_to_onset(df_cases_diag_id, p_delay, "num_cases_diag", min_onset_date=None)
         df_cases_diag_id = df_cases_diag_id.resample('1D').sum().fillna(0)
-        
+
         min_date = max(min(df_mov_poly_id.index.values), min(df_cases_diag_id.index.values))
         max_date = min(max(df_mov_poly_id.index.values), max(df_cases_diag_id.index.values))
 
@@ -232,13 +232,7 @@ for poly_id in df_mov_ranges.poly_id.unique():
         mt[mt==0] = mt_resampled[mt==0] 
         mt = (mt-mt.values.min())/(mt.values.max()-mt.values.min())
 
-
-        min_date = max(min(mt.index.values), min(onset.index.values))
-        max_date = min(max(mt.index.values), max(onset.index.values))
-        mt = mt.loc[min_date:max_date]
-        onset = onset.loc[min_date:max_date]
-
-        dict_result = estimate_mov_th(mt, onset, poly_id)
+        dict_result = estimate_mov_th(mt, onset+1, poly_id)
             
         df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
         df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
