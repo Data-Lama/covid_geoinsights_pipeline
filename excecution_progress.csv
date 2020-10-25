@@ -1,2 +1,2 @@
 timestamp,script_name,parameters,result,elapsed_time
-2020-10-25 12:50:13.328426,generate_mobility_threshold.py,colombia community,256,250
+2020-10-25 12:57:34.092142,generate_mobility_threshold.py,colombia community,256,53

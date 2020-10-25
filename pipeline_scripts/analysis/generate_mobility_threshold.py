@@ -210,13 +210,14 @@ for poly_id in df_mov_ranges.poly_id.unique():
         df_mov_poly_id.set_index("date_time", inplace=True)
         df_cases_diag_id.set_index("date_time", inplace=True)
         
-        df_cases_diag_id = df_cases_diag_id.resample('D').sum().fillna(0)
+        df_cases_diag_id = df_cases_diag_id.resample('1D').sum().fillna(0)
         df_cases_diag_id = confirmed_to_onset(df_cases_diag_id, p_delay, "num_cases_diag", min_onset_date=None)
-
+        df_cases_diag_id = df_cases_diag_id.resample('1D').sum().fillna(0)
+        
         min_date = max(min(df_mov_poly_id.index.values), min(df_cases_diag_id.index.values))
         max_date = min(max(df_mov_poly_id.index.values), max(df_cases_diag_id.index.values))
 
-        df_onset_mcmc = df_cases_diag_id.loc[min_date:max_date]['num_cases_diag']
+        df_onset_mcmc  = df_cases_diag_id.loc[min_date:max_date]['num_cases_diag']
         df_mov_df_mcmc = df_mov_poly_id.loc[min_date:max_date]['movement_change']
         df_mcmc = pd.Series(df_cases_diag_id['num_cases_diag'], name='num_cases_diag')
 
@@ -230,6 +231,12 @@ for poly_id in df_mov_ranges.poly_id.unique():
         mt = mt.rolling(7).mean(std=2).fillna(0)
         mt[mt==0] = mt_resampled[mt==0] 
         mt = (mt-mt.values.min())/(mt.values.max()-mt.values.min())
+
+
+        min_date = max(min(mt.index.values), min(onset.index.values))
+        max_date = min(max(mt.index.values), max(onset.index.values))
+        mt = mt.loc[min_date:max_date]
+        onset = onset.loc[min_date:max_date]
 
         dict_result = estimate_mov_th(mt, onset, poly_id)
             
