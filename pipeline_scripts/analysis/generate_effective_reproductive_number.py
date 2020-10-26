@@ -334,7 +334,6 @@ if selected_polygons_boolean:
     print('\nWARNING: Rt was not computed for polygons: {}'.format(''.join([str(p)+', ' for p in skipped_polygons]) ))
 
 
-df_cases = df_cases[df_cases['poly_id'].isin(poly_norte_santander)]
 df_all = df_cases.copy()
 df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
 df_all    = df_all.groupby('date_time').sum()[['num_cases']]
