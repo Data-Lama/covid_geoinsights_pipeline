@@ -205,7 +205,7 @@ for poly_id in df_mov_ranges.poly_id.unique():
     all_cases_id = df_cases_diag_id.num_cases_diag.sum()
     p_delay = time_delays[poly_id]
 
-    path_to_save_tr = os.path.join(output_folder, str(poly_id) )
+    path_to_save_tr = os.path.join(output_folder, 'MCMC', str(poly_id) )
 
     if all_cases_id > 100:
 
@@ -296,8 +296,6 @@ if all_cases_id > 100:
     onset = onset.loc[min_date:max_date]
     onset = onset.resample('1D').sum().fillna(0)
     mt = mt.loc[min_date:max_date]
-
-
     dict_result = estimate_mov_th(mt, onset, 'aggregated', os.path.join(path_to_save_tr, 'mob_th_trace.pymc3.pkl'))
 
     df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
