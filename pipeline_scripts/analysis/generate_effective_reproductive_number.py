@@ -60,11 +60,11 @@ if selected_polygons_boolean:
     selected_polygons_folder_name = selected_polygon_name
     df_cases = df_cases[df_cases["poly_id"].isin(selected_polygons)].copy()
     df_time_delay = df_time_delay[df_time_delay["poly_id"].isin(selected_polygons)].copy()
+    df_polygons = df_polygons[df_polygons["poly_id"].isin(selected_polygons)].copy()
 
 else:
     print(indent + f"Calculating rt for {location_folder} entire location.")
     selected_polygons_folder_name = "entire_location"
-    selected_polygons_boolean = True
 
 
 def prepare_cases(daily_cases, col='Cases', cutoff=0):
