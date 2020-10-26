@@ -334,7 +334,6 @@ if selected_polygons_boolean:
     print('\nWARNING: Rt was not computed for polygons: {}'.format(''.join([str(p)+', ' for p in skipped_polygons]) ))
 
 
-poly_norte_santander = [54001, 54261, 54673, 54874, 54051, 54099, 54599, 54109, 54128, 54172, 54174, 54223, 54239, 54245, 54250, 54313, 54344, 54347, 54377, 54405, 54418, 54003, 54206, 54398, 54498, 54518, 54125, 54480, 54520, 54553, 54660, 54670, 54680, 54720, 54743, 54800, 54810, 54820, 54871]
 df_cases = df_cases[df_cases['poly_id'].isin(poly_norte_santander)]
 df_all = df_cases.copy()
 df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
