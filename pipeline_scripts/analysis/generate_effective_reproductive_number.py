@@ -290,7 +290,7 @@ computed_polygons = []
 from tqdm import tqdm
 if selected_polygons_boolean:
     #pdb.set_trace()
-    df_all = df_cases.copy()
+
     df_all = df_time_delay[['date_time', 'location', 'num_cases']].copy().reset_index().rename(columns={'geo_id': 'poly_id'})
     df_polygons = df_polygons[['poly_id', 'attr_time_delay']].set_index('poly_id')
     df_polygons = df_polygons.dropna()
