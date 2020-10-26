@@ -43,11 +43,11 @@ else :
 agglomerated_folder = os.path.join(data_dir, 'data_stages', location_folder, 'agglomerated', agglomeration_method )
 
 # Get cases
-df_cases = pd.read_csv( os.path.join( agglomerated_folder, 'cases.csv' ) )
+df_cases = pd.read_csv( os.path.join(agglomerated_folder, 'cases.csv' ) )
 
 ## add time delta
-df_polygons   = pd.read_csv(os.path.join(agglomerated_folder,  "polygons.csv"))
-df_time_delay = pd.read_csv(os.path.join(data_dir, 'data_stages', location_folder, "unified", "cases_diag.csv"))
+df_polygons   = pd.read_csv( os.path.join(agglomerated_folder ,  "polygons.csv") )
+df_time_delay = pd.read_csv( os.path.join(data_dir, 'data_stages', location_folder, "unified", "cases_diag.csv") )
 df_time_delay["attr_time-delay_union"] = df_time_delay.apply(lambda x: np.fromstring(x["attr_time-delay_union"], sep="|"), axis=1)
 df_time_delay.set_index("geo_id", inplace=True)
 df_polygons["attr_time_delay"] = df_polygons.apply(lambda x: list(df_time_delay.loc[x.poly_id]["attr_time-delay_union"])[0], axis=1)
@@ -116,11 +116,8 @@ def adjust_onset_for_right_censorship(onset, p_delay, col_name='Cases'):
     
     return onset, cumulative_p_delay
 
- 
 def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min_time=pd.to_datetime('2020-02-26'), state=None, path_to_save=None):
     fig, ax = plt.subplots(2,1, figsize=(12.5, 10) )
-
-
     index = cases_df[col_cases].index.get_level_values(FIS_KEY)
     if pop:
         values_cases    = cases_df[col_cases].values*100000/pop
@@ -290,7 +287,6 @@ if not os.path.isdir(export_folder_location):
 skipped_polygons = []
 computed_polygons = []
 from tqdm import tqdm
-
 if selected_polygons_boolean:
     #pdb.set_trace()
     df_all = df_cases.copy()

@@ -65,6 +65,7 @@ df_cases_diag = df_cases_diag[df_cases_diag["date_time"] <= MAX_DATE]
 if selected_polygons_boolean:
     df_mov_ranges = df_mov_ranges[df_mov_ranges["poly_id"].isin(selected_polygons)]
     df_cases = df_cases[df_cases["poly_id"].isin(selected_polygons)]
+    df_cases_diag = df_cases_diag[df_cases_diag["poly_id"].isin(selected_polygons)]
     df_polygons = df_polygons[df_polygons["poly_id"].isin(selected_polygons)]
     output_folder = os.path.join(analysis_dir, location_name, agglomeration_folder, "r_t", selected_polygon_name)
 else:
@@ -140,8 +141,7 @@ def df_from_model(rt_trace):
                  columns=['mean', 'median', 'lower_90', 'upper_90', 'lower_50','upper_50'])
     return df
 
-
-def estimate_mov_th(mobility_data, cases_onset_data, poly_id, path_to_save_trace):
+def estimate_mov_th(mobility_data, cases_onset_data, poly_id, path_to_save_trace=None):
     onset = cases_onset_data 
     mt = mobility_data
 
@@ -179,6 +179,7 @@ def estimate_mov_th(mobility_data, cases_onset_data, poly_id, path_to_save_trace
         if path_to_save_trace:
             with open(model_fpath, 'wb') as buff:
                 pickle.dump({'model': model, 'trace': trace, 'X_shared': X_shared}, buff)
+
     return {'poly_id': poly_id, 'R0':R0_dist.mean(), 'beta':beta_dist.mean(), 'mob_th':mb_th }
 
     
