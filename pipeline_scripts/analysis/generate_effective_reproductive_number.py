@@ -59,8 +59,7 @@ if selected_polygons_boolean:
     selected_polygons = [int(x) for x in selected_polygons]
     selected_polygons_folder_name = selected_polygon_name
     df_cases = df_cases[df_cases["poly_id"].isin(selected_polygons)].copy()
-    df_time_delay = df_time_delay[df_time_delay["poly_id"].isin(selected_polygons)].copy()
-    df_polygons = df_polygons[df_polygons["poly_id"].isin(selected_polygons)].copy()
+    df_time_delay = df_time_delay[df_time_delay.index.isin(selected_polygons)].copy()
 
 else:
     print(indent + f"Calculating rt for {location_folder} entire location.")
@@ -348,7 +347,7 @@ if all_cases > 100:
     df_polygons_agg = df_polygons.copy()
     
     #p_delay = np.array( list(df_polygons_agg.attr_time_delay) ).mean(0)
-    p_delay = df_polygons_agg.set_index('poly_id').loc[11001]['attr_time_delay']
+    p_delay = df_polygons_agg.reset_index().set_index('poly_id').loc[11001]['attr_time_delay']
     
     df_all = confirmed_to_onset(df_all, p_delay, min_onset_date=None)
 
