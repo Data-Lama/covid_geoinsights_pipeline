@@ -6,6 +6,7 @@ import pymc3 as pm
 import pandas as pd
 import scipy.stats as stats    
 from scipy.stats import gamma  
+import pickle
 
 # Local functions 
 import pipeline_scripts.functions.Rt_estimate
@@ -140,7 +141,7 @@ def df_from_model(rt_trace):
     return df
 
 
-def estimate_mov_th(mobility_data, cases_onset_data, poly_id):
+def estimate_mov_th(mobility_data, cases_onset_data, poly_id, path_to_save_trace):
     onset = cases_onset_data 
     mt = mobility_data
 
@@ -175,7 +176,10 @@ def estimate_mov_th(mobility_data, cases_onset_data, poly_id):
         beta_dist = Rt_trace.get_values(burn=BURN_IN,varname='beta')
         mb_th = mov_th(beta_dist.mean(), R0_dist.mean())
 
-        return {'poly_id': poly_id, 'R0':R0_dist.mean(), 'beta':beta_dist.mean(), 'mob_th':mb_th }
+        if path_to_save_trace:
+            with open(model_fpath, 'wb') as buff:
+                pickle.dump({'model': model, 'trace': trace, 'X_shared': X_shared}, buff)
+    return {'poly_id': poly_id, 'R0':R0_dist.mean(), 'beta':beta_dist.mean(), 'mob_th':mb_th }
 
     
 # Get time delay
@@ -204,8 +208,15 @@ for poly_id in df_mov_ranges.poly_id.unique():
 
     all_cases_id = df_cases_diag_id.num_cases_diag.sum()
     p_delay = time_delays[poly_id]
-    
+
+    path_to_save_tr = os.path.join(output_folder, str(poly_id) )
+
     if all_cases_id > 100:
+
+        # Check if folder exists
+        if not os.path.isdir(path_to_save_tr):
+                os.makedirs(path_to_save_tr)
+
         print(f"        Running model for {poly_id}")
         df_mov_poly_id.set_index("date_time", inplace=True)
         df_cases_diag_id.set_index("date_time", inplace=True)
@@ -238,7 +249,7 @@ for poly_id in df_mov_ranges.poly_id.unique():
         onset = onset.loc[min_date:max_date]
         mt = mt.loc[min_date:max_date]
 
-        dict_result = estimate_mov_th(mt, onset+1, poly_id)
+        dict_result = estimate_mov_th(mt, onset+1, poly_id, os.path.join(path_to_save_tr, 'mob_th_trace.pymc3.pkl'))
             
         df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
         df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
@@ -282,8 +293,8 @@ if all_cases_id > 100:
     mt[mt==0] = mt_resampled[mt==0] 
     mt = (mt-mt.values.min())/(mt.values.max()-mt.values.min())
 
-    dict_result = estimate_mov_th(mt, onset, 'aggregated')
-        
+    dict_result = estimate_mov_th(mt, onset, 'aggregated', os.path.join(path_to_save_tr, 'mob_th_trace.pymc3.pkl'))
+
     df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
     df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
     df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']

@@ -357,12 +357,13 @@ if all_cases > 100:
     df_all = confirmed_to_onset(df_all, p_delay, min_onset_date=None)
     df_all, _ = adjust_onset_for_right_censorship(df_all, p_delay, col_name='num_cases')
     df_all['num_cases_adjusted'] = np.round(df_all['num_cases_adjusted'])
+
     df_all = df_all.iloc[:-10]
 
     df_all = prepare_cases(df_all, col='num_cases_adjusted', cutoff=0)
     min_time = df_all.index[0]
     FIS_KEY = 'date_time'
-    export_folder_location = '/Users/chaosdonkey06/Dropbox/covid_fb/report/reporte_norte_de_santander/report_figure_folder'
+    # export_folder_location = '/Users/chaosdonkey06/Dropbox/covid_fb/report/reporte_norte_de_santander/report_figure_folder'
     path_to_save = os.path.join(export_folder_location, 'aggregated_Rt.png')
     df_all.iloc[-10:]['num_cases_adjusted'] = df_all.iloc[-10:]['Smoothed_num_cases_adjusted']
 
