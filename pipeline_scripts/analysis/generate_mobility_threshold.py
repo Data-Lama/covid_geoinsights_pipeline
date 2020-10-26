@@ -136,7 +136,7 @@ def df_from_model(rt_trace):
 
     df = pd.DataFrame(data=np.c_[mean, median, hpd_90, hpd_50],
                  columns=['mean', 'median', 'lower_90', 'upper_90', 'lower_50','upper_50'])
-                 
+
     return df
 
 def estimate_mov_th(mobility_data, cases_onset_data, poly_id, path_to_save_trace=None):
@@ -290,6 +290,13 @@ if all_cases_id > 100:
     mt = mt.rolling(7).mean(std=2).fillna(0)
     mt[mt==0] = mt_resampled[mt==0] 
     mt = (mt-mt.values.min())/(mt.values.max()-mt.values.min())
+
+    min_date = max(min(mt.index.values), min(onset.index.values))
+    max_date = min(max(mt.index.values), max(onset.index.values))
+    
+    onset = onset.loc[min_date:max_date]
+    mt = mt.loc[min_date:max_date]
+
 
     dict_result = estimate_mov_th(mt, onset, 'aggregated', os.path.join(path_to_save_tr, 'mob_th_trace.pymc3.pkl'))
 

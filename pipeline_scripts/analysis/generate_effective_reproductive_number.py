@@ -60,11 +60,9 @@ if selected_polygons_boolean:
     selected_polygons_folder_name = selected_polygon_name
     df_cases = df_cases[df_cases["poly_id"].isin(selected_polygons)].copy()
     df_time_delay = df_time_delay[df_time_delay.index.isin(selected_polygons)].copy()
-
 else:
     print(indent + f"Calculating rt for {location_folder} entire location.")
     selected_polygons_folder_name = "entire_location"
-
 
 def prepare_cases(daily_cases, col='Cases', cutoff=0):
     daily_cases['Smoothed_'+col] = daily_cases[col].rolling(7,
@@ -301,7 +299,10 @@ if selected_polygons_boolean:
 
     print(indent + indent + f"Calculating individual polygon rt.")
     polys_not = []
-    for idx, poly_id in tqdm( enumerate(list( df_all['poly_id'].unique()) )):
+    for idx, poly_id in tqdm( enumerate(list( df_all['mpoly_id'].unique()) )):
+        ###### running just for capitals ######
+        #if str(poly_id)[-3:]!='001':
+        #    continue
 
         print(indent + indent + indent + f" {poly_id}.", end="\r")
         computed_polygons.append(poly_id)

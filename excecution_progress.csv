@@ -1,2 +1,2 @@
 timestamp,script_name,parameters,result,elapsed_time
-2020-10-26 11:34:50.277285,copy_report_files.py,nan,256,3
+2020-10-26 16:26:05.595741,generate_effective_reproductive_number.py,colombia geometry,0,9
