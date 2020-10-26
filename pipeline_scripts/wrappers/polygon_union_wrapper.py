@@ -97,12 +97,21 @@ parameters = "{} {} {} {}".format(location_folder,
                                 
 ef.excecute_script(analysis_scripts_location, "generate_effective_reproductive_number.py", "python", parameters)
 
+# Mobiliy threshold
+print()
+print("{}Excecuting generate_mobility_threshold.py for {}".format(ident, selected_polygons_name))
+parameters = "{} {} {} {}".format(location_folder,  
+                                agglomeration_method,
+                                folder_name, 
+                                selected_polygons_parameter)
+                                
+ef.excecute_script(analysis_scripts_location, "generate_mobility_threshold.py", "python", parameters)
+
 # Execute generate_threshold_alerts
 print()
 print("{}Excecuting generate_threshold_alerts.py for {}".format(ident, selected_polygons_name))
-parameters = "{} {} {} {} {}".format(location_folder,  
-                                    agglomeration_method, 
-                                    "min_record",
+parameters = "{} {} {} {}".format(location_folder,  
+                                    agglomeration_method,
                                     folder_name, 
                                     selected_polygons_parameter)
 

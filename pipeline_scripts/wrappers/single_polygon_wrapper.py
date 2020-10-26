@@ -115,18 +115,27 @@ if agglomeration_method == "geometry":
     print()
     print("{}Excecuting generate_effective_reproductive_number.py for {} at a community level".format(ident, poly_id))
     parameters = "{} {} {} {}".format(location_folder,  
-                                    agglomeration_method,
+                                    "community",
                                     folder_name, 
                                     selected_geographic_neighbors_polygons_parameter)
                                 
 ef.excecute_script(analysis_scripts_location, "generate_effective_reproductive_number.py", "python", parameters)
 
+# mobility threshold
+print()
+print("{}Excecuting generate_mobility_threshold.py for {}".format(ident, poly_id))
+parameters = "{} {} {} {}".format(location_folder,  
+                                agglomeration_method,
+                                folder_name, 
+                                selected_geographic_neighbors_polygons_parameter)
+
+ef.excecute_script(analysis_scripts_location, "generate_mobility_threshold.py", "python", parameters)
+
 # Execute generate_threshold_alerts
 print()
 print("{}Excecuting generate_threshold_alerts.py for {}".format(ident, polygon_name))
-parameters = "{} {} {} {} {}".format(location_folder,  
-                                    agglomeration_method, 
-                                    "min_record",
+parameters = "{} {} {} {}".format(location_folder,  
+                                    agglomeration_method,
                                     folder_name, 
                                     selected_geographic_neighbors_polygons_parameter)
 
