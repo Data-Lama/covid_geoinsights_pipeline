@@ -54,7 +54,7 @@ TRANSLATE = {'internal_alert': 'Alerta interna (movimiento)',
                 "alert_external_num_cases":"Alerta numero de casos en municipios vecinos", 
                 "alert_internal_num_cases":"Alerta numero de casos",
                 "vulnerability_alert":"Alerta de vulnerabilidad", 
-                "movement_range_alert": "Alerta interna (movimiento)",
+                "movement_range_alert": "Alerta interna (threshold movimiento)",
                 "max_alert": "Alerta agregada",
                 "rt_alert":"Alerta por RT"}
 
@@ -77,7 +77,6 @@ movement_range = os.path.join(agglomerated_file_path, 'movement_range.csv')
 movement = os.path.join(agglomerated_file_path, 'movement.csv')
 socioecon = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'socio_economic', 'estadisticas_por_municipio.csv')
 readme = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', "geometry", "README.txt")
-
 
 # Geofiles
 community_file = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', "community", "polygon_community_map.csv")
@@ -377,8 +376,9 @@ if not DONE:
     red_alerts = red_alerts.merge(df_ipm, how="outer", left_on="poly_id", right_on="node_id").dropna()
     red_alerts.sort_values(by=['Departamento','Municipio'], inplace=True)
     red_alerts.rename(columns=TRANSLATE, inplace=True)
-    red_alerts.to_csv(os.path.join(output_file_path, 'alerts.csv'), columns=['Departamento', 'Municipio', 'Unidad funcional',                                           
-                                                                            'Alerta interna (movimiento)',
+    
+    red_alerts.to_csv(os.path.join(output_file_path, 'alerts.csv'), columns=['Departamento', 'Municipio', 'Unidad funcional',
+                                                                            'Alerta interna (threshold movimiento)',
                                                                             'Alerta numero de casos',
                                                                             'Alerta de primer caso detectado',
                                                                             'Alerta externa (movimiento)', 

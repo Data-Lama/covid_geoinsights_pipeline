@@ -109,7 +109,7 @@ Colombia,colombia,POS,wrappers,2,NO,single_polygon_wrapper,python,colombia geome
 Colombia,colombia,POS,wrappers,2,NO,single_polygon_wrapper,python,colombia community Popayán popayan 19001
 Colombia,colombia,POS,wrappers,3,NO,polygon_union_prediction_wrapper,python,colombia community 0.8 20 Colombia
 Colombia,colombia,POS,analysis,1,NO,polygon_info_timewindow,python,colombia geometry 5 days
-Colombia,colombia,POS,analysis,2,NO,generate_threshold_alerts,python,colombia geometry min_record
+Colombia,colombia,POS,analysis,2,YES,generate_threshold_alerts,python,colombia geometry
 Colombia,colombia,POS,analysis,2,NO,choropleth_maps,python,colombia geometry
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia geometry
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia community
@@ -119,7 +119,7 @@ Colombia,colombia,POS,analysis,1,NO,generate_effective_reproductive_number,pytho
 Colombia,colombia,POS,analysis,2,NO,generate_effective_reproductive_number,python,colombia geometry  54001 54261 54673 54874 54051 54099 54599 54109 54128 54172 54174 54223 54239 54245 54250 54313 54344 54347 54377 54405 54418 54003 54206 54398 54498 54518 54125 54480 54520 54553 54660 54670 54680 54720 54743 54800 54810 54820 54871
 Colombia,colombia,POS,analysis,2,NO,generate_effective_reproductive_number,python,colombia community 54001 54261 54673 54874 54051 54099 54599 54109 54128 54172 54174 54223 54239 54245 54250 54313 54344 54347 54377 54405 54418 54003 54206 54398 54498 54518 54125 54480 54520 54553 54660 54670 54680 54720 54743 54800 54810 54820 54871
 
-Colombia,colombia,POS,analysis,2,YES,generate_mobility_threshold,python,colombia community
+Colombia,colombia,POS,analysis,2,NO,generate_mobility_threshold,python,colombia community
 
 
 All,,POS,POS,6,NO,generate_website_files,python,
