@@ -1,6 +1,9 @@
 # Specific configuration file
 global_config/config_file.csv
 
+# Excecution Progress
+excecution_progress.csv
+
 # Rplots
 Rplots.pdf
 
