@@ -60,10 +60,10 @@ class Unifier(GenericUnifier):
 		df = pd.read_csv(file_name, parse_dates = ['Fecha diagnostico','FIS','Fecha de muerte','Fecha recuperado'], date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
 		df = df.rename(columns=cols)
 
-		df.dropna(subset = ['FIS', 'attention'], inplace = True)
+		df.dropna(subset = ['DIAG', 'attention', 'FIS'], inplace = True)
 
 		# Rounds to day
-		df['date_time'] = df['FIS'].dt.round('D')
+		df['date_time'] = df['DIAG'].dt.round('D')
 		df.geo_id = df.geo_id.apply(str).astype(str)
 
 		df['num_cases'] = 1
