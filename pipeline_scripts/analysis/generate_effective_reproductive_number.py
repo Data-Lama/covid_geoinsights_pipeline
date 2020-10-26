@@ -170,12 +170,16 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
         tick_loc = 1000 
     elif 5000<max_cases_tick<=15000:
         tick_loc = 3000 
-    elif 15000<max_cases_tick<=30000:
+    elif 15000<max_cases_tick<=20000:
         tick_loc = 5000 
-
-
-    #else:    
-    #    tick_loc = np.round( max_cases_tick/100+0.1*100//5 )  
+    elif 20000<max_cases_tick<=25000:
+        tick_loc = 7000 
+    elif 25000<max_cases_tick<=30000:
+        tick_loc = 8000 
+    elif 35000<max_cases_tick<=40000:
+        tick_loc = 10000 
+    else:    
+        tick_loc = np.round( max_cases_tick/100+0.1*100//5 )  
 
     ax[0].yaxis.set_major_locator(ticker.MultipleLocator(tick_loc) )
     ax[0].yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.0f}"))
@@ -339,18 +343,16 @@ all_cases = df_all['num_cases'].sum()
 
 print(indent + indent + f"Calculating aggregated rt.")
 if all_cases > 100:
+
     df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
     df_polygons_agg = df_polygons.copy()
 
-    df_polygons_agg['cum_p'] = df_polygons_agg.apply(lambda x: np.sum([x['attr_time_delay']]).sum(), axis=1)
-    df_polygons_agg = df_polygons_agg[df_polygons_agg['cum_p']>0.6]
-    df_polygons_agg['attr_time_delay'] = df_polygons_agg.apply(lambda x: list(x['attr_time_delay']), axis=1 )
-    df_polygons_agg['len'] = df_polygons_agg.apply(lambda x: len(x['attr_time_delay']), axis=1)
-    df_polygons_agg = df_polygons_agg[df_polygons_agg['len']==61]
 
-    p_delay = np.array( list(df_polygons_agg.attr_time_delay) ).mean(0)
-
+    #p_delay = np.array( list(df_polygons_agg.attr_time_delay) ).mean(0)
+    p_delay = df_polygons_agg.set_index('poly_id').loc[11001]['attr_time_delay']
+    
     df_all = confirmed_to_onset(df_all, p_delay, min_onset_date=None)
+
     df_all, _ = adjust_onset_for_right_censorship(df_all, p_delay, col_name='num_cases')
     df_all['num_cases_adjusted'] = np.round(df_all['num_cases_adjusted'])
 
