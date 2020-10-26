@@ -31,6 +31,7 @@ agglomeration_method =  sys.argv[2] # agglomeration method ### geometry for exam
 if len(sys.argv) <= 3:
 	selected_polygons_boolean = False
 else :
+    
     selected_polygons_boolean = True
     selected_polygons = []
     i = 3
@@ -299,7 +300,7 @@ if selected_polygons_boolean:
 
     print(indent + indent + f"Calculating individual polygon rt.")
     polys_not = []
-    for idx, poly_id in tqdm( enumerate(list( df_all['mpoly_id'].unique()) )):
+    for idx, poly_id in tqdm( enumerate(list( df_all['poly_id'].unique()) )):
         ###### running just for capitals ######
         #if str(poly_id)[-3:]!='001':
         #    continue
