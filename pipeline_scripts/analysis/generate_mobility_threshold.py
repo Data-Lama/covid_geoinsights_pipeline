@@ -64,7 +64,7 @@ df_cases_diag = df_cases_diag[df_cases_diag["date_time"] <= MAX_DATE]
 
 if selected_polygons_boolean:
     df_mov_ranges = df_mov_ranges[df_mov_ranges["poly_id"].isin(selected_polygons)]
-    df_cases = df_cases[df_cases["poly_id"].isin(selected_polygons)]
+    df_cases = df_cases[ df_cases["poly_id"].isin(selected_polygons)]
     df_cases_diag = df_cases_diag[df_cases_diag["poly_id"].isin(selected_polygons)]
     df_polygons = df_polygons[df_polygons["poly_id"].isin(selected_polygons)]
     output_folder = os.path.join(analysis_dir, location_name, agglomeration_folder, "r_t", selected_polygon_name)
@@ -93,7 +93,6 @@ def confirmed_to_onset(confirmed, p_delay, col_name, min_onset_date=None):
 
     onset.index.name = 'date'
     return pd.DataFrame(onset)
-
 
 ######## this might work but CAREFULL
 def adjust_onset_for_right_censorship(onset, p_delay, col_name='num_cases'):
@@ -129,13 +128,11 @@ def prepare_cases(daily_cases, col='num_cases', cutoff=0):
     return daily_cases
 
 def df_from_model(rt_trace):
-    
     r_t = rt_trace
     mean = np.mean(r_t, axis=0)
     median = np.median(r_t, axis=0)
     hpd_90 = pm.stats.hpd(r_t, hdi_prob=.9)
     hpd_50 = pm.stats.hpd(r_t, hdi_prob=.5)
-    
 
     df = pd.DataFrame(data=np.c_[mean, median, hpd_90, hpd_50],
                  columns=['mean', 'median', 'lower_90', 'upper_90', 'lower_50','upper_50'])
@@ -177,8 +174,8 @@ def estimate_mov_th(mobility_data, cases_onset_data, poly_id, path_to_save_trace
         mb_th = mov_th(beta_dist.mean(), R0_dist.mean())
 
         if path_to_save_trace:
-            with open(model_fpath, 'wb') as buff:
-                pickle.dump({'model': model, 'trace': trace, 'X_shared': X_shared}, buff)
+            with open(path_to_save_trace, 'wb') as buff:
+                pickle.dump({'model': Rt_mobility_model, 'trace': Rt_trace }, buff)
 
     return {'poly_id': poly_id, 'R0':R0_dist.mean(), 'beta':beta_dist.mean(), 'mob_th':mb_th }
 
