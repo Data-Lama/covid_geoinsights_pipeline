@@ -348,7 +348,7 @@ if all_cases > 100:
 
 
     #p_delay = np.array( list(df_polygons_agg.attr_time_delay) ).mean(0)
-    p_delay = df_polygons_agg.set_index('poly_id').loc[11001]['attr_time_delay']
+    p_delay = df_polygons_agg.reset_index().set_index('poly_id').loc[11001]['attr_time_delay']
     
     df_all = confirmed_to_onset(df_all, p_delay, min_onset_date=None)
 
