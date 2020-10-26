@@ -12,7 +12,7 @@ import pickle
 import pipeline_scripts.functions.Rt_estimate
 from  pipeline_scripts.functions.Rt_estimate import calculate_threshold as mov_th
 
-# Direcotries
+# Directories
 from global_config import config
 
 data_dir = config.get_property('data_dir')
@@ -136,6 +136,7 @@ def df_from_model(rt_trace):
 
     df = pd.DataFrame(data=np.c_[mean, median, hpd_90, hpd_50],
                  columns=['mean', 'median', 'lower_90', 'upper_90', 'lower_50','upper_50'])
+                 
     return df
 
 def estimate_mov_th(mobility_data, cases_onset_data, poly_id, path_to_save_trace=None):
@@ -178,7 +179,6 @@ def estimate_mov_th(mobility_data, cases_onset_data, poly_id, path_to_save_trace
                 pickle.dump({'model': Rt_mobility_model, 'trace': Rt_trace }, buff)
 
     return {'poly_id': poly_id, 'R0':R0_dist.mean(), 'beta':beta_dist.mean(), 'mob_th':mb_th }
-
     
 # Get time delay
 print(f"    Extracts time delay per polygon")

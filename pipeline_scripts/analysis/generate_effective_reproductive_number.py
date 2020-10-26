@@ -346,8 +346,7 @@ if all_cases > 100:
 
     df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
     df_polygons_agg = df_polygons.copy()
-
-
+    
     #p_delay = np.array( list(df_polygons_agg.attr_time_delay) ).mean(0)
     p_delay = df_polygons_agg.set_index('poly_id').loc[11001]['attr_time_delay']
     
