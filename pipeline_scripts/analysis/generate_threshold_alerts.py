@@ -87,11 +87,11 @@ shape_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'g
 if selected_polygons_boolean:
     rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", selected_polygon_name)
     time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', selected_polygon_name)
-    threshold = os.path.join(analysis_dir, location_name, "community", "r_t", selected_polygon_name, "mobility_thresholds.csv")
+    threshold = os.path.join(analysis_dir, location_name, location_folder, "r_t", selected_polygon_name, "mobility_thresholds.csv")
 else:
     time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', "entire_location")
-    rt = os.path.join(analysis_dir, location_name, "community", "r_t", "entire_location")
-    threshold = os.path.join(analysis_dir, location_name, "community", "r_t", "entire_location", "mobility_thresholds.csv")
+    rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", "entire_location")
+    threshold = os.path.join(analysis_dir, location_name, location_folder, "r_t", "entire_location", "mobility_thresholds.csv")
 
 total_window = os.path.join(time_window_file_path, 'deltas_forward_window_5days.csv')
 
@@ -310,7 +310,7 @@ if location_folder == "geometry" and not selected_polygons_boolean:
     df_movement_threshold = df_thresholds_geometry
 
 df_movement_range_recent = df_movement_range_recent.merge(df_movement_threshold, on="poly_id", how="outer")
-df_movement_range_recent["movement_range_alert"] = df_movement_range_recent.apply(lambda x: set_movement_range_alert(x.movement_change, x.threshold), axis=1)
+df_movement_range_recent["movement_range_alert"] = df_movement_range_recent.apply(lambda x: set_movement_range_alert(x.movement_change, x.mob_th), axis=1)
 
 df_alerts = calculate_alerts_record(df_movement_stats, df_movement_recent).reset_index()
 df_alerts.drop(columns=["points_inner_movement", "points_external_movement"], inplace=True)
@@ -342,14 +342,6 @@ df_alerts[['Municipio', 'Departamento']] = df_alerts.poly_name.str.split('-',exp
 
 df_alerts['vulnerability_alert'] = df_alerts.apply(lambda x: get_vulnerability_alert(x.poly_id), axis=1)
 
-# set_colors
-alert_list = ['max_alert', 'external_alert', 'movement_range_alert', 'alert_external_num_cases', \
-'alert_internal_num_cases', 'alert_first_case', 'rt_alert', "internal_alert"]
-for i in alert_list:
-    df_alerts[f"{i}_color"] = df_alerts.apply(lambda x: set_color(x[i]), axis=1)
-
-df_alerts['vulnerability_alert_color'] = df_alerts.apply(lambda x: set_vulnerability_color(x.vulnerability_alert), axis=1)
-
 # If asked for specific polygons, get subset
 if selected_polygons_boolean:
     df_alerts = df_alerts[df_alerts["poly_id"].isin(selected_polygons)]
@@ -359,6 +351,15 @@ if selected_polygons_boolean:
     output_file_path = os.path.join(output_file_path, selected_polygon_name)
 else:
     output_file_path = os.path.join(output_file_path, "entire_location")
+
+# set_colors
+alert_list = ['max_alert', 'external_alert', 'movement_range_alert', 'alert_external_num_cases', \
+'alert_internal_num_cases', 'alert_first_case', 'rt_alert', "internal_alert"]
+for i in alert_list:
+    df_alerts[f"{i}_color"] = df_alerts.apply(lambda x: set_color(x[i]), axis=1)
+
+df_alerts['vulnerability_alert_color'] = df_alerts.apply(lambda x: set_vulnerability_color(x.vulnerability_alert), axis=1)
+
 
 if not DONE:
     
@@ -391,7 +392,7 @@ if not DONE:
     df_alerts = geo_df.merge(df_alerts, left_on='Codigo_Dan', right_on='poly_id')
     cmap = ListedColormap([(1,0.8,0), (0.8, 0, 0), (0,0.4,0)], name='alerts')
     df_alerts.to_crs(epsg=3857, inplace=True)
-
+    
     # Draw maps
     print(ident+ "  Drawing alert maps.")
     for i in ['internal_alert', 'movement_range_alert', 'external_alert', 'max_alert', 'rt_alert']:
