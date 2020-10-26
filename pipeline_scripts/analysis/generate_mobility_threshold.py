@@ -296,7 +296,7 @@ if all_cases_id > 100:
     onset = onset.loc[min_date:max_date]
     onset = onset.resample('1D').sum().fillna(0)
     mt = mt.loc[min_date:max_date]
-    dict_result = estimate_mov_th(mt, onset, 'aggregated', os.path.join(path_to_save_tr, 'mob_th_trace.pymc3.pkl'))
+    dict_result = estimate_mov_th(mt, onset+1, 'aggregated', os.path.join(path_to_save_tr, 'mob_th_trace.pymc3.pkl'))
 
     df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
     df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
