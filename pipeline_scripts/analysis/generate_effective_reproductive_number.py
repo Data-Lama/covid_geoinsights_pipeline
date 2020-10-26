@@ -332,6 +332,7 @@ if selected_polygons_boolean:
 
 
 df_all = df_cases.copy()
+df_all = df_time_delay[['date_time', 'location', 'num_cases']].copy().reset_index().rename(columns={'geo_id': 'poly_id'})
 df_all['date_time'] = pd.to_datetime( df_all['date_time'] )
 df_all    = df_all.groupby('date_time').sum()[['num_cases']]
 all_cases = df_all['num_cases'].sum()
@@ -365,7 +366,6 @@ if all_cases > 100:
     (_, _, result) = plot_cases_rt(df_all, 'num_cases_adjusted', 'num_cases_adjusted' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
     
     result.to_csv(os.path.join(export_folder_location,'aggregated_Rt.csv'))
-
 else:
     print('WARNING: for poly_id {} Rt was not computed...'.format(poly_id))
 
