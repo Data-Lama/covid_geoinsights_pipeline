@@ -31,6 +31,11 @@ analysis_dir = config.get_property('analysis_dir')
 
 
 gap_hours = 20
+gap_hours = 2000
+
+if gap_hours >= 24:
+    print(f'WARNING: Gap hours is set to {gap_hours} please check if excecuting in production!!!!')
+    
 ident = '         '
 
 # Reads the parameters from excecution
