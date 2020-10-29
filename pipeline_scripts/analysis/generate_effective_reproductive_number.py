@@ -12,6 +12,8 @@ import json
 from scipy import stats as sps
 from scipy.interpolate import interp1d
 from pipeline_scripts.functions.Rt_estimate import get_posteriors, highest_density_interval
+import warnings
+warnings.filterwarnings("ignore")
 
 import sys
 
