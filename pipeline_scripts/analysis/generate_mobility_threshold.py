@@ -161,7 +161,7 @@ def estimate_mov_th(mobility_data, cases_onset_data, poly_id, path_to_save_trace
 
             # Using Metropolis Hastings Sampling
             step     = pm.Metropolis(vars=[ Rt_mobility_model.beta, Rt_mobility_model.R0 ], S = np.array([ (100+100)**2 , (5-2)**2 ]) )
-            Rt_trace = pm.sample( N_SAMPLES, tune=1000, chains=20, step=step )
+            Rt_trace = pm.sample( N_SAMPLES, tune=2000, chains=20, step=step )
 
         BURN_IN = 2000
         rt_info = df_from_model(Rt_trace.get_values(burn=BURN_IN,varname='Rt'))
