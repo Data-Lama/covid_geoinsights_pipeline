@@ -153,6 +153,7 @@ readme_dict = gf.load_README(readme)
 max_date = readme_dict["Movement"].split(",")[1].strip()
 max_date = max_date.split(" ")[1].strip()
 first_day = pd.Timestamp(datetime.datetime.strptime(max_date, '%Y-%m-%d')) - datetime.timedelta(days = WINDOW_SIZE)
+first_day_rt = df_rt.date_time.max() - datetime.timedelta(days = WINDOW_SIZE)
 
 # Get socio-economic variables
 df_socioecon = pd.read_csv(socioecon)
@@ -171,7 +172,7 @@ df_movement_range_recent = df_movement_range.loc[df_movement_range['date_time'] 
 df_movement_range_recent = df_movement_range.groupby("poly_id").mean()
 
 # RT alerts
-df_rt = df_rt[df_rt["date_time"] >= first_day]
+df_rt = df_rt[df_rt["date_time"] >= first_day_rt]
 df_rt_alert = df_rt.groupby("poly_id").mean()
 
 # Get internal and external movement 
