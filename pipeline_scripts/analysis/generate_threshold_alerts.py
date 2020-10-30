@@ -390,7 +390,7 @@ if not DONE:
                                                                             'Alerta de vulnerabilidad'], index=False, float_format='%.3f', sep=",")
 
     # Map alerts
-    df_alerts = geo_df.merge(df_alerts, left_on='Codigo_Dan', right_on='poly_id')
+    df_alerts = geo_df.merge(df_alerts, left_on='Codigo_Dan', right_on='poly_id').fillna("VERDE")
     cmap = ListedColormap([(1,0.8,0), (0.8, 0, 0), (0,0.4,0)], name='alerts')
     df_alerts.to_crs(epsg=3857, inplace=True)
     
