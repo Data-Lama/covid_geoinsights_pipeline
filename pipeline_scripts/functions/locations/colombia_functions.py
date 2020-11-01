@@ -210,10 +210,15 @@ class Unifier(GenericUnifier):
 	def attr_agglomeration_scheme(self):
 		aggl_scheme = self.get_generic_attr_agglomeration_scheme()
  
-		aggl_scheme["^attr.*wvg-pop$"] = ["attr_weighted_average", "attr_pop_sum",""]
-		aggl_scheme["^num.*"] = ["attr_addition", "",""]
+		aggl_scheme["^attr.*wvg-pop$"] = ["attr_weighted_average", "attr_population",""]
 		aggl_scheme["^attr.*time_delay$"] = ["estimate_gamma_delay", "", ""]
+		aggl_scheme["attr_area"] = ["attr_addition", "", ""]
+		aggl_scheme["geometry"] = ["merge_geometry", "", ""]
+		aggl_scheme["poly_name"] = ["attr_with_max", "attr_population",""]
+		aggl_scheme["poly_lat"] = ["attr_with_max", "attr_population",""]
+		aggl_scheme["poly_lon"] = ["attr_with_max", "attr_population",""]
 
+		
 		return aggl_scheme
 
 

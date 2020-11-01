@@ -4,27 +4,20 @@ import os
 import re
 import numpy as np
 import pandas as pd
+import geopandas as geopandas
 import scipy.stats as stats    
+from shapely import wkt
 
 #Directories
 from global_config import config
 data_dir = config.get_property('data_dir')
-
-'''
-GONCHE:
-Hice estos cambios:
-    (1) Agregue al dict de response el nombre del atributo principal para poder ejecutar las funciones con atributo principal y secundario
-    (2) Cuando se llegaba al merge de "Agglomerates columns with multiple parameters" fallaba si el df_response no se habia inicializado antes,
-        es decir, cuando el único atributo era de este tipo. Inclui un check para ver si el df_response seguia siendo pd.series para inicializarlocomo DF.
-    (3) Agregue parametros por defecto para las funciones y una funcion para setear los parametros que se llama get_params().
-'''
 
 
 # Identation variable
 ident = '            '
 
 # Main Method
-def agglomerate(df, aggl_scheme, groupby_cols, agglomerate_cols):
+def agglomerate(df, aggl_scheme, groupby_cols, agglomerate_cols, df_polygons = None):
     '''
     Main method.
     
@@ -74,6 +67,7 @@ def agglomerate(df, aggl_scheme, groupby_cols, agglomerate_cols):
             # Merges
             if isinstance(df_response, pd.Series):
                 df_response = pd.DataFrame(df_response)
+                
             df_response = df_response.merge(df_temp, on = groupby_cols)
             
     
@@ -92,11 +86,11 @@ def get_corresponding_function_declaration(col, aggl_scheme):
     matches = []
     for name in aggl_scheme.attr_name:
         x = re.search(name, attr_name)
-        if x:
+        if x and (x.span()[1] - x.span()[0]) == len(attr_name): # Checks for a match and that it spans the whole column
             matches.append(name)
     
     if len(matches) == 0:
-        raise ValueError(f'No match was found for: {attr_name}')
+        raise ValueError(f"No match was found for column: {attr_name}. Please declare it inside the location's scheme")
         
     if len(matches) > 1:
         print(f"WARNING: More than one possible function found. {matches}. Using first match: {matches[0]}")
@@ -121,6 +115,7 @@ def get_params(default_params, input_params):
         default_params[key] = value
 
     return default_params
+
 
 
 # Organizer Method
@@ -156,9 +151,7 @@ def get_corresponding_function(function_declaration):
     if name == 'attr_average':
         return('mean')
     
-    # TODO:
-    # Add the rest of the functions
-
+    
     # Returns a list of the values separated by the indicated character.  
     if name == 'attr_append': 
         input_params = function_declaration['aggl_parameters'].split(";")
@@ -195,13 +188,34 @@ def get_corresponding_function(function_declaration):
         fun = lambda df : (df[weight]*df[attr]).sum() / df[weight].sum() 
 
         return(fun)
-
+    
+    if name == "attr_with_max":    
+        sort = function_declaration['secondary_attr']
+        attr = function_declaration['attr_name']
+        
+        fun = lambda df : df.sort_values(sort, ascending = False)[attr].values[0]
+        
+        return(fun)
+                           
+    if name == "attr_with_min":    
+        sort = function_declaration['secondary_attr']
+        attr = function_declaration['attr_name']
+        
+        fun = lambda df : df.sort_values(sort, ascending = True)[attr].values[0]
+        return(fun)
+    
     if name == 'estimate_gamma_delay':
         fun = lambda s : estimate_gamma_delay(s)
         return(fun)
     
     
-    raise ValueError(f'No implementation found for function: {name}')
+    if name == "merge_geometry":
+        
+        fun = lambda s : merge_geometry(s)
+        return(fun)
+    
+
+    raise ValueError(f'No implementation found for function: {name}. Please add it.')
 
 
 
@@ -248,3 +262,16 @@ def estimate_gamma_delay(series):
     pdf_fitted = stats.gamma.pdf(x, *(fit_alpha, fit_loc, fit_beta))
     pdf_list = [str(i) for i in pdf_fitted.tolist()]
     return "|".join(pdf_list)
+
+def merge_geometry(series):
+    
+    # Declares dataframe
+    geo_pd = pd.DataFrame({'geometry':series, 'level':1})
+    geo_pd['geometry'] = geo_pd['geometry'].apply(wkt.loads)
+
+    # Converts to Geopandas
+    geo_pd = geopandas.GeoDataFrame(geo_pd, geometry='geometry')
+
+    final = geo_pd.dissolve('level')
+
+    return(str(final.geometry.values[0]))

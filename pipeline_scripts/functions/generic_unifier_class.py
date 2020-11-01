@@ -119,14 +119,28 @@ class GenericUnifier():
 		Method that builds the csv that describes the agglomeration function needed per attribute code
 		'''
 		
-		aggl_scheme = {"^attr.*sum$": ["attr_addition", "",""],
-						"^attr.*sub$": ["attr_substraction", "", ""],
-						"^attr.*append": ["attr_append", "", "sep=|"],
-						"^attr.*append_float": ["attr_append_float", "", "sep=|"],
-						"^attr.*union$": ["attr_union", "", "sep=|"],
-						"^attr.*union_int$": ["attr_union_int", "", "sep=|"],
-						"^attr.*intersect$": ["attr_intersection", "", "sep=|"],
-						"^attr.*avg$": ["attr_average", "", ""]}
+
+		# Columns
+		# 1. attr_name: Name of the attribute (can have regex).
+		# 2. aggl_function: Name of the agglomeration function.
+		# 3. secondary_attr: Secondary attribute or column of the same DF to aglomerate.
+		# 4. polygon_attr: Columns of polygons in case is necesary.
+		# 5. aggl_parameters: Other agglomeraton parameters.
+		
+		aggl_scheme = {"^attr_.*sum$": ["attr_addition", "",""],
+						"^attr_.*sub$": ["attr_substraction", "", ""],
+						"^attr_.*append": ["attr_append", "", "sep=|"],
+						"^attr_.*append_float": ["attr_append_float", "", "sep=|"],
+						"^attr_.*union$": ["attr_union", "", "sep=|"],
+						"^attr_.*union_int$": ["attr_union_int", "", "sep=|"],
+						"^attr_.*intersect$": ["attr_intersection", "", "sep=|"],
+						"^attr_.*avg$": ["attr_average", "", ""],
+						"^num_.*": ["attr_addition", "",""], # Number of cases
+						"attr_population": ["attr_addition", "",""], # Population
+						"movement": ["attr_addition", "",""], # Movement
+						"population": ["attr_addition", "",""] # Population
+						
+						}
  
 		
 		return aggl_scheme
