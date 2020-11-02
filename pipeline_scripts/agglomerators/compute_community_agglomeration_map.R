@@ -2,10 +2,8 @@
 options(warn=-1)
 
 # Imports the libraries
-suppressMessages(library("dplyr"))
 suppressMessages(library('igraph'))
-suppressMessages(library('proxy'))
-suppressMessages(library('ramify'))
+suppressMessages(library("dplyr"))
 
 
 source("pipeline_scripts/functions/agglomeration_functions.R")
