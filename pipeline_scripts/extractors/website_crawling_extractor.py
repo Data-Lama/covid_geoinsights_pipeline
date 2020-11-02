@@ -6,6 +6,8 @@ from os import listdir
 from pathlib import Path
 from datetime import date
 
+import fb_functions as fb
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.firefox.options import Options
@@ -62,13 +64,9 @@ print(INDENT + '   Extracting:')
 
 def get_driver():
     # Set driver options
-    options = Options()
-    options.set_preference("browser.download.folderList", 2)
-    options.set_preference("browser.download.dir", cases_folder)
-    options.set_preference("browser.download.useDownloadDir", True)
-    options.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv")
 
-    driver = webdriver.Firefox(options=options)
+    driver = fb.get_driver(cases_folder)
+    
     driver.get(url) 
     driver.implicitly_wait(5)
 
