@@ -63,7 +63,7 @@ dir.create(export_folder)
 
 
 # Loads movement
-cat(paste(ident, '   Loads Movement','\n', sep = ""))
+cat(paste(ident, '   Loads Files','\n', sep = ""))
 movement = read.csv(file.path(agglomerated_folder, 'movement.csv'),  stringsAsFactors = FALSE)
 polygons = read.csv(file.path(agglomerated_folder, 'polygons.csv'),  stringsAsFactors = FALSE)
 cases = read.csv(file.path(agglomerated_folder, 'cases.csv'), stringsAsFactors = FALSE)
@@ -101,55 +101,32 @@ polygons$community_id = membership(wc)
 #------------------------
 cat(paste(ident, '   Creates Polygon Community Map','\n', sep = ""))
 
+
 # Final_comunity
 # I population is found it will be used for the id
 # if not, the number of cases will be used
 if('attr_population' %in% colnames(polygons))
 {
   final_community = polygons %>%
-    select(poly_id, community_id, attr_population) %>%
+    select(poly_id, poly_name, community_id, attr_population) %>%
     group_by(community_id) %>%
-    summarise(final_id = exctract_id_by_population(poly_id, attr_population), .groups = "keep") %>%
+    summarise(final_id = exctract_id_by_population(poly_id, attr_population), final_name = exctract_name_by_population(poly_name, attr_population), .groups = "keep") %>%
     ungroup()  
 }else
 {
   final_community = polygons %>%
     select(poly_id, community_id, num_cases) %>%
     group_by(community_id) %>%
-    summarise(final_id = exctract_id_by_cases(poly_id, num_cases), .groups = "keep") %>%
+    summarise(final_id = exctract_id_by_cases(poly_id, num_cases), final_name = exctract_name_by_cases(poly_name, num_cases), .groups = "keep") %>%
     ungroup()  
 }
 
 
-polygons = polygons %>%
+polygon_community_map = polygons %>%
+  select(poly_id, poly_name, community_id) %>%
   inner_join(final_community, by = c('community_id' = 'community_id')) %>%
-  mutate(community_id = final_id)
-
-
-
-# Creates the community name:
-# If population exists it uses it if not, number of cases
-if('attr_population' %in% colnames(polygons))
-{
-  agg_poly_1 = polygons %>% 
-    group_by(community_id) %>%
-    summarise(poly_name = exctract_name_by_population(poly_name, attr_population), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(geometry), poly_lon = extract_center_by_population(poly_lon, poly_lat, attr_population)[1], poly_lat = extract_center_by_population(poly_lon, poly_lat, attr_population)[2], .groups = "keep") %>%
-    ungroup()  
-  
-}else
-{
-  agg_poly_1 = polygons %>% 
-    group_by(community_id) %>%
-    summarise(poly_name = exctract_name_by_cases(poly_name, num_cases), agglomerated_polygons = extract_list_of_agg_polygons(poly_id), geometry = extract_geometry(geometry), poly_lon = extract_center_by_cases(poly_lon, poly_lat, num_cases)[1], poly_lat = extract_center_by_cases(poly_lon, poly_lat, num_cases)[2], .groups = "keep") %>%
-    ungroup()  
-}
-
-
-# Creates the location to community map
-polygon_community_map = agg_poly_1 %>% 
-  select(community_id, poly_name) %>%
-  rename(community_name = poly_name) %>%
-  inner_join(polygons, by = c('community_id' = 'final_id')) %>%
+  select(-community_id) %>%
+  mutate(community_id = final_id, community_name = final_name) %>%
   select(poly_id, poly_name, community_id, community_name )
 
 
