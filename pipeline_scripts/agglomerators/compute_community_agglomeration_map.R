@@ -22,6 +22,7 @@ ident = '            '
 
 args = commandArgs(trailingOnly=TRUE)
 
+
 # For Debug
 debug = FALSE
 if(debug)
@@ -31,11 +32,9 @@ if(debug)
   args = c('Colombia','colombia','geometry')
 }
 
-
 location_name = args[1] # Location Name
 location_folder = args[2] # Location Folder
 agglomeration_method = args[3] # Agglomeration method to build on to
-
 
 agglomerated_folder = file.path(data_dir, 'data_stages',location_folder,'agglomerated', agglomeration_method)
 
@@ -71,6 +70,7 @@ movement = read.csv(file.path(agglomerated_folder, 'movement.csv'),  stringsAsFa
 polygons = read.csv(file.path(agglomerated_folder, 'polygons.csv'),  stringsAsFactors = FALSE)
 cases = read.csv(file.path(agglomerated_folder, 'cases.csv'), stringsAsFactors = FALSE)
 
+
 # Extracts the cases columns
 cases_col = colnames(cases)[as.vector(sapply(colnames(cases), function(col){grepl('num_', col, fixed = TRUE)}))]
 # Extracts the attr columns
@@ -99,12 +99,9 @@ polygons$community_id = membership(wc)
 
 
 
-cat(paste(ident, '   Agglomerates Cases','\n', sep = ""))
-
-
 # creates the agglomerated polygons
 #------------------------
-cat(paste(ident, '   Agglomerates Polygons','\n', sep = ""))
+cat(paste(ident, '   Creates Polygon Community Map','\n', sep = ""))
 
 # Final_comunity
 # I population is found it will be used for the id
