@@ -60,7 +60,7 @@ print(ident + '   Computing the Community Map (R Code)')
 script_location = 'pipeline_scripts/agglomerators/'
 name = 'compute_community_agglomeration_map'
 code_type = 'R'
-parameters = f'{location_name} {location_folder_name} {agglomeration_method}'
+parameters = f'{location_name} {location_folder_name} {source_agglomeration}'
 
 # Excecutes Script
 resp = ef.excecute_script(script_location, name, code_type, parameters)

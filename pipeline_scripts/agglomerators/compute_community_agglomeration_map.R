@@ -68,11 +68,8 @@ movement = read.csv(file.path(agglomerated_folder, 'movement.csv'),  stringsAsFa
 polygons = read.csv(file.path(agglomerated_folder, 'polygons.csv'),  stringsAsFactors = FALSE)
 cases = read.csv(file.path(agglomerated_folder, 'cases.csv'), stringsAsFactors = FALSE)
 
-
-# Extracts the cases columns
-cases_col = colnames(cases)[as.vector(sapply(colnames(cases), function(col){grepl('num_', col, fixed = TRUE)}))]
-# Extracts the attr columns
-attr_col = colnames(polygons)[as.vector(sapply(colnames(polygons), function(col){grepl('attr_', col, fixed = TRUE)}))]
+print(agglomerated_folder)
+print(dim(polygons))
 
 
 # Groups the dataframe
