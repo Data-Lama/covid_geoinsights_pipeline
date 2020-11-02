@@ -68,10 +68,6 @@ movement = read.csv(file.path(agglomerated_folder, 'movement.csv'),  stringsAsFa
 polygons = read.csv(file.path(agglomerated_folder, 'polygons.csv'),  stringsAsFactors = FALSE)
 cases = read.csv(file.path(agglomerated_folder, 'cases.csv'), stringsAsFactors = FALSE)
 
-print(agglomerated_folder)
-print(dim(polygons))
-
-
 # Groups the dataframe
 g_mov = movement %>% 
   group_by(start_poly_id, end_poly_id) %>% 
