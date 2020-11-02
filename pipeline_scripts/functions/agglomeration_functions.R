@@ -1,5 +1,5 @@
 # Community Agglomeration Functions
-suppressMessages(library('rgeos'))
+#suppressMessages(library('rgeos'))
 
 
 km_constant = 110.567 # For extarcting distances
