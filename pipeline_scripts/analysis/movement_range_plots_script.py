@@ -12,6 +12,8 @@ import general_functions as gf
 
 from datetime import timedelta
 
+import locations.colombia_functions as col_fun
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set_style("whitegrid")
@@ -168,9 +170,9 @@ for agglomeration_method in agglomeration_methods:
 
 
 		# First Date
-		date = 'fecha reporte web'
+		date = col_fun.DATE_REPORTED_WEB
 		# Adds the date reported
-		df_cases_other_date = pd.read_csv(os.path.join(raw_folder_location, 'cases/cases_raw.csv'), parse_dates = ['fecha reporte web', 'Fecha de notificación'], 
+		df_cases_other_date = pd.read_csv(os.path.join(raw_folder_location, 'cases/cases_raw.csv'), parse_dates = [date], 
 			date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
 
 		df_cases_other_date = df_cases_other_date[[date]].rename(columns = {date:'date_time'})
@@ -194,10 +196,10 @@ for agglomeration_method in agglomeration_methods:
 
 
 		# Second Date
-		date = 'FIS'
+		date = col_fun.FIS_COLUMN
 
 		# Adds the date reported
-		df_cases_other_date = pd.read_csv(os.path.join(raw_folder_location, 'cases/cases_raw.csv'), parse_dates = ['FIS', 'Fecha de notificación'], 
+		df_cases_other_date = pd.read_csv(os.path.join(raw_folder_location, 'cases/cases_raw.csv'), parse_dates = [date], 
 			date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
 
 

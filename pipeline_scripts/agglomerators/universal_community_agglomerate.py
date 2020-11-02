@@ -72,27 +72,28 @@ if resp != 0: # Error
 # 2 -- Loads all the necessary files
 print(ident + '   Loads Files')
 # Cases
-df_cases = pd.read_csv(os.path.join(source_agglomeration_folder, 'cases.csv'), parse_dates = ['date_time'])
+df_cases = pd.read_csv(os.path.join(source_agglomeration_folder, 'cases.csv'), parse_dates = ['date_time'], dtype = {'poly_id':str})
 
 # Movement
-df_movement = pd.read_csv(os.path.join(source_agglomeration_folder, 'movement.csv'), parse_dates = ['date_time'])
+df_movement = pd.read_csv(os.path.join(source_agglomeration_folder, 'movement.csv'), parse_dates = ['date_time'], dtype = {'start_poly_id':str, 'end_poly_id':str})
 
 # Polygons
-df_polygons = pd.read_csv(os.path.join(source_agglomeration_folder, 'polygons.csv'))
+df_polygons = pd.read_csv(os.path.join(source_agglomeration_folder, 'polygons.csv'), dtype = {'poly_id':str})
 
 # Population (Mock)
-df_population = pd.read_csv(os.path.join(source_agglomeration_folder, 'population.csv'), parse_dates = ['date_time'])
+df_population = pd.read_csv(os.path.join(source_agglomeration_folder, 'population.csv'), parse_dates = ['date_time'], dtype = {'poly_id':str})
 
 # Movement Range (if Exists)
 df_movement_range = None
 if os.path.exists(os.path.join(source_agglomeration_folder, 'movement_range.csv')):
-    df_movement_range = pd.read_csv(os.path.join(source_agglomeration_folder, 'movement_range.csv'), parse_dates = ['date_time'])
+    df_movement_range = pd.read_csv(os.path.join(source_agglomeration_folder, 'movement_range.csv'), parse_dates = ['date_time'], dtype = {'poly_id':str})
 
 # Agglomeration Scheme
 aggl_scheme = pd.read_csv(os.path.join(data_dir, 'data_stages', location_folder_name, 'unified/aggl_scheme.csv'))
 
 # Community map
-community_map = pd.read_csv(os.path.join(destination_agglomeration_folder, 'polygon_community_map.csv'))
+community_map = pd.read_csv(os.path.join(destination_agglomeration_folder, 'polygon_community_map.csv'), dtype = {'poly_id':str, 'community_id':str})
+
 community_map = community_map[["poly_id","community_id","community_name"]].copy()
 
 
@@ -165,10 +166,12 @@ df_population_final = df_population.merge(community_map[['poly_id','community_id
 df_population_final.drop(['poly_id'], axis = 1, inplace = True)
 df_population_final.rename(columns = {'community_id':'poly_id'}, inplace = True)
 
-# Groups by
-groupby_cols = ['date_time','poly_id']
-agglomerate_cols = df_population_final.columns.drop(groupby_cols).values
-df_population_final = agglomerate(df_population_final, aggl_scheme, groupby_cols, agglomerate_cols)
+
+# Groups by (Mock)
+#groupby_cols = ['date_time','poly_id']
+#agglomerate_cols = df_population_final.columns.drop(groupby_cols).values
+#df_population_final = agglomerate(df_population_final, aggl_scheme, groupby_cols, agglomerate_cols)
+
 
 # Movement Range
 # ---------------

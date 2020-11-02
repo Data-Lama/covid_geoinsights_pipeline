@@ -17,6 +17,13 @@ from generic_unifier_class import GenericUnifier
 import attr_agglomeration_functions as attr_agg
 
 
+# Constants
+FIS_COLUMN = 'Fecha de inicio de síntomas'
+DATE_DEATH_COLUMN = 'Fecha de muerte'
+DIAG_COLUMN = 'Fecha de diagnóstico'
+DATE_RECOVERED_COLUMN = 'Fecha de recuperación'
+DATE_REPORTED_WEB = 'fecha reporte web'
+
 
 
 class Unifier(GenericUnifier):
@@ -103,12 +110,13 @@ class Unifier(GenericUnifier):
 		cols['ID de caso'] = 'ID' 
 		cols['Código DIVIPOLA municipio'] = 'geo_id'		
 		cols['Ubicación del caso'] = 'attention'
-		cols['Fecha de inicio de síntomas'] = 'FIS'
-		cols['Fecha de muerte'] = 'date_death'
-		cols['Fecha de diagnóstico'] = 'DIAG'
-		cols['Fecha de recuperación'] = 'date_recovered'
-		cols['Fecha reporte web'] = 'date_reported_web'
-
+		cols[FIS_COLUMN] = 'FIS'
+		cols[DATE_DEATH_COLUMN] = 'date_death'
+		cols[DIAG_COLUMN] = 'DIAG'
+		cols[DATE_RECOVERED_COLUMN] = 'date_recovered'
+		cols[DATE_REPORTED_WEB] = 'date_reported_web'
+        
+        
 		df = pd.read_csv(file_name, parse_dates = ['Fecha de diagnóstico','Fecha de inicio de síntomas','Fecha de muerte','Fecha de recuperación'], date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
 		df = df.rename(columns=cols)
 
