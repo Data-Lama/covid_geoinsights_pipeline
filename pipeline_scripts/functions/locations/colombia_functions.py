@@ -24,6 +24,8 @@ DIAG_COLUMN = 'Fecha de diagnóstico'
 DATE_RECOVERED_COLUMN = 'Fecha de recuperación'
 DATE_REPORTED_WEB = 'fecha reporte web'
 
+# Dates Start with day
+dayfirst = True
 
 
 class Unifier(GenericUnifier):
@@ -117,7 +119,7 @@ class Unifier(GenericUnifier):
 		cols[DATE_REPORTED_WEB] = 'date_reported_web'
         
         
-		df = pd.read_csv(file_name, parse_dates = ['Fecha de diagnóstico','Fecha de inicio de síntomas','Fecha de muerte','Fecha de recuperación'], date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
+		df = pd.read_csv(file_name, parse_dates = ['Fecha de diagnóstico','Fecha de inicio de síntomas','Fecha de muerte','Fecha de recuperación'], date_parser = lambda x: pd.to_datetime(x, errors="coerce", dayfirst = dayfirst), low_memory = False)
 		df = df.rename(columns=cols)
 
 		# Adds delay
