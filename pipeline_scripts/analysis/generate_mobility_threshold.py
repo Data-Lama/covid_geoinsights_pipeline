@@ -201,6 +201,9 @@ df_mov_thresholds = df_mov_thresholds.set_index('poly_id')
 
 for poly_id in df_mov_ranges.poly_id.unique():
 
+    if location_name=='colombia' and str(poly_id)[-3:]!='001':
+        continue
+
     df_mov_poly_id = df_mov_ranges[df_mov_ranges['poly_id'] == poly_id][["date_time", "poly_id", "movement_change"]].sort_values("date_time").copy()
     df_cases_diag_id = df_cases_diag[df_cases_diag["poly_id"] == poly_id][["date_time", "num_cases_diag"]]
 

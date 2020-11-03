@@ -111,7 +111,6 @@ Colombia,colombia,POS,analysis,1,NO,polygon_info_timewindow,python,colombia geom
 Colombia,colombia,POS,analysis,2,YES,generate_mobility_threshold,python,colombia community
 Colombia,colombia,POS,analysis,2,YES,generate_mobility_threshold,python,colombia geometry
 Colombia,colombia,POS,analysis,2,NO,choropleth_maps,python,colombia geometry
-
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia geometry
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia community
 Colombia,colombia,POS,analysis,1,NO,incidence_map,r,Colombia colombia geometry
