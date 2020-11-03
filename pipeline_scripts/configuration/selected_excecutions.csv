@@ -109,7 +109,6 @@ Colombia,colombia,POS,wrappers,2,NO,single_polygon_wrapper,python,colombia geome
 Colombia,colombia,POS,wrappers,3,NO,polygon_union_prediction_wrapper,python,colombia community 0.8 20 Colombia
 Colombia,colombia,POS,analysis,1,NO,polygon_info_timewindow,python,colombia geometry 5 days
 Colombia,colombia,POS,analysis,2,YES,generate_mobility_threshold,python,colombia community
-Colombia,colombia,POS,analysis,2,YES,generate_mobility_threshold,python,colombia geometry
 Colombia,colombia,POS,analysis,2,NO,choropleth_maps,python,colombia geometry
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia geometry
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia community
