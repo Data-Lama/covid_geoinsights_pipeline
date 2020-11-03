@@ -87,11 +87,11 @@ shape_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'g
 if selected_polygons_boolean:
     rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", selected_polygon_name)
     time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', selected_polygon_name)
-    threshold = os.path.join(analysis_dir, location_name, location_folder, "r_t", selected_polygon_name, "mobility_thresholds.csv")
+    threshold = os.path.join(analysis_dir, location_name, "community", "r_t", selected_polygon_name, "mobility_thresholds.csv")
 else:
     time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', "entire_location")
     rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", "entire_location")
-    threshold = os.path.join(analysis_dir, location_name, location_folder, "r_t", "entire_location", "mobility_thresholds.csv")
+    threshold = os.path.join(analysis_dir, location_name, "community", "r_t", "entire_location", "mobility_thresholds.csv")
 
 total_window = os.path.join(time_window_file_path, 'deltas_forward_window_5days.csv')
 
@@ -309,9 +309,8 @@ if location_folder == "geometry" and not selected_polygons_boolean:
     df_thresholds_geometry = pd.DataFrame({"poly_id":df_community.index})
     df_thresholds_geometry["threshold"] = df_thresholds_geometry.apply(lambda x: expand_to_geometry(df_community.at[x.poly_id, "community_id"], df_movement_threshold.set_index("poly_id"), "mob_th"), axis=1)
     df_movement_threshold = df_thresholds_geometry
-
 df_movement_range_recent = df_movement_range_recent.merge(df_movement_threshold, on="poly_id", how="outer")
-df_movement_range_recent["movement_range_alert"] = df_movement_range_recent.apply(lambda x: set_movement_range_alert(x.movement_change, x.mob_th), axis=1)
+df_movement_range_recent["movement_range_alert"] = df_movement_range_recent.apply(lambda x: set_movement_range_alert(x.movement_change, x.threshold), axis=1)
 
 df_alerts = calculate_alerts_record(df_movement_stats, df_movement_recent).reset_index()
 df_alerts.drop(columns=["points_inner_movement", "points_external_movement"], inplace=True)
@@ -323,7 +322,7 @@ df_alerts['alert_first_case'] = df_alerts.apply(lambda x: set_cases_alert_firstc
 
 # RT alerts
 df_rt_alert["rt_alert"] = df_rt_alert.apply(lambda x: set_rt_alert_color(x.ML), axis=1)
-df_alerts = df_alerts.merge(df_rt_alert, how="outer", on="poly_id").fillna("BLANCO")
+df_alerts = df_alerts.merge(df_rt_alert, how="outer", on="poly_id")
 df_alerts.drop(columns=["ML"], inplace=True)
 
 # Num cases alerts
@@ -331,7 +330,15 @@ df_alerts_cases = df_total_window.copy()
 df_alerts_cases["alert_internal_num_cases"] = df_alerts_cases.apply(lambda x: set_cases_alert_delta(x.delta_num_cases), axis=1)
 df_alerts_cases["alert_external_num_cases"] = df_alerts_cases.apply(lambda x: set_cases_alert_delta(x.delta_external_num_cases), axis=1)
 df_alerts_cases.drop(columns=["delta_num_cases", "delta_external_num_cases"], inplace=True)
-df_alerts = df_alerts.merge(df_alerts_cases, on="poly_id", how="outer").fillna("VERDE")
+df_alerts = df_alerts.merge(df_alerts_cases, on="poly_id", how="outer")
+
+# Fill missing values
+df_alerts["external_alert"] = df_alerts["external_alert"].fillna("VERDE")
+df_alerts["movement_range_alert"] = df_alerts["movement_range_alert"].fillna("BLANCO")
+df_alerts["alert_first_case"] = df_alerts["alert_first_case"].fillna("VERDE")
+df_alerts["alert_internal_num_cases"] = df_alerts["alert_internal_num_cases"].fillna("VERDE")
+df_alerts["alert_external_num_cases"] = df_alerts["alert_external_num_cases"].fillna("VERDE")
+df_alerts["rt_alert"] = df_alerts["rt_alert"].fillna("BLANCO")
 
 # Set max alert
 df_alerts['max_alert'] = df_alerts.apply(lambda x: get_max_alert([x.external_alert, x.movement_range_alert, x.alert_first_case, 
@@ -390,7 +397,7 @@ if not DONE:
                                                                             'Alerta de vulnerabilidad'], index=False, float_format='%.3f', sep=",")
 
     # Map alerts
-    df_alerts = geo_df.merge(df_alerts, left_on='Codigo_Dan', right_on='poly_id').fillna("VERDE")
+    df_alerts = geo_df.merge(df_alerts, left_on='Codigo_Dan', right_on='poly_id')
     cmap = ListedColormap([(1,0.8,0), (0.8, 0, 0), (0,0.4,0)], name='alerts')
     df_alerts.to_crs(epsg=3857, inplace=True)
     

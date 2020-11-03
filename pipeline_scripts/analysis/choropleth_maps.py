@@ -119,9 +119,10 @@ print(ident + f"Using {day_t3} as base for window")
 day_t2 = day_t3 - datetime.timedelta(days = WINDOW_SIZE)
 day_t0 = pd.Timestamp(datetime.datetime.strptime("2020-04-02", '%Y-%m-%d'))
 day_t1 = day_t0 + datetime.timedelta(days = WINDOW_SIZE)
+first_day_rt = df_rt.date_time.max() - datetime.timedelta(days = WINDOW_SIZE)
 
 # RT alerts
-df_rt = df_rt[df_rt["date_time"] >= day_t3]
+df_rt = df_rt[df_rt["date_time"] >= first_day_rt]
 df_rt = df_rt.groupby("poly_id").mean()
 
 # returns name of river node intersects or nan
