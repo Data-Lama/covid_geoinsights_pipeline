@@ -5,7 +5,7 @@ USA,usa,PRE,extractors,2,NO,usa_extractor,python,
 Colombia,colombia,extract,extractors,1,NO,single_file_download_extractor,python,Colombia colombia 
 Colombia,colombia,unify,unifiers,1,NO,universal_generic_unifier,python,Colombia colombia
 Colombia,colombia,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Colombia colombia 10
-Colombia,colombia,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,Colombia colombia geometry
+Colombia,colombia,agglomerate,agglomerators,2,NO,universal_community_agglomerate,python,Colombia colombia geometry
 Colombia,colombia,agglomerate,agglomerators,1,NO,universal_geometry_agglomerate,python,Colombia colombia False
 Colombia,colombia,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Colombia colombia all
 Colombia,colombia,analyse,analysis,1,NO,tda_script,r,Colombia colombia community
@@ -108,8 +108,10 @@ Colombia,colombia,POS,wrappers,2,NO,single_polygon_wrapper,python,colombia geome
 Colombia,colombia,POS,wrappers,2,NO,single_polygon_wrapper,python,colombia geometry Popayán popayan 19001
 Colombia,colombia,POS,wrappers,3,NO,polygon_union_prediction_wrapper,python,colombia community 0.8 20 Colombia
 Colombia,colombia,POS,analysis,1,NO,polygon_info_timewindow,python,colombia geometry 5 days
-Colombia,colombia,POS,analysis,2,NO,generate_mobility_threshold,python,colombia community
+Colombia,colombia,POS,analysis,2,YES,generate_mobility_threshold,python,colombia community
+Colombia,colombia,POS,analysis,2,YES,generate_mobility_threshold,python,colombia geometry
 Colombia,colombia,POS,analysis,2,NO,choropleth_maps,python,colombia geometry
+
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia geometry
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia community
 Colombia,colombia,POS,analysis,1,NO,incidence_map,r,Colombia colombia geometry
