@@ -306,9 +306,12 @@ if location_folder == "geometry" and not selected_polygons_boolean:
     df_rt_alert = df_rt_geometry
 
     # Thresholds
+    
     df_thresholds_geometry = pd.DataFrame({"poly_id":df_community.index})
-    df_thresholds_geometry["threshold"] = df_thresholds_geometry.apply(lambda x: expand_to_geometry(df_community.at[x.poly_id, "community_id"], df_movement_threshold.set_index("poly_id"), "mob_th"), axis=1)
+    df_thresholds_geometry["mob_th"] = df_thresholds_geometry.apply(lambda x: expand_to_geometry(df_community.at[x.poly_id, "community_id"], df_movement_threshold.set_index("poly_id"), "mob_th"), axis=1)
     df_movement_threshold = df_thresholds_geometry
+    
+df_movement_threshold.rename(columns={"mob_th":"threshold"}, inplace=True)    
 df_movement_range_recent = df_movement_range_recent.merge(df_movement_threshold, on="poly_id", how="outer")
 df_movement_range_recent["movement_range_alert"] = df_movement_range_recent.apply(lambda x: set_movement_range_alert(x.movement_change, x.threshold), axis=1)
 
@@ -334,6 +337,7 @@ df_alerts = df_alerts.merge(df_alerts_cases, on="poly_id", how="outer")
 
 # Fill missing values
 df_alerts["external_alert"] = df_alerts["external_alert"].fillna("VERDE")
+df_alerts["internal_alert"] = df_alerts["internal_alert"].fillna("VERDE")
 df_alerts["movement_range_alert"] = df_alerts["movement_range_alert"].fillna("BLANCO")
 df_alerts["alert_first_case"] = df_alerts["alert_first_case"].fillna("VERDE")
 df_alerts["alert_internal_num_cases"] = df_alerts["alert_internal_num_cases"].fillna("VERDE")
@@ -359,8 +363,13 @@ if selected_polygons_boolean:
     output_file_path = os.path.join(output_file_path, selected_polygon_name)
 else:
     output_file_path = os.path.join(output_file_path, "entire_location")
-
 # set_colors
+df_alerts = df_alerts[["poly_id", 'max_alert', 'external_alert', 'movement_range_alert', 'alert_external_num_cases', \
+'alert_internal_num_cases', 'alert_first_case', 'rt_alert', "internal_alert", "vulnerability_alert","Departamento", "Municipio", "community_name"]]
+
+#Fill missing values one last time
+df_alerts = df_alerts.fillna("VERDE")
+
 alert_list = ['max_alert', 'external_alert', 'movement_range_alert', 'alert_external_num_cases', \
 'alert_internal_num_cases', 'alert_first_case', 'rt_alert', "internal_alert"]
 for i in alert_list:
