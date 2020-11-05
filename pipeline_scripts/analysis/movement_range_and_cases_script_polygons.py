@@ -174,6 +174,9 @@ df_mov_range_all['Tipo'] = 'Movimiento Global'
 
 df_mov_plot = pd.concat((df_mov[['date_time','value','type','Tipo']], df_mov_range_all[['date_time','value','type','Tipo']]), ignore_index = True)
 
+# Converts to percentage
+df_mov_plot['vaue'] = 100*df_mov_plot['vaue']
+
 # Loads cases
 df_cases_raw = pd.read_csv(os.path.join(agglomerated_folder_location, 'cases.csv'), parse_dates = ['date_time'])
 df_cases_all = df_cases_raw.rename(columns = {'num_cases':'value'})
@@ -204,7 +207,7 @@ g = sns.relplot(x="date_time", y="value",row="type", hue = 'Tipo',
 
 # Axis
 g.set_axis_labels("Fecha", "")
-g.axes[0,0].set_ylabel('Proporción (0-1)')
+g.axes[0,0].set_ylabel('Porcentaje (%)')
 g.axes[1,0].set_ylabel('Número Casos')
 
 # Titles
