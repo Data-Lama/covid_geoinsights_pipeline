@@ -116,6 +116,9 @@ polygons = polygons[polygons.poly_id.isin(selected_polygons)].copy()
 df_mov_range = pd.read_csv(movement_range_file, parse_dates = ['date_time'])
 df_mov_range.poly_id = df_mov_range.poly_id.astype(str)
 
+# Converts to percentage
+df_mov_range['movement_change'] = 100*df_mov_range['movement_change']
+
 # For the national movement
 df_mov_range_all = df_mov_range.copy()
 
@@ -177,6 +180,7 @@ df_mov_range_all['Tipo'] = 'Movimiento Nacional'
 
 df_mov_plot = pd.concat((df_mov[['date_time','value','type','Tipo']], df_mov_range_all[['date_time','value','type','Tipo']]), ignore_index = True)
 
+
 # Loads cases
 df_cases_raw = pd.read_csv(os.path.join(unified_folder_location, 'cases.csv'), parse_dates = ['date_time'])
 df_cases_all = df_cases_raw.rename(columns = {'num_cases':'value', 'geo_id': 'polygon_id'})
@@ -217,7 +221,7 @@ ax.map(sns.lineplot, "date_time", "movement_change", linewidth=0.7)
 axes = ax.axes.flatten()
 for i in range(len(data)):
 	axes[i].set_title(data[i])
-	axes[i].set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
+	axes[i].set_ylabel('Porcentaje (%)', fontsize=axis_font_size)
 	axes[i].set_xlabel('Fecha', fontsize=axis_font_size)
 	axes[i].set_xticklabels(axes[i].get_xticklabels(), rotation=45)
 
@@ -229,11 +233,11 @@ fig = plt.figure(figsize=(19,8))
 ax = sns.lineplot(data = df_plot, x = 'date_time', y = 'movement_change', hue = 'poly_name')
 ax.set_title('Cambio Porcentual en Movilidad en Unidades {} para {}'.format(unit_type_prural, selected_polygons_name), fontsize=suptitle_font_size)
 ax.set_xlabel('Fecha', fontsize=axis_font_size)
-ax.set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
+ax.set_ylabel('Porcentaje (%)', fontsize=axis_font_size)
 ax.legend().texts[0].set_text(f"Unidad {unit_type}")
 
 # Adds the horizontal line
-ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)	
+ax.axhline( -50, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)	
 
 fig.savefig(os.path.join(export_folder_location, f'movement_range_selected_polygons_{selected_polygons_folder_name}.png'))	
 print(ident + 'Done')

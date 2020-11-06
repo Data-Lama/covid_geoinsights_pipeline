@@ -147,6 +147,9 @@ for agglomeration_method in agglomeration_methods:
 	df_mov['Tipo'] = 'Movimiento'
 
 	df_mov_plot = df_mov[['date_time','value','type','Tipo']].copy()
+	
+	# Changes to percentage
+	df_mov_plot['value'] = 100*df_mov_plot['value']
 
 	# Loads cases
 	df_cases_raw = pd.read_csv(os.path.join(unified_folder_location, 'cases.csv'), parse_dates = ['date_time'])
@@ -173,7 +176,7 @@ for agglomeration_method in agglomeration_methods:
 		date = col_fun.DATE_REPORTED_WEB
 		# Adds the date reported
 		df_cases_other_date = pd.read_csv(os.path.join(raw_folder_location, 'cases/cases_raw.csv'), parse_dates = [date], 
-			date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
+			date_parser = lambda x: pd.to_datetime(x, errors="coerce", dayfirst = col_fun.dayfirst), low_memory = False)
 
 		df_cases_other_date = df_cases_other_date[[date]].rename(columns = {date:'date_time'})
 
@@ -200,7 +203,7 @@ for agglomeration_method in agglomeration_methods:
 
 		# Adds the date reported
 		df_cases_other_date = pd.read_csv(os.path.join(raw_folder_location, 'cases/cases_raw.csv'), parse_dates = [date], 
-			date_parser = lambda x: pd.to_datetime(x, errors="coerce"), low_memory = False)
+			date_parser = lambda x: pd.to_datetime(x, errors="coerce", dayfirst = col_fun.dayfirst), low_memory = False)
 
 
 		df_cases_other_date = df_cases_other_date[[date]].rename(columns = {date:'date_time'})
@@ -251,14 +254,15 @@ for agglomeration_method in agglomeration_methods:
 	# --------------------------------------------
 
 	#df_mov_plot.to_csv('temp.csv', index = False)
-
+	
 	fig = plt.figure(figsize=(19,8))
+
 	ax = sns.lineplot(x = "date_time",y = "value", data = df_mov_plot)
 
 
 	ax.set_title('Cambio Porcentual en el Movimiento a Nivel Nacional')
 	ax.set_xlabel('Fecha', fontsize=axis_font_size)
-	ax.set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
+	ax.set_ylabel('Porcentaje (%)', fontsize=axis_font_size)
 
 
 	#Adds milestones
@@ -274,7 +278,7 @@ for agglomeration_method in agglomeration_methods:
 
 
 	# Adds the horizontal line
-	ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
+	ax.axhline( -50, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
 
 	min_dat, max_date = ax.get_xlim()
 
@@ -293,7 +297,7 @@ for agglomeration_method in agglomeration_methods:
 	# --------------------------------------------
 
 
-	# Global Movmeent Plot
+	# Global Movement Plot
 	df_plot = df
 
 	g = sns.relplot(x="date_time", y="value",row="type", hue = 'Tipo',
@@ -303,7 +307,7 @@ for agglomeration_method in agglomeration_methods:
 
 	# Axis
 	g.set_axis_labels("Fecha", "")
-	g.axes[0,0].set_ylabel('Proporción (0-1)')
+	g.axes[0,0].set_ylabel('Porcentaje (%)')
 	g.axes[1,0].set_ylabel('Número Casos')
 
 	# Titles
@@ -324,7 +328,7 @@ for agglomeration_method in agglomeration_methods:
 
 
 	# Adds the horizontal line
-	g.axes[0,0].axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
+	g.axes[0,0].axhline( -50, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
 
 	min_dat, max_date = g.axes[0,0].get_xlim()
 
@@ -355,19 +359,22 @@ for agglomeration_method in agglomeration_methods:
 
 
 	df_plot = df_mov_range.merge(polygons[['poly_id','poly_name']], on = 'poly_id')
+	
+	# Converts to percentage
+	df_plot.movement_change = 100*df_plot.movement_change
 
 	fig = plt.figure(figsize=(19,8))
 
 	ax = sns.lineplot(data = df_plot, x = 'date_time', y = 'movement_change', hue = 'poly_name')
 	ax.set_title('Cambio Porcentual en Movilidad en Unidades {} para {}'.format(unit_type_prural, location_name), fontsize=suptitle_font_size)
 	ax.set_xlabel('Fecha', fontsize=axis_font_size)
-	ax.set_ylabel('Proporción (0-1)', fontsize=axis_font_size)
+	ax.set_ylabel('Porcentaje (%)', fontsize=axis_font_size)
 	#ax.legend().texts[0].set_text(f"Unidad {unit_type}")
 	ax.legend(title = f"Unidad {unit_type}")
 
 
 	# Adds the horizontal line
-	ax.axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)		
+	ax.axhline( -50, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)		
 
 	fig.savefig(os.path.join(export_folder_location, f'movement_range_selected_polygons_{location_folder}.png'))
 	# Saves data

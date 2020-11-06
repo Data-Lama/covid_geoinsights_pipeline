@@ -121,7 +121,7 @@ for ind, row in df_files.iterrows():
 		source_temp = sources[i]
 		destination_temp = destinations[i]
 
-		print(ident + '   {}'.format(source_temp))
+		#print(ident + '   {}'.format(source_temp))
 
 
 		try:
@@ -130,8 +130,7 @@ for ind, row in df_files.iterrows():
 		except FileNotFoundError:
 			# File NOt found
 			not_found += 1
-			print(f'File Not Found \n: {source}')
-			print("")
+			print(f'File Not Found: {source}')
 
 
 print(ident + 'Write TimeStamp')
