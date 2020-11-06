@@ -8,6 +8,10 @@ import scipy.stats as stats
 from scipy.stats import gamma  
 import pickle
 import warnings
+
+import logging
+logger = logging.getLogger("pymc3")
+logger.propagate = False
 warnings.filterwarnings("ignore")
 
 # Local functions 
@@ -198,11 +202,7 @@ df_mov_thresholds['poly_id'] = list(df_mov_ranges.poly_id.unique())+['aggregated
 df_mov_thresholds = df_mov_thresholds.set_index('poly_id')
 
 # Palmira: 76520
-
 for poly_id in df_mov_ranges.poly_id.unique():
-
-    if location_name=='colombia' and str(poly_id)[-3:]!='001':
-        continue
 
     df_mov_poly_id = df_mov_ranges[df_mov_ranges['poly_id'] == poly_id][["date_time", "poly_id", "movement_change"]].sort_values("date_time").copy()
     df_cases_diag_id = df_cases_diag[df_cases_diag["poly_id"] == poly_id][["date_time", "num_cases_diag"]]
@@ -257,7 +257,6 @@ for poly_id in df_mov_ranges.poly_id.unique():
         df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']
 
     else:
-
         dict_result = {'poly_id': poly_id}
         df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
         df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
