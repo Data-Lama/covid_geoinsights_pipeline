@@ -31,8 +31,9 @@ analysis_dir = config.get_property('analysis_dir')
 DEFAULT_DELAY_DIST = 11001
 
 # Reads the parameters from excecution
-location_name  =  sys.argv[1] # location name
-agglomeration_folder =  sys.argv[2] # agglomeration folder
+location_name        =  'colombia'        # sys.argv[1] # location name
+agglomeration_folder =  'community'  # sys.argv[2] # agglomeration folder
+
 
 if len(sys.argv) <= 3:
 	selected_polygons_boolean = False
@@ -51,12 +52,10 @@ cases_path = os.path.join(agglomerated_path, 'cases.csv')
 mov_range_path = os.path.join(agglomerated_path, 'movement_range.csv')
 polygons_path = os.path.join(agglomerated_path, 'polygons.csv')
 
-# TODO must generate cases_diag automatically !!! AND Agglomerate properly 
-#time_delay_path = os.path.join(data_dir, "data_stages", location_name, "unified", "cases_diag.csv")
 time_delay_path = os.path.join(data_dir, "data_stages", location_name, "unified", "cases.csv")
 
-
 df_time_delay = pd.read_csv(time_delay_path, parse_dates=["date_time"])
+df_time_delay['attr_time-delay_union'] = df_time_delay.apply(lambda x:[float(v) for v in x['attr_time-delay_union'].split('|') ], axis=1)
 df_time_delay.rename(columns={"geo_id":"poly_id", "num_cases":"num_cases_diag"}, inplace=True)
 df_cases_diag = df_time_delay[["date_time", "poly_id", "num_cases_diag"]]
 
@@ -87,20 +86,12 @@ time_delays = {}
 df_time_delay["attr_time_delay"] = df_time_delay.apply(lambda x: np.fromstring(x["attr_time-delay_union"], sep="|"), axis=1)
 df_time_delay.set_index("poly_id", inplace=True)
 
-DEFAULT_DELAY_DIST = 11001
-for poly_id in df_time_delay.index.unique():
-    # If the time delay distribution is not long enough, use bogota
-    if len(df_time_delay.at[poly_id, "attr_time_delay"]) < 30:
-        time_delays[poly_id] = df_time_delay.loc[[DEFAULT_DELAY_DIST], "attr_time_delay"].values[0]
-    else:
-        time_delays[poly_id] = df_time_delay.loc[[poly_id], "attr_time_delay"].values[0]
-
 # Loop over polygons to run model and calculate thresholds
 print(f"    Runs model and calculates mobility thresholds")
 
-df_mov_thresholds = pd.DataFrame(columns =['poly_id', 'R0', 'Beta', 'mob_th'])
+df_mov_thresholds            = pd.DataFrame(columns =['poly_id', 'R0', 'Beta', 'mob_th'])
 df_mov_thresholds['poly_id'] = list(df_mov_ranges.poly_id.unique())+['aggregated']
-df_mov_thresholds = df_mov_thresholds.set_index('poly_id')
+df_mov_thresholds            = df_mov_thresholds.set_index('poly_id')
 
 # Palmira: 76520
 for poly_id in df_mov_ranges.poly_id.unique():
@@ -166,7 +157,7 @@ for poly_id in df_mov_ranges.poly_id.unique():
 
 
 df_mov_poly_id = df_mov_ranges[["date_time", "poly_id", "movement_change"]].sort_values("date_time").copy()
-df_cases_diag_id = df_cases_diag[["date_time", "num_cases_diag"]]
+df_cases_diag_id = df_cases_diag[["date_time", "num_cases_diag"]].copy()
 all_cases_id = df_cases_diag_id.num_cases_diag.sum()
 p_delay = time_delays[poly_id]
 

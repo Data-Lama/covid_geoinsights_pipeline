@@ -20,7 +20,7 @@ import sys
 # Constants
 indent = "\t"
 
-# Direcotries
+# Directories
 from global_config import config
 
 data_dir = config.get_property('data_dir')
