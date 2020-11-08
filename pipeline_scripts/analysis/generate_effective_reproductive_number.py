@@ -282,9 +282,9 @@ if selected_polygons_boolean:
 
             df_poly_id = prepare_cases(df_poly_id, col='num_cases', cutoff=0)
             min_time = df_poly_id.index[0]
-            FIS_KEY = 'date_time'
+            FIS_KEY = 'date'
             path_to_save = os.path.join(export_folder_location, str(poly_id)+'_Rt.png')
-            #pdb.set_trace()
+            pdb.set_trace()
             (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
             
             result.to_csv(os.path.join(export_folder_location, str(poly_id)+'_Rt.csv'))
@@ -305,8 +305,6 @@ if all_cases > 100:
 
     df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
     df_polygons_agg = df_polygons.copy()
-    
-    #p_delay = np.array( list(df_polygons_agg.attr_time_delay) ).mean(0)
     p_delay = df_polygons_agg.reset_index().set_index('poly_id').loc[11001]['attr_time_delay']
     
     df_all = confirmed_to_onset(df_all, p_delay, min_onset_date=None)
@@ -318,11 +316,11 @@ if all_cases > 100:
 
     df_all = prepare_cases(df_all, col='num_cases_adjusted', cutoff=0)
     min_time = df_all.index[0]
-    FIS_KEY = 'date_time'
-    # export_folder_location = '/Users/chaosdonkey06/Dropbox/covid_fb/report/reporte_norte_de_santander/report_figure_folder'
+    FIS_KEY = 'date'
+
     path_to_save = os.path.join(export_folder_location, 'aggregated_Rt.png')
     df_all.iloc[-10:]['num_cases_adjusted'] = df_all.iloc[-10:]['smoothed_num_cases_adjusted']
-
+    #pdb.set_trace()
     (_, _, result) = plot_cases_rt(df_all, 'num_cases_adjusted', 'num_cases_adjusted' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
     
     result.to_csv(os.path.join(export_folder_location,'aggregated_Rt.csv'))
