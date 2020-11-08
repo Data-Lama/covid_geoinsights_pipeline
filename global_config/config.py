@@ -1,8 +1,5 @@
 # Config file for global variables in python.
 # This script reads the variables in Python and makes them available through the function
-
-
-
 import pandas as pd
 from pathlib import Path
 import os

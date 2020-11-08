@@ -12,6 +12,8 @@ import json
 from scipy import stats as sps
 from scipy.interpolate import interp1d
 from pipeline_scripts.functions.Rt_estimate import get_posteriors, highest_density_interval
+from pipeline_scripts.functions.adjust_cases_observations_function import prepare_cases, adjust_onset_for_right_censorship, confirmed_to_onset
+
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -69,55 +71,7 @@ else:
     print(indent + f"Calculating rt for {location_folder} entire location.")
     selected_polygons_folder_name = "entire_location"
 
-def prepare_cases(daily_cases, col='Cases', cutoff=0):
-    daily_cases['Smoothed_'+col] = daily_cases[col].rolling(7,
-        win_type='gaussian',
-        min_periods=1,
-        center=True).mean(std=2).round()
 
-    idx_start = np.searchsorted(daily_cases['Smoothed_'+col], cutoff)
-    daily_cases['Smoothed_'+col] = daily_cases['Smoothed_'+col].iloc[idx_start:]
-
-    return daily_cases
-
-def confirmed_to_onset(confirmed, p_delay, min_onset_date=None):
-    min_onset_date = pd.to_datetime(min_onset_date)
-    # Reverse cases so that we convolve into the past
-    convolved = np.convolve(np.squeeze(confirmed.iloc[::-1].values), p_delay)
-
-    # Calculate the new date range
-    dr = pd.date_range(end=confirmed.index[-1],
-                        periods=len(convolved))
-    # Flip the values and assign the date range
-    onset = pd.Series(np.flip(convolved), index=dr, name='num_cases')
-    if min_onset_date:
-        onset = np.round(onset.loc[min_onset_date:])
-    else: 
-        onset = np.round(onset.iloc[onset.values>=1])
-
-    onset.index.name = 'date_time'
-    return pd.DataFrame(onset)
-
-######## this might work but CAREFULL
-def adjust_onset_for_right_censorship(onset, p_delay, col_name='Cases'):
-    onset_df =  onset[col_name]
-    cumulative_p_delay = p_delay.cumsum()
-    
-    # Calculate the additional ones needed so shapes match
-    ones_needed = len(onset) - len(cumulative_p_delay)
-    padding_shape = (0, ones_needed)
-    
-    # Add ones and flip back
-    cumulative_p_delay = np.pad(
-        cumulative_p_delay,
-        padding_shape,
-        constant_values=1)
-    cumulative_p_delay = np.flip(cumulative_p_delay)
-    
-    # Adjusts observed onset values to expected terminal onset values
-    onset[col_name+'_adjusted'] = onset_df / cumulative_p_delay
-    
-    return onset, cumulative_p_delay
 
 def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min_time=pd.to_datetime('2020-02-26'), state=None, path_to_save=None):
     fig, ax = plt.subplots(2,1, figsize=(12.5, 10) )

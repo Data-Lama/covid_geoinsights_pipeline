@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 # Define functions for model
-def confirmed_to_onset(confirmed, p_delay, col_name, min_onset_date=None):
+def confirmed_to_onset(confirmed, p_delay, col_name='num_cases', min_onset_date=None):
     min_onset_date = pd.to_datetime(min_onset_date)
     # Reverse cases so that we convolve into the past
     convolved = np.convolve(np.squeeze(confirmed.iloc[::-1].values), p_delay)

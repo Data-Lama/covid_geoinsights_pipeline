@@ -34,7 +34,6 @@ DEFAULT_DELAY_DIST = 11001
 location_name        =  'colombia'        # sys.argv[1] # location name
 agglomeration_folder =  'community'  # sys.argv[2] # agglomeration folder
 
-
 if len(sys.argv) <= 3:
 	selected_polygons_boolean = False
 else :
@@ -196,7 +195,6 @@ if all_cases_id > 100:
         os.makedirs(path_to_save_tr)
 
     dict_result = estimate_mov_th(mt, onset+1, 'aggregated', os.path.join(path_to_save_tr, 'mob_th_trace.pymc3.pkl'))
-
     df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
     df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
     df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']
