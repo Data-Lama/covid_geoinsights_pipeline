@@ -285,7 +285,7 @@ if selected_polygons_boolean:
             FIS_KEY = 'date_time'
             path_to_save = os.path.join(export_folder_location, str(poly_id)+'_Rt.png')
             #pdb.set_trace()
-            (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+            (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
             
             result.to_csv(os.path.join(export_folder_location, str(poly_id)+'_Rt.csv'))
             plt.close()
@@ -321,7 +321,7 @@ if all_cases > 100:
     FIS_KEY = 'date_time'
     # export_folder_location = '/Users/chaosdonkey06/Dropbox/covid_fb/report/reporte_norte_de_santander/report_figure_folder'
     path_to_save = os.path.join(export_folder_location, 'aggregated_Rt.png')
-    df_all.iloc[-10:]['num_cases_adjusted'] = df_all.iloc[-10:]['Smoothed_num_cases_adjusted']
+    df_all.iloc[-10:]['num_cases_adjusted'] = df_all.iloc[-10:]['smoothed_num_cases_adjusted']
 
     (_, _, result) = plot_cases_rt(df_all, 'num_cases_adjusted', 'num_cases_adjusted' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
     
