@@ -15,15 +15,20 @@ import shutil
 import extraction_functions as ext_fun
 from pathlib import Path
 
+#Directories
+from global_config import config
+data_dir = config.get_property('data_dir')
+analysis_dir = config.get_property('analysis_dir')
 
 
 # Reads the parameters from excecution
 location_name  = sys.argv[1] # Location name
 location_folder_name = sys.argv[2] # location folder name
 
-global_dir = Path(os.path.realpath(__file__)).parent.parent.parent
+ident = '         '
+
 # Location Folder
-location_folder = os.path.join(global_dir, 'data/data_stages/', location_folder_name)
+location_folder = os.path.join(data_dir, 'data_stages', location_folder_name)
 
 
 # Extracts the description
@@ -32,15 +37,17 @@ df_description = pd.read_csv(os.path.join(location_folder, 'description.csv'), i
 
 url = df_description.loc['cases_url','value']
 
+sep = ","
+if "cases_sep" in df_description.index:
+	sep = df_description.loc['cases_sep','value']
+	print(ident + f'Separator: {sep} detected')
 
-ident = '         '
 
-# Constructs the export
-global_dir = Path(os.path.realpath(__file__)).parent.parent.parent
-data_dir = os.path.join(global_dir, 'data/data_stages/')
+
+
 
 # Creates the folders if the don't exist
-cases_folder = os.path.join(data_dir, location_folder_name, 'raw','cases')
+cases_folder = os.path.join(data_dir, 'data_stages', location_folder_name, 'raw','cases')
 if not os.path.exists(cases_folder):
 	os.makedirs(cases_folder)
 
@@ -59,14 +66,19 @@ print(ident + '   Extracting:')
 # Downloads the file
 ext_fun.download_file(url, new_cases_file_name)
 
+try:
+	new_cases = pd.read_csv(new_cases_location, low_memory=False, sep = sep)
+except:
+	new_cases = pd.read_csv(new_cases_location, low_memory=False, encoding = 'latin-1', sep = sep)
 
 print(ident + '   Checking Integrity')
 
 if os.path.exists(cases_file_location) and os.path.isfile(cases_file_location):
 
-	old_cases = pd.read_csv(cases_file_location, low_memory=False)
-	new_cases = pd.read_csv(new_cases_location, low_memory=False)
-
+	try:
+		old_cases = pd.read_csv(cases_file_location, low_memory=False)
+	except:
+		old_cases = pd.read_csv(cases_file_location, low_memory=False, encoding = 'latin-1')
 
 	ok = True
 
@@ -93,7 +105,8 @@ if ok:
 	print(ident + '      Integrity OK')
 	print(ident + '   Moving File')
 	# Moves the file
-	shutil.copy(new_cases_location, cases_file_location)
+	new_cases.to_csv(cases_file_location, index = False, encoding = 'utf-8')
+	#shutil.copy(new_cases_location, cases_file_location)
 
 	print(ident + 'Done')
 

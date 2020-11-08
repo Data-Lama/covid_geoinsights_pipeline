@@ -138,8 +138,11 @@ class GenericUnifier():
 						"^num_.*": ["attr_addition", "",""], # Number of cases
 						"attr_population": ["attr_addition", "",""], # Population
 						"movement": ["attr_addition", "",""], # Movement
-						"population": ["attr_addition", "",""] # Population
-						
+						"population": ["attr_addition", "",""], # Population
+						"geometry": ["merge_geometry", "",""], # Geometry
+						"poly_name": ["attr_with_max", "num_cases",""], # Polygon Name
+						"poly_lat": ["attr_with_max", "num_cases",""], # Polygon lat
+						"poly_lon": ["attr_with_max", "num_cases",""] # Polygon lon
 						}
  
 		

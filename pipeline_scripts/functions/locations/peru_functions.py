@@ -38,11 +38,9 @@ class Unifier(GenericUnifier):
 		columns['FECHA_RESULTADO'] = 'date_time'
 
 
-						
-
 		file_name = os.path.join(self.raw_folder, 'cases', self.get('cases_file_name'))
 
-		df = pd.read_csv(file_name, parse_dates = ['FECHA_RESULTADO'], dayfirst = True, encoding = 'latin-1')
+		df = pd.read_csv(file_name, parse_dates = ['FECHA_RESULTADO'], dayfirst = True)
 		df = df.rename(columns = columns)
 
 		df_cases = df[['date_time','departement', 'province']].copy()
@@ -55,12 +53,12 @@ class Unifier(GenericUnifier):
 		df_cases.sort_values(['date_time'], inplace = True)
 
 		df_cases = df_cases.merge(df_geo, on = ['departement', 'province'])
+
 		df_cases = df_cases[df_cases.province != 'EN INVESTIGACIÓN'].copy()
 		
 		df_cases.departement = df_cases.departement.apply(lambda s: s.title())
 		df_cases.province = df_cases.province.apply(lambda s: s.title())
 		
-
         
 		return(df_cases)
 
@@ -88,6 +86,7 @@ class Unifier(GenericUnifier):
 
 		# Finds missing locations
 		merged = cases.merge(df_geo, on = ['geo_id'], how = 'left')
+		
 		missing = merged.loc[merged.lon.isna(), ['geo_id','departement', 'province']].drop_duplicates()
 
 
