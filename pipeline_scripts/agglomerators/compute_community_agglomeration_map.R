@@ -27,7 +27,7 @@ if(debug)
 {   
   cat("\n\n\n\n\n\n\n\n\n\n\n¡¡¡¡¡DEBUG IS ON!!!!\n\n\n\n\n\n\n\n\n")
   setwd("~/Dropbox/Projects/covid_fb_pipeline/covid_geoinsights_pipeline")
-  args = c('Colombia','colombia','geometry')
+  args = c('Peru','peru','radial')
 }
 
 location_name = args[1] # Location Name
@@ -108,7 +108,7 @@ if('attr_population' %in% colnames(polygons))
 }else
 {
   final_community = polygons %>%
-    select(poly_id, community_id, num_cases) %>%
+    select(poly_id, poly_name, community_id, num_cases) %>%
     group_by(community_id) %>%
     summarise(final_id = exctract_id_by_cases(poly_id, num_cases), final_name = exctract_name_by_cases(poly_name, num_cases), .groups = "keep") %>%
     ungroup()  
