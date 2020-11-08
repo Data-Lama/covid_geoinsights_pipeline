@@ -6,7 +6,7 @@ Kentucky,Kentucky,kentucky_usa,movement,YES,2712702045493792,,2020-04-02
 Florida,Florida,florida_usa,movement,YES,213899456725544,,2020-04-09
 Italy,Italy,italy,movement,YES,208980503584163,,2020-03-23
 Peru,Peru,peru,movement,YES,542449253076164,,2020-03-25
-Bogota,Bogota,bogota,movement,YES,592302144964359,,2020-04-12
+Bogota,Bogota,bogota,movement,NO,592302144964359,,2020-04-12
 New South Wales,New South Wales,new_south_wales,movement,YES,529422397944028,,2020-05-03
 Vermont,Vermont,vermont_usa,movement,YES,512760616081916,,2020-04-06
 Oregon,Oregon,oregon_usa,movement,YES,533347404237840,,2020-04-28
@@ -15,9 +15,9 @@ Brazil,Brazil,brazil,movement,YES,2319035081732462,,2020-03-31
 Colombia,COL_gadm_2,colombia,movement_range,YES,642750926308152,extra%5Bcrisis_name%5D=COL_gadm_2,2020-02-21
 Chile,Chile,chile,movement,YES,148531153150951,,2020-03-23
 Mexico,Mexico,mexico,movement,YES,725370771332086,,2020-04-02
-Cameroon,Cameroon,cameroon,movement,YES,173411453997724,,2020-05-12
-Cameroon,CMR_gadm_2,cameroon,movement_range,YES,642750926308152,extra[crisis_name]=CMR_gadm_2,2020-02-21
-Gabon,Gabon,gabon,movement,YES,2297163850592389,,2020-05-14
-Gabon,GAB_gadm_2,gabon,movement_range,YES,642750926308152,extra[crisis_name]=GAB_gadm_2,2020-02-21
-Equatorial Guinea,Equatorial Guinea,equatorial_guinea,movement,YES,2297163850592389,,2020-05-14
-Equatorial Guinea,GNQ_gadm_2,equatorial_guinea,movement_range,YES,642750926308152,extra[crisis_name]=GNQ_gadm_2,2020-02-21
+Cameroon,Cameroon,cameroon,movement,NO,173411453997724,,2020-05-12
+Cameroon,CMR_gadm_2,cameroon,movement_range,NO,642750926308152,extra[crisis_name]=CMR_gadm_2,2020-02-21
+Gabon,Gabon,gabon,movement,NO,2297163850592389,,2020-05-14
+Gabon,GAB_gadm_2,gabon,movement_range,NO,642750926308152,extra[crisis_name]=GAB_gadm_2,2020-02-21
+Equatorial Guinea,Equatorial Guinea,equatorial_guinea,movement,NO,2297163850592389,,2020-05-14
+Equatorial Guinea,GNQ_gadm_2,equatorial_guinea,movement_range,NO,642750926308152,extra[crisis_name]=GNQ_gadm_2,2020-02-21
