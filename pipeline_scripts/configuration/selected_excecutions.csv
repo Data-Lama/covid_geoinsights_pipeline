@@ -1,7 +1,7 @@
 location_name,locations_folder,stage,folder_location,position,excecute,script_name,script_type,script_parameters
-All,,PRE,PRE,1,YES,download_facebook,python,
-ALL,,PRE,extractors,1,YES,johns_hopkins_extractor,python,
-USA,usa,PRE,extractors,2,YES,usa_extractor,python,
+All,,PRE,PRE,1,NO,download_facebook,python,
+ALL,,PRE,extractors,1,NO,johns_hopkins_extractor,python,
+USA,usa,PRE,extractors,2,NO,usa_extractor,python,
 Colombia,colombia,extract,extractors,1,NO,single_file_download_extractor,python,Colombia colombia 
 Colombia,colombia,unify,unifiers,1,NO,universal_generic_unifier,python,Colombia colombia
 Colombia,colombia,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Colombia colombia 10
@@ -12,66 +12,64 @@ Colombia,colombia,analyse,analysis,1,NO,tda_script,r,Colombia colombia community
 Colombia,colombia,analyse,analysis,1,NO,graph_maps,r,Colombia colombia community
 Colombia,colombia,analyse,analysis,2,NO,movement_range_plots_script,python,Colombia colombia community
 Colombia,colombia,analyse,analysis,3,NO,neighbors_location_extraction,python,Colombia colombia community
-Peru,peru,extract,extractors,1,YES,single_file_download_extractor,python,Peru peru
-Peru,peru,unify,unifiers,1,YES,universal_generic_unifier,python,Peru peru
-Peru,peru,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Peru peru 10
-Peru,peru,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Peru peru
+Peru,peru,extract,extractors,1,NO,single_file_download_extractor,python,Peru peru
+Peru,peru,unify,unifiers,1,NO,universal_generic_unifier,python,Peru peru
+Peru,peru,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Peru peru 10
+Peru,peru,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,Peru peru radial
 Peru,peru,construct,constructors,1,YES,universal_daily_graphs_constructor,python,Peru peru all
 Chile,chile,extract,extractors,1,YES,universal_git_single_extractor,python,Chile chile
 Chile,chile,unify,unifiers,1,YES,universal_generic_unifier,python,Chile chile
 Chile,chile,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Chile chile 10
-Chile,chile,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Chile chile
+Chile,chile,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,Chile chile radial
 Chile,chile,construct,constructors,1,YES,universal_daily_graphs_constructor,python,Chile chile all
 Brazil,brazil,extract,extractors,1,YES,universal_git_single_extractor,python,Brazil brazil
 Brazil,brazil,unify,unifiers,1,YES,universal_generic_unifier,python,Brazil brazil
 Brazil,brazil,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Brazil brazil 10
-Brazil,brazil,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Brazil brazil
+Brazil,brazil,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,Brazil brazil radial
 Brazil,brazil,construct,constructors,1,YES,universal_daily_graphs_constructor,python,Brazil brazil all
 Germany,germany,extract,extractors,1,YES,universal_git_single_extractor,python,Germany germany
 Germany,germany,unify,unifiers,1,YES,universal_generic_unifier,python,Germany germany
 Germany,germany,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Germany germany 10
-Germany,germany,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Germany germany
+Germany,germany,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,Germany germany radial
 Germany,germany,construct,constructors,1,YES,universal_daily_graphs_constructor,python,Germany germany all
 Indiana,indiana_usa,unify,unifiers,1,YES,usa_state_unifier,python,Indiana indiana_usa
 Indiana,indiana_usa,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Indiana indiana_usa 10
-Indiana,indiana_usa,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Indiana indiana_usa
+Indiana,indiana_usa,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,Indiana indiana_usa radial
 Indiana,indiana_usa,construct,constructors,1,YES,universal_daily_graphs_constructor,python,Indiana indiana_usa all
-Illinois,illinois_usa,unify,unifiers,1,YES,usa_state_unifier,python,Illinois illinois_usa
+Illinois,illinois_usa,unify,unifiers,1,YES,usa_state_unifier,python,Illinois illinois_usa radial
 Illinois,illinois_usa,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Illinois illinois_usa 10
-Illinois,illinois_usa,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Illinois illinois_usa
+Illinois,illinois_usa,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,Illinois illinois_usa radial
 Illinois,illinois_usa,construct,constructors,1,YES,universal_daily_graphs_constructor,python,Illinois illinois_usa all
 Kentucky,kentucky_usa,unify,unifiers,1,YES,usa_state_unifier,python,Kentucky kentucky_usa
 Kentucky,kentucky_usa,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Kentucky kentucky_usa 10
-Kentucky,kentucky_usa,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Kentucky kentucky_usa
+Kentucky,kentucky_usa,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,Kentucky kentucky_usa radial
 Kentucky,kentucky_usa,construct,constructors,1,YES,universal_daily_graphs_constructor,python,Kentucky kentucky_usa all
 Italy,italy,extract,extractors,1,YES,italy_extractor,python,
 Italy,italy,unify,unifiers,1,YES,italy_unifier,python,
 Italy,italy,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Italy italy 10
-Italy,italy,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Italy italy
+Italy,italy,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,Italy italy radial
 Italy,italy,construct,constructors,1,YES,universal_daily_graphs_constructor,python,Italy italy all
 Florida,florida_usa,unify,unifiers,1,YES,usa_state_unifier,python,Florida florida_usa
 Florida,florida_usa,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Florida florida_usa 10
-Florida,florida_usa,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Florida florida_usa
+Florida,florida_usa,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,Florida florida_usa radial
 Florida,florida_usa,construct,constructors,1,YES,universal_daily_graphs_constructor,python,Florida florida_usa all
 NewSouthWales,new_south_wales,extract,extractors,1,YES,single_file_download_extractor,python,NewSouthWales new_south_wales
 NewSouthWales,new_south_wales,unify,unifiers,1,YES,universal_generic_unifier,python,NewSouthWales new_south_wales
 NewSouthWales,new_south_wales,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,NewSouthWales new_south_wales 10
-NewSouthWales,new_south_wales,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,NewSouthWales new_south_wales
+NewSouthWales,new_south_wales,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,NewSouthWales new_south_wales radial
 NewSouthWales,new_south_wales,construct,constructors,1,YES,universal_daily_graphs_constructor,python,NewSouthWales new_south_wales all
-NewSouthWales,new_south_wales,analyse,analysis,1,YES,tda_script,r,NewSouthWales new_south_wales all
-NewSouthWales,new_south_wales,analyse,analysis,3,YES,movement_plots_script,python,NewSouthWales new_south_wales all
 Vermont,vermont_usa,unify,unifiers,1,YES,usa_state_unifier,python,Vermont vermont_usa
 Vermont,vermont_usa,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Vermont vermont_usa 10
-Vermont,vermont_usa,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Vermont vermont_usa
+Vermont,vermont_usa,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,Vermont vermont_usa radial
 Vermont,vermont_usa,construct,constructors,1,YES,universal_daily_graphs_constructor,python,Vermont vermont_usa all
 Oregon,oregon_usa,unify,unifiers,1,YES,usa_state_unifier,python,Oregon oregon_usa
 Oregon,oregon_usa,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Oregon oregon_usa 10
-Oregon,oregon_usa,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Oregon oregon_usa
+Oregon,oregon_usa,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,Oregon oregon_usa radial
 Oregon,oregon_usa,construct,constructors,1,YES,universal_daily_graphs_constructor,python,Oregon oregon_usa all
 Mexico,mexico,extract,extractors,1,YES,website_crawling_extractor,python,Mexico mexico
 Mexico,mexico,unify,unifiers,1,YES,universal_generic_unifier,python,Mexico mexico
 Mexico,mexico,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Mexico mexico 10
-Mexico,mexico,agglomerate,agglomerators,2,YES,universal_community_agglomerate,r,Mexico mexico
+Mexico,mexico,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,Mexico mexico radial
 Mexico,mexico,construct,constructors,1,YES,universal_daily_graphs_constructor,python,Mexico mexico all
 Colombia,colombia,POS,wrappers,1,NO,polygon_prediction_wrapper,python,
 Colombia,colombia,POS,wrappers,1,NO,polygon_socio_economic_wrapper,python,
