@@ -15,8 +15,11 @@ logger.propagate = False
 warnings.filterwarnings("ignore")
 
 # Local functions 
-import pipeline_scripts.functions.Rt_estimate
-from  pipeline_scripts.functions.Rt_estimate import calculate_threshold as mov_th
+from pipeline_scripts.functions.mobility_th_functions import calculate_threshold as mov_th
+from pipeline_scripts.functions.mobility_th_functions import statistics_from_trace_model as df_from_model
+from pipeline_scripts.functions.mobility_th_functions import mov_th_mcmcm_model as estimate_mov_th
+
+from pipeline_scripts.functions.adjust_cases_observations_function import confirmed_to_onset, adjust_onset_for_right_censorship, prepare_cases 
 
 # Directories
 from global_config import config
@@ -49,7 +52,10 @@ mov_range_path = os.path.join(agglomerated_path, 'movement_range.csv')
 polygons_path = os.path.join(agglomerated_path, 'polygons.csv')
 
 # TODO must generate cases_diag automatically !!! AND Agglomerate properly 
-time_delay_path = os.path.join(data_dir, "data_stages", location_name, "unified", "cases_diag.csv")
+#time_delay_path = os.path.join(data_dir, "data_stages", location_name, "unified", "cases_diag.csv")
+time_delay_path = os.path.join(data_dir, "data_stages", location_name, "unified", "cases.csv")
+
+
 df_time_delay = pd.read_csv(time_delay_path, parse_dates=["date_time"])
 df_time_delay.rename(columns={"geo_id":"poly_id", "num_cases":"num_cases_diag"}, inplace=True)
 df_cases_diag = df_time_delay[["date_time", "poly_id", "num_cases_diag"]]
@@ -75,111 +81,6 @@ else:
 if not os.path.isdir(output_folder):
         os.makedirs(output_folder)
 
-# Define functions for model
-def confirmed_to_onset(confirmed, p_delay, col_name, min_onset_date=None):
-    min_onset_date = pd.to_datetime(min_onset_date)
-    # Reverse cases so that we convolve into the past
-    convolved = np.convolve(np.squeeze(confirmed.iloc[::-1].values), p_delay)
-
-    # Calculate the new date range
-    dr = pd.date_range(end=confirmed.index[-1],
-                        periods=len(convolved))
-    # Flip the values and assign the date range
-    onset = pd.Series(np.flip(convolved), index=dr, name=col_name)
-    if min_onset_date:
-        onset = np.round(onset.loc[min_onset_date:])
-    else: 
-        onset = np.round(onset.iloc[onset.values>=1])
-
-    onset.index.name = 'date'
-    return pd.DataFrame(onset)
-
-######## this might work but CAREFULL
-def adjust_onset_for_right_censorship(onset, p_delay, col_name='num_cases'):
-    onset_df =  onset[col_name]
-    cumulative_p_delay = p_delay.cumsum()
-    
-    # Calculate the additional ones needed so shapes match
-    ones_needed = len(onset) - len(cumulative_p_delay)
-    padding_shape = (0, ones_needed)
-    
-    # Add ones and flip back
-    cumulative_p_delay = np.pad(
-        cumulative_p_delay,
-        padding_shape,
-        constant_values=1)
-    cumulative_p_delay = np.flip(cumulative_p_delay)
-    
-    # Adjusts observed onset values to expected terminal onset values
-    onset[col_name+'_adjusted'] = onset_df / cumulative_p_delay
-    
-    return onset, cumulative_p_delay
-
-# Smooths cases using a rolling window and gaussian sampling
-def prepare_cases(daily_cases, col='num_cases', cutoff=0):
-    daily_cases['smoothed_'+col] = daily_cases[col].rolling(7,
-        win_type='gaussian',
-        min_periods=1,
-        center=True).mean(std=2).round()
-
-    idx_start = np.searchsorted(daily_cases['smoothed_'+col], cutoff)
-    daily_cases['smoothed_'+col] = daily_cases['smoothed_'+col].iloc[idx_start:]
-
-    return daily_cases
-
-def df_from_model(rt_trace):
-    r_t = rt_trace
-    mean = np.mean(r_t, axis=0)
-    median = np.median(r_t, axis=0)
-    hpd_90 = pm.stats.hpd(r_t, hdi_prob=.9)
-    hpd_50 = pm.stats.hpd(r_t, hdi_prob=.5)
-
-    df = pd.DataFrame(data=np.c_[mean, median, hpd_90, hpd_50],
-                 columns=['mean', 'median', 'lower_90', 'upper_90', 'lower_50','upper_50'])
-
-    return df
-
-def estimate_mov_th(mobility_data, cases_onset_data, poly_id, path_to_save_trace=None):
-    onset = cases_onset_data 
-    mt = mobility_data
-
-    with pm.Model() as Rt_mobility_model:            
-        # Create the alpha and beta parameters
-        # Assume a normal distribution
-        beta  = pm.Uniform('beta', lower=-100, upper=100)
-        Ro = pm.Uniform('R0', lower=2, upper=5)
-
-        # The effective reproductive number is given by:
-        Rt = pm.Deterministic('Rt', Ro*pm.math.exp(-beta*(1+mt[:-1].values)))
-        serial_interval = pm.Gamma('serial_interval', alpha=6, beta=1.5)
-        GAMMA = 1/serial_interval
-        lam = onset[:-1].values * pm.math.exp( GAMMA * (Rt- 1))
-        observed = onset.round().values[1:]
-
-        # Likelihood
-        cases = pm.Poisson('cases', mu=lam, observed=observed)
-
-        with Rt_mobility_model:
-            # Draw the specified number of samples
-            N_SAMPLES = 10000
-
-            # Using Metropolis Hastings Sampling
-            step     = pm.Metropolis(vars=[ Rt_mobility_model.beta, Rt_mobility_model.R0 ], S = np.array([ (100+100)**2 , (5-2)**2 ]) )
-            Rt_trace = pm.sample( N_SAMPLES, tune=1000, chains=10, step=step )
-
-        BURN_IN = 2000
-        rt_info = df_from_model(Rt_trace.get_values(burn=BURN_IN,varname='Rt'))
-
-        R0_dist   = Rt_trace.get_values(burn=BURN_IN, varname='R0')
-        beta_dist = Rt_trace.get_values(burn=BURN_IN,varname='beta')
-        mb_th = mov_th(beta_dist.mean(), R0_dist.mean())
-
-        if path_to_save_trace:
-            with open(path_to_save_trace, 'wb') as buff:
-                pickle.dump({'model': Rt_mobility_model, 'trace': Rt_trace }, buff)
-
-    return {'poly_id': poly_id, 'R0':R0_dist.mean(), 'beta':beta_dist.mean(), 'mob_th':mb_th }
-    
 # Get time delay
 print(f"    Extracts time delay per polygon")
 time_delays = {}
