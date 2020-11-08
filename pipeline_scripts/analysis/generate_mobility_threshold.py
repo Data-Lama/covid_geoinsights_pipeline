@@ -18,13 +18,12 @@ warnings.filterwarnings("ignore")
 from pipeline_scripts.functions.mobility_th_functions import calculate_threshold as mov_th
 from pipeline_scripts.functions.mobility_th_functions import statistics_from_trace_model as df_from_model
 from pipeline_scripts.functions.mobility_th_functions import mov_th_mcmcm_model as estimate_mov_th
-
 from pipeline_scripts.functions.adjust_cases_observations_function import confirmed_to_onset, adjust_onset_for_right_censorship, prepare_cases 
 
 # Directories
 from global_config import config
 
-data_dir = config.get_property('data_dir')
+data_dir     = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
 # Contants
@@ -46,10 +45,10 @@ else :
     selected_polygon_name = selected_polygons.pop(0)
 
 # Data paths
-agglomerated_path  = os.path.join(data_dir, "data_stages", location_name, "agglomerated", agglomeration_folder)
-cases_path = os.path.join(agglomerated_path, 'cases.csv')
-mov_range_path = os.path.join(agglomerated_path, 'movement_range.csv')
-polygons_path = os.path.join(agglomerated_path, 'polygons.csv')
+agglomerated_path = os.path.join(data_dir, "data_stages", location_name, "agglomerated", agglomeration_folder)
+cases_path        = os.path.join(agglomerated_path, 'cases.csv')
+mov_range_path    = os.path.join(agglomerated_path, 'movement_range.csv')
+polygons_path     = os.path.join(agglomerated_path, 'polygons.csv')
 
 time_delay_path = os.path.join(data_dir, "data_stages", location_name, "unified", "cases.csv")
 
