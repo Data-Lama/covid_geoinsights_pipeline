@@ -249,10 +249,7 @@ skipped_polygons = []
 computed_polygons = []
 from tqdm import tqdm
 if selected_polygons_boolean:
-<<<<<<< HEAD
-=======
-
->>>>>>> 239cea6328527e0b6edfdf10c5bf991c02ea5799
+        
     df_all = df_time_delay[['date_time', 'location', 'num_cases']].copy().reset_index().rename(columns={'geo_id': 'poly_id'})
     df_polygons = df_polygons[['poly_id', 'attr_time_delay']].set_index('poly_id')
     df_polygons = df_polygons.dropna()
