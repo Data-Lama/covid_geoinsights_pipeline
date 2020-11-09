@@ -34,7 +34,6 @@ DEFAULT_DELAY_DIST = 11001
 location_name        =  sys.argv[1] # location name
 agglomeration_folder =  sys.argv[2] # agglomeration folder
 
-selected_polygons = [76520]
 
 if len(sys.argv) <= 3:
 	selected_polygons_boolean = False
