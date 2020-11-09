@@ -249,8 +249,6 @@ skipped_polygons = []
 computed_polygons = []
 from tqdm import tqdm
 if selected_polygons_boolean:
-    #pdb.set_trace()
-
     df_all = df_time_delay[['date_time', 'location', 'num_cases']].copy().reset_index().rename(columns={'geo_id': 'poly_id'})
     df_polygons = df_polygons[['poly_id', 'attr_time_delay']].set_index('poly_id')
     df_polygons = df_polygons.dropna()
@@ -284,7 +282,6 @@ if selected_polygons_boolean:
             min_time = df_poly_id.index[0]
             FIS_KEY = 'date'
             path_to_save = os.path.join(export_folder_location, str(poly_id)+'_Rt.png')
-            pdb.set_trace()
             (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
             
             result.to_csv(os.path.join(export_folder_location, str(poly_id)+'_Rt.csv'))
@@ -320,7 +317,6 @@ if all_cases > 100:
 
     path_to_save = os.path.join(export_folder_location, 'aggregated_Rt.png')
     df_all.iloc[-10:]['num_cases_adjusted'] = df_all.iloc[-10:]['smoothed_num_cases_adjusted']
-    #pdb.set_trace()
     (_, _, result) = plot_cases_rt(df_all, 'num_cases_adjusted', 'num_cases_adjusted' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
     
     result.to_csv(os.path.join(export_folder_location,'aggregated_Rt.csv'))
