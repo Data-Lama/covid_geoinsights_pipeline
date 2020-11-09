@@ -13,6 +13,7 @@ import logging
 logger = logging.getLogger("pymc3")
 logger.propagate = False
 warnings.filterwarnings("ignore")
+warnings.simplefilter("ignore")
 
 # Local functions 
 from pipeline_scripts.functions.mobility_th_functions import calculate_threshold as mov_th
@@ -30,8 +31,10 @@ analysis_dir = config.get_property('analysis_dir')
 DEFAULT_DELAY_DIST = 11001
 
 # Reads the parameters from excecution
-location_name        =  'colombia'        # sys.argv[1] # location name
-agglomeration_folder =  'community'  # sys.argv[2] # agglomeration folder
+location_name        =  sys.argv[1] # location name
+agglomeration_folder =  sys.argv[2] # agglomeration folder
+
+selected_polygons = [76520]
 
 if len(sys.argv) <= 3:
 	selected_polygons_boolean = False
@@ -53,8 +56,9 @@ polygons_path     = os.path.join(agglomerated_path, 'polygons.csv')
 time_delay_path = os.path.join(data_dir, "data_stages", location_name, "unified", "cases.csv")
 
 df_time_delay = pd.read_csv(time_delay_path, parse_dates=["date_time"])
-df_time_delay['attr_time-delay_union'] = df_time_delay.apply(lambda x:[float(v) for v in x['attr_time-delay_union'].split('|') ], axis=1)
+df_time_delay["attr_time-delay_union"] = df_time_delay.apply(lambda x: np.fromstring(x["attr_time-delay_union"], sep="|"), axis=1)
 
+df_time_delay = df_time_delay.rename(columns={'geo_id': 'poly_id'})
 df_cases_diag = df_time_delay[["date_time", "poly_id", "num_cases"]]
 
 # Load dataframes
@@ -81,7 +85,6 @@ if not os.path.isdir(output_folder):
 # Get time delay
 print(f"    Extracts time delay per polygon")
 time_delays = {}
-df_time_delay["attr_time_delay"] = df_time_delay.apply(lambda x: np.fromstring(x["attr_time-delay_union"], sep="|"), axis=1)
 df_time_delay.set_index("poly_id", inplace=True)
 
 # Loop over polygons to run model and calculate thresholds
@@ -90,14 +93,17 @@ df_mov_thresholds            = pd.DataFrame(columns =['poly_id', 'R0', 'Beta', '
 df_mov_thresholds['poly_id'] = list(df_mov_ranges.poly_id.unique())+['aggregated']
 df_mov_thresholds            = df_mov_thresholds.set_index('poly_id')
 
-# Palmira: 76520
 for poly_id in df_mov_ranges.poly_id.unique():
 
     df_mov_poly_id   = df_mov_ranges[df_mov_ranges['poly_id'] == poly_id][["date_time", "poly_id", "movement_change"]].sort_values("date_time").copy()
     df_cases_diag_id = df_cases_diag[df_cases_diag["poly_id"] == poly_id][["date_time", "num_cases"]]
 
     all_cases_id = df_cases_diag_id['num_cases'].sum()
-    p_delay      = time_delays[poly_id]
+
+    try:
+        p_delay      = df_time_delay.loc[poly_id]['attr_time-delay_union'].iloc[0]
+    except: 
+        p_delay      = df_time_delay.loc[DEFAULT_DELAY_DIST]['attr_time-delay_union'].iloc[0]
 
     path_to_save_tr = os.path.join(output_folder, 'MCMC', str(poly_id) )
 
@@ -156,7 +162,10 @@ for poly_id in df_mov_ranges.poly_id.unique():
 df_mov_poly_id   = df_mov_ranges[["date_time", "poly_id", "movement_change"]].sort_values("date_time").copy()
 df_cases_diag_id = df_cases_diag[["date_time", "num_cases"]].copy()
 all_cases_id     = df_cases_diag_id.num_cases.sum()
-p_delay          = time_delays[poly_id]
+try:
+    p_delay      = df_time_delay.loc[poly_id]['attr_time-delay_union'].iloc[0]
+except: 
+    p_delay      = df_time_delay.loc[DEFAULT_DELAY_DIST]['attr_time-delay_union'].iloc[0]
 
 if all_cases_id > 100:
     df_mov_poly_id.set_index("date_time", inplace=True)
