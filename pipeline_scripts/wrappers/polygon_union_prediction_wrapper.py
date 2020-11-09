@@ -102,7 +102,7 @@ polygons.poly_id = polygons.poly_id.astype(str)
 if len(selected_polygons) > 0:
     polygons = polygons[polygons.poly_id.isin(selected_polygons)].copy()
 
-polygons.sort_values('num_cases', ascending = False)
+polygons = polygons.sort_values('num_cases', ascending = False)
 
 # Defines Coverage
 polygons['coverage'] = polygons['num_cases'].rolling(min_periods=1, window=polygons.shape[0]).sum() /  polygons['num_cases'].sum()

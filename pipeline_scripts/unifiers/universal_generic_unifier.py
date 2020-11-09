@@ -110,7 +110,7 @@ movement_date = df_movement.date_time.max()
 
 # Saves
 df_movement.to_csv(os.path.join(unified_dir, 'movement.csv'), index = False)
-#df_movement.loc[df_movement.start_polygon_id != df_movement.end_polygon_id].to_csv(os.path.join(data_dir, 'unified/movement_non_internal.csv'), index = False)
+
 
 # -------------------
 # ---- Population -----

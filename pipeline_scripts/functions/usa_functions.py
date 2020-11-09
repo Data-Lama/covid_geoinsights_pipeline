@@ -19,6 +19,8 @@ import fb_functions as fb
 
 import extraction_functions as ext_fun
 
+import attr_agglomeration_functions as agg_fun
+
 #Directories
 from global_config import config
 data_dir = config.get_property('data_dir')
@@ -92,3 +94,10 @@ def build_polygons(state_name, state_folder_name):
 	df_poly = df_cases[['geo_id', 'location','lon', 'lat']].drop_duplicates().rename(columns = {'geo_id':'poly_id', 'location':'poly_name', 'lon':'poly_lon', 'lat':'poly_lat'})
 
 	return(df_poly)
+
+
+def attr_agglomeration_scheme():
+	'''
+	Default agglomeration Scheme
+	'''
+	return(agg_fun.get_generic_attr_agglomeration_scheme())
