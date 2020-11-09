@@ -13,6 +13,8 @@ import geo_functions as geo
 import fb_functions as fb
 import extraction_functions as ext_fun
 
+import attr_agglomeration_functions as agg_fun
+
 
 #Directories
 from global_config import config
@@ -113,47 +115,12 @@ class GenericUnifier():
 		
 		pass
 
-
-	def get_generic_attr_agglomeration_scheme(self):
-		'''
-		Method that builds the csv that describes the agglomeration function needed per attribute code
-		'''
-		
-
-		# Columns
-		# 1. attr_name: Name of the attribute (can have regex).
-		# 2. aggl_function: Name of the agglomeration function.
-		# 3. secondary_attr: Secondary attribute or column of the same DF to aglomerate.
-		# 4. polygon_attr: Columns of polygons in case is necesary.
-		# 5. aggl_parameters: Other agglomeraton parameters.
-		
-		aggl_scheme = {"^attr_.*sum$": ["attr_addition", "",""],
-						"^attr_.*sub$": ["attr_substraction", "", ""],
-						"^attr_.*append": ["attr_append", "", "sep=|"],
-						"^attr_.*append_float": ["attr_append_float", "", "sep=|"],
-						"^attr_.*union$": ["attr_union", "", "sep=|"],
-						"^attr_.*union_int$": ["attr_union_int", "", "sep=|"],
-						"^attr_.*intersect$": ["attr_intersection", "", "sep=|"],
-						"^attr_.*avg$": ["attr_average", "", ""],
-						"^num_.*": ["attr_addition", "",""], # Number of cases
-						"attr_population": ["attr_addition", "",""], # Population
-						"movement": ["attr_addition", "",""], # Movement
-						"population": ["attr_addition", "",""], # Population
-						"geometry": ["merge_geometry", "",""], # Geometry
-						"poly_name": ["attr_with_max", "num_cases",""], # Polygon Name
-						"poly_lat": ["attr_with_max", "num_cases",""], # Polygon lat
-						"poly_lon": ["attr_with_max", "num_cases",""] # Polygon lon
-						}
- 
-		
-		return aggl_scheme
-
 		
 	def attr_agglomeration_scheme(self):
 		'''
 		Defines agglomeration scheme
 		'''
-		return self.get_generic_attr_agglomeration_scheme()
+		return agg_fun.get_generic_attr_agglomeration_scheme()
 
 	def generic_build_cases_geo(self, country):
 		'''

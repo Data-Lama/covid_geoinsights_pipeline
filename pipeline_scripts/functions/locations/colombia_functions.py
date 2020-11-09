@@ -218,7 +218,7 @@ class Unifier(GenericUnifier):
 		return(polygons_final)
 
 	def attr_agglomeration_scheme(self):
-		aggl_scheme = self.get_generic_attr_agglomeration_scheme()
+		aggl_scheme = attr_agg.get_generic_attr_agglomeration_scheme()
  
 		aggl_scheme["^attr.*wvg-pop$"] = ["attr_weighted_average", "attr_population",""]
 		aggl_scheme["^attr.*time_delay$"] = ["estimate_gamma_delay", "", ""]

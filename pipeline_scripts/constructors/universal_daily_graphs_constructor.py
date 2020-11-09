@@ -96,9 +96,9 @@ for agglomeration_method in agglomeration_methods:
 	elapsed_days = nodes.day.min()
 
 
-	print(ident + '         Distance Matrix')
-	distance_matrix = constr.build_distance(nodes, edges, node_locations)
-	distance_matrix.to_csv(os.path.join(graphs_folder, 'distance_matrix.csv'))
+	#print(ident + '         Distance Matrix')
+	#distance_matrix = constr.build_distance(nodes, edges, node_locations)
+	#distance_matrix.to_csv(os.path.join(graphs_folder, 'distance_matrix.csv'))
 
 
 
