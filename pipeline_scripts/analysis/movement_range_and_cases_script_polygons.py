@@ -175,7 +175,7 @@ df_mov_range_all['Tipo'] = 'Movimiento Global'
 df_mov_plot = pd.concat((df_mov[['date_time','value','type','Tipo']], df_mov_range_all[['date_time','value','type','Tipo']]), ignore_index = True)
 
 # Converts to percentage
-df_mov_plot['vaue'] = 100*df_mov_plot['vaue']
+df_mov_plot['value'] = 100*df_mov_plot['value']
 
 # Loads cases
 df_cases_raw = pd.read_csv(os.path.join(agglomerated_folder_location, 'cases.csv'), parse_dates = ['date_time'])

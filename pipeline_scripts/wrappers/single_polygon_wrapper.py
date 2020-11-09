@@ -108,7 +108,7 @@ print("{}Excecuting generate_effective_reproductive_number.py for {}".format(ide
 parameters = "{} {} {} {}".format(location_folder,  
                                 agglomeration_method,
                                 folder_name, 
-                                poly_id)
+                                selected_geographic_neighbors_polygons_parameter)
                                 
 ef.excecute_script(analysis_scripts_location, "generate_effective_reproductive_number.py", "python", parameters)
 
@@ -118,7 +118,7 @@ print("{}Excecuting generate_mobility_threshold.py for {}".format(ident, poly_id
 parameters = "{} {} {} {}".format(location_folder,  
                                 agglomeration_method,
                                 folder_name, 
-                                poly_id)
+                                selected_geographic_neighbors_polygons_parameter)
 
 ef.excecute_script(analysis_scripts_location, "generate_mobility_threshold.py", "python", parameters)
 

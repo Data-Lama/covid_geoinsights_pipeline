@@ -20,7 +20,7 @@ analysis_dir = config.get_property('analysis_dir')
 
 # Reads the parameters from excecution
 location_name  =  sys.argv[1] # location name
-location_folder =  sys.argv[2] # polygon name
+location_folder =  sys.argv[2] # agglomeration method
 
 if len(sys.argv) <= 3:
 	selected_polygons_boolean = False
@@ -87,11 +87,15 @@ shape_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'g
 if selected_polygons_boolean:
     rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", selected_polygon_name)
     time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', selected_polygon_name)
-    threshold = os.path.join(analysis_dir, location_name, "community", "r_t", selected_polygon_name, "mobility_thresholds.csv")
-else:
+    threshold = os.path.join(analysis_dir, location_name, location_folder, "r_t", selected_polygon_name, "mobility_thresholds.csv")
+elif location_folder == "geometry":
     time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', "entire_location")
     rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", "entire_location")
     threshold = os.path.join(analysis_dir, location_name, "community", "r_t", "entire_location", "mobility_thresholds.csv")
+else:
+    time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', "entire_location")
+    rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", "entire_location")
+    threshold = os.path.join(analysis_dir, location_name, location_folder, "r_t", "entire_location", "mobility_thresholds.csv")
 
 total_window = os.path.join(time_window_file_path, 'deltas_forward_window_5days.csv')
 
@@ -306,7 +310,6 @@ if location_folder == "geometry" and not selected_polygons_boolean:
     df_rt_alert = df_rt_geometry
 
     # Thresholds
-    
     df_thresholds_geometry = pd.DataFrame({"poly_id":df_community.index})
     df_thresholds_geometry["mob_th"] = df_thresholds_geometry.apply(lambda x: expand_to_geometry(df_community.at[x.poly_id, "community_id"], df_movement_threshold.set_index("poly_id"), "mob_th"), axis=1)
     df_movement_threshold = df_thresholds_geometry
