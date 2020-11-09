@@ -51,5 +51,4 @@ def prepare_cases(daily_cases, col='num_cases', cutoff=0):
 
     idx_start = np.searchsorted(daily_cases['smoothed_'+col], cutoff)
     daily_cases['smoothed_'+col] = daily_cases['smoothed_'+col].iloc[idx_start:]
-
     return daily_cases

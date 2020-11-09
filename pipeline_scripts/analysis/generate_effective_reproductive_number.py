@@ -284,7 +284,7 @@ if selected_polygons_boolean:
             min_time = df_poly_id.index[0]
             FIS_KEY = 'date'
             path_to_save = os.path.join(export_folder_location, str(poly_id)+'_Rt.png')
-            pdb.set_trace()
+            #pdb.set_trace()
             (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
             
             result.to_csv(os.path.join(export_folder_location, str(poly_id)+'_Rt.csv'))
