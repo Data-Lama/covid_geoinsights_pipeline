@@ -12,6 +12,8 @@ import json
 from scipy import stats as sps
 from scipy.interpolate import interp1d
 from pipeline_scripts.functions.Rt_estimate import get_posteriors, highest_density_interval
+from pipeline_scripts.functions.adjust_cases_observations_function import prepare_cases, adjust_onset_for_right_censorship, confirmed_to_onset
+
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -20,7 +22,7 @@ import sys
 # Constants
 indent = "\t"
 
-# Direcotries
+# Directories
 from global_config import config
 
 data_dir = config.get_property('data_dir')
@@ -69,55 +71,7 @@ else:
     print(indent + f"Calculating rt for {location_folder} entire location.")
     selected_polygons_folder_name = "entire_location"
 
-def prepare_cases(daily_cases, col='Cases', cutoff=0):
-    daily_cases['Smoothed_'+col] = daily_cases[col].rolling(7,
-        win_type='gaussian',
-        min_periods=1,
-        center=True).mean(std=2).round()
 
-    idx_start = np.searchsorted(daily_cases['Smoothed_'+col], cutoff)
-    daily_cases['Smoothed_'+col] = daily_cases['Smoothed_'+col].iloc[idx_start:]
-
-    return daily_cases
-
-def confirmed_to_onset(confirmed, p_delay, min_onset_date=None):
-    min_onset_date = pd.to_datetime(min_onset_date)
-    # Reverse cases so that we convolve into the past
-    convolved = np.convolve(np.squeeze(confirmed.iloc[::-1].values), p_delay)
-
-    # Calculate the new date range
-    dr = pd.date_range(end=confirmed.index[-1],
-                        periods=len(convolved))
-    # Flip the values and assign the date range
-    onset = pd.Series(np.flip(convolved), index=dr, name='num_cases')
-    if min_onset_date:
-        onset = np.round(onset.loc[min_onset_date:])
-    else: 
-        onset = np.round(onset.iloc[onset.values>=1])
-
-    onset.index.name = 'date_time'
-    return pd.DataFrame(onset)
-
-######## this might work but CAREFULL
-def adjust_onset_for_right_censorship(onset, p_delay, col_name='Cases'):
-    onset_df =  onset[col_name]
-    cumulative_p_delay = p_delay.cumsum()
-    
-    # Calculate the additional ones needed so shapes match
-    ones_needed = len(onset) - len(cumulative_p_delay)
-    padding_shape = (0, ones_needed)
-    
-    # Add ones and flip back
-    cumulative_p_delay = np.pad(
-        cumulative_p_delay,
-        padding_shape,
-        constant_values=1)
-    cumulative_p_delay = np.flip(cumulative_p_delay)
-    
-    # Adjusts observed onset values to expected terminal onset values
-    onset[col_name+'_adjusted'] = onset_df / cumulative_p_delay
-    
-    return onset, cumulative_p_delay
 
 def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min_time=pd.to_datetime('2020-02-26'), state=None, path_to_save=None):
     fig, ax = plt.subplots(2,1, figsize=(12.5, 10) )
@@ -328,10 +282,10 @@ if selected_polygons_boolean:
 
             df_poly_id = prepare_cases(df_poly_id, col='num_cases', cutoff=0)
             min_time = df_poly_id.index[0]
-            FIS_KEY = 'date_time'
+            FIS_KEY = 'date'
             path_to_save = os.path.join(export_folder_location, str(poly_id)+'_Rt.png')
-            #pdb.set_trace()
-            (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'Smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+            pdb.set_trace()
+            (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'smoothed_num_cases' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
             
             result.to_csv(os.path.join(export_folder_location, str(poly_id)+'_Rt.csv'))
             plt.close()
@@ -351,8 +305,6 @@ if all_cases > 100:
 
     df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
     df_polygons_agg = df_polygons.copy()
-    
-    #p_delay = np.array( list(df_polygons_agg.attr_time_delay) ).mean(0)
     p_delay = df_polygons_agg.reset_index().set_index('poly_id').loc[11001]['attr_time_delay']
     
     df_all = confirmed_to_onset(df_all, p_delay, min_onset_date=None)
@@ -364,11 +316,11 @@ if all_cases > 100:
 
     df_all = prepare_cases(df_all, col='num_cases_adjusted', cutoff=0)
     min_time = df_all.index[0]
-    FIS_KEY = 'date_time'
-    # export_folder_location = '/Users/chaosdonkey06/Dropbox/covid_fb/report/reporte_norte_de_santander/report_figure_folder'
-    path_to_save = os.path.join(export_folder_location, 'aggregated_Rt.png')
-    df_all.iloc[-10:]['num_cases_adjusted'] = df_all.iloc[-10:]['Smoothed_num_cases_adjusted']
+    FIS_KEY = 'date'
 
+    path_to_save = os.path.join(export_folder_location, 'aggregated_Rt.png')
+    df_all.iloc[-10:]['num_cases_adjusted'] = df_all.iloc[-10:]['smoothed_num_cases_adjusted']
+    #pdb.set_trace()
     (_, _, result) = plot_cases_rt(df_all, 'num_cases_adjusted', 'num_cases_adjusted' , pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
     
     result.to_csv(os.path.join(export_folder_location,'aggregated_Rt.csv'))
