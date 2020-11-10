@@ -21,8 +21,7 @@ def calculate_threshold(a, r):
         return None
     return (1 - (np.log(r) / a))
 
-def mov_th_mcmcm_model(mt, onset, poly_id, path_to_save_trace=None):
-
+def mob_th_mcmcm_model(mt, onset, poly_id, path_to_save_trace=None):
     with pm.Model() as Rt_mobility_model:            
         # Create the alpha and beta parameters
         # Assume a uninformed distribution

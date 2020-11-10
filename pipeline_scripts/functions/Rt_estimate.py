@@ -106,3 +106,20 @@ def highest_density_interval(pmf, p=.9, debug=False):
                      index=[f'Low_{p*100:.0f}',
                             f'High_{p*100:.0f}'])
 
+
+def estimate_rt(cases_df, col_name_cases, CI=50):
+
+    #posteriors, log_likelihood = get_posteriors(cases_df[col_cases_smoothed]+1, sigma=.25)
+
+    posteriors, log_likelihood = get_posteriors(cases_df[col_name_cases]+1, sigma=.25)
+    posteriors = posteriors[posteriors.keys()[1:]]
+    # posteriors_cm  = posteriors.dropna(axis=1)
+    # Note that this takes a while to execute - it's not the most efficient algorithm
+    hdis = highest_density_interval( posteriors , p=CI/100 )
+    CI = str(CI) 
+    most_likely = posteriors.idxmax().rename('ML')
+    result = pd.concat([most_likely, hdis], axis=1)
+    result = result.reset_index().rename( columns={'date_time': 'date', 'FIS': 'date'}).set_index('date')
+
+    return result
+    
