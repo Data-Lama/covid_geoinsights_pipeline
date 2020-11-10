@@ -71,8 +71,6 @@ else:
     print(indent + f"Calculating rt for {location_folder} entire location.")
     selected_polygons_folder_name = "entire_location"
 
-
-
 def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min_time=pd.to_datetime('2020-02-26'), state=None, path_to_save=None):
     fig, ax = plt.subplots(2,1, figsize=(12.5, 10) )
     index = cases_df[col_cases].index.get_level_values(FIS_KEY)
@@ -104,8 +102,6 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     if pop:
         ax[0].set_ylabel('Incidencia por 100.000 hab.', fontsize=15 )
     ax[0].set_ylabel('Incidencia', fontsize=15 )
-
-    #ax.set_title( 'Amazonas', fontsize=15 )
     
     ax[0].legend(fontsize=15, frameon=False)
     ax[0].spines['top'].set_visible(False)
@@ -213,8 +209,6 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed , pop=None, CI=50, min
     ax[1].set_xlim( min_time-pd.Timedelta( days=1 ), index[-1]+pd.Timedelta(days=1) )
     ax[0].set_xlim( min_time-pd.Timedelta( days=1 ), index[-1]+pd.Timedelta(days=1) )
     #ax1tick_params( axis='x',  rotation=90 )
-    #ax[1].set_ylabel('Incidence per. 100.000', fontsize=15 )
-    #ax1set_title( 'Amazonas', fontsize=15 )
     #ax[1].legend(fontsize=15, frameon=False, title='Region', title_fontsize=15)
     ax[1].spines['top'].set_visible(False)
     ax[1].spines['right'].set_visible(False)

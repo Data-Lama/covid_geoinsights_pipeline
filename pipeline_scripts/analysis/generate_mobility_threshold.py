@@ -16,9 +16,9 @@ warnings.filterwarnings("ignore")
 warnings.simplefilter("ignore")
 
 # Local functions 
-from pipeline_scripts.functions.mobility_th_functions import calculate_threshold as mov_th
+from pipeline_scripts.functions.mobility_th_functions import calculate_threshold as mob_th
 from pipeline_scripts.functions.mobility_th_functions import statistics_from_trace_model as df_from_model
-from pipeline_scripts.functions.mobility_th_functions import mov_th_mcmcm_model as estimate_mov_th
+from pipeline_scripts.functions.mobility_th_functions import mob_th_mcmcm_model as estimate_mob_th
 from pipeline_scripts.functions.adjust_cases_observations_function import confirmed_to_onset, adjust_onset_for_right_censorship, prepare_cases 
 
 # Directories
@@ -33,7 +33,6 @@ DEFAULT_DELAY_DIST = 11001
 # Reads the parameters from excecution
 location_name        =  sys.argv[1] # location name
 agglomeration_folder =  sys.argv[2] # agglomeration folder
-
 
 if len(sys.argv) <= 3:
 	selected_polygons_boolean = False
@@ -88,9 +87,9 @@ df_time_delay.set_index("poly_id", inplace=True)
 
 # Loop over polygons to run model and calculate thresholds
 print(f"    Runs model and calculates mobility thresholds")
-df_mov_thresholds            = pd.DataFrame(columns =['poly_id', 'R0', 'Beta', 'mob_th'])
-df_mov_thresholds['poly_id'] = list(df_mov_ranges.poly_id.unique())+['aggregated']
-df_mov_thresholds            = df_mov_thresholds.set_index('poly_id')
+df_mob_thresholds            = pd.DataFrame(columns =['poly_id', 'R0', 'Beta', 'mob_th'])
+df_mob_thresholds['poly_id'] = list(df_mov_ranges.poly_id.unique())+['aggregated']
+df_mob_thresholds            = df_mob_thresholds.set_index('poly_id')
 
 for poly_id in df_mov_ranges.poly_id.unique():
 
@@ -144,19 +143,17 @@ for poly_id in df_mov_ranges.poly_id.unique():
         onset = onset.loc[min_date:max_date]
         mt    = mt.loc[min_date:max_date]
 
-        dict_result = estimate_mov_th(mt, onset+1, poly_id, None)
+        dict_result = estimate_mob_th(mt, onset+1, poly_id, None)
             
-        df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
-        df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
-        df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']
+        df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
+        df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
+        df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']
 
     else:
         dict_result = {'poly_id': poly_id}
-        df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
-        df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
-        df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
-
-
+        df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
+        df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
+        df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
 
 df_mov_poly_id   = df_mov_ranges[["date_time", "poly_id", "movement_change"]].sort_values("date_time").copy()
 df_cases_diag_id = df_cases_diag[["date_time", "num_cases"]].copy()
@@ -201,14 +198,14 @@ if all_cases_id > 100:
     if not os.path.isdir(path_to_save_tr):
         os.makedirs(path_to_save_tr)
 
-    dict_result = estimate_mov_th(mt, onset+1, 'aggregated', os.path.join(path_to_save_tr, 'mob_th_trace.pymc3.pkl'))
-    df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
-    df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
-    df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']
+    dict_result = estimate_mob_th(mt, onset+1, 'aggregated', os.path.join(path_to_save_tr, 'mob_th_trace.pymc3.pkl'))
+    df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
+    df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
+    df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']
 else:
     dict_result = {'poly_id': poly_id}
-    df_mov_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
-    df_mov_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
-    df_mov_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
+    df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
+    df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
+    df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
 
-df_mov_thresholds.to_csv( os.path.join( output_folder ,'mobility_thresholds.csv'))
+df_mob_thresholds.to_csv( os.path.join( output_folder ,'mobility_thresholds.csv'))
