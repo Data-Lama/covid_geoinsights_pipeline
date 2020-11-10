@@ -216,7 +216,7 @@ g.axes[1,0].set_title(f'Casos Diarios en {selected_polygons_name}')
 
 
 # Adds the horizontal line
-g.axes[0,0].axhline( -0.5, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
+g.axes[0,0].axhline( -50, color = cut_line_color, linestyle='--', lw = cut_stones_width, xmin = 0.0,  xmax = 1)
 
 min_dat, max_date = g.axes[0,0].get_xlim()
 

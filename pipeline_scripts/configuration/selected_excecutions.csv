@@ -83,24 +83,19 @@ Colombia,colombia,POS,wrappers,2,NO,polygon_union_wrapper,python,colombia geomet
 Colombia,colombia,POS,wrappers,2,NO,polygon_union_wrapper,python,colombia community Tolima tolima 73001 73030 73055 73270 73283 73349 73443 73520 73148 73226 73352 73449 73873 73067 73168 73217 73483 73504 73555 73616 73622 73675 73026 73043 73124 73200 73268 73275 73547 73624 73678 73854 73024 73236 73319 73563 73585 73671 73770 73152 73347 73408 73411 73461 73686 73861 73870
 Colombia,colombia,POS,wrappers,2,NO,polygon_union_wrapper,python,colombia geometry Quindio quindio 63001 63111 63130 63302 63401 63470 63594 63690 63190 63212 63548 63272
 Colombia,colombia,POS,wrappers,2,NO,polygon_union_wrapper,python,colombia community Quindio quindio 63001 63111 63130 63302 63401 63470 63594 63690 63190 63212 63548 63272
-Colombia,colombia,POS,wrappers,2,NO,single_polygon_wrapper,python,colombia geometry Palmira palmira 76520
+Colombia,colombia,POS,wrappers,2,YES,single_polygon_wrapper,python,colombia geometry Palmira palmira 76520
 Colombia,colombia,POS,wrappers,2,NO,single_polygon_wrapper,python,colombia geometry Popayán popayan 19001
-Colombia,colombia,POS,wrappers,3,YES,polygon_union_prediction_wrapper,python,colombia community 0.8 20 Colombia
+Colombia,colombia,POS,wrappers,3,NO,polygon_union_prediction_wrapper,python,colombia community 0.8 20 Colombia
 Colombia,colombia,POS,analysis,1,NO,polygon_info_timewindow,python,colombia geometry 5 days
 Colombia,colombia,POS,analysis,2,NO,generate_mobility_threshold,python,colombia community
 Colombia,colombia,POS,analysis,2,NO,generate_mobility_threshold,python,colombia geometry
-Colombia,colombia,POS,analysis,3,YES,choropleth_maps,python,colombia geometry
-Colombia,colombia,POS,analysis,3,YES,generate_threshold_alerts,python,colombia geometry
-Colombia,colombia,POS,analysis,3,YES,generate_threshold_alerts,python,colombia community
+Colombia,colombia,POS,analysis,3,NO,choropleth_maps,python,colombia geometry
+Colombia,colombia,POS,analysis,3,NO,generate_threshold_alerts,python,colombia geometry
+Colombia,colombia,POS,analysis,3,NO,generate_threshold_alerts,python,colombia community
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia geometry
 Colombia,colombia,POS,analysis,1,NO,general_statistics,python,colombia community
 Colombia,colombia,POS,analysis,1,NO,incidence_map,r,Colombia colombia geometry
 Colombia,colombia,POS,analysis,1,NO,generate_effective_reproductive_number,python,colombia geometry
 Colombia,colombia,POS,analysis,1,NO,generate_effective_reproductive_number,python,colombia community
-<<<<<<< HEAD
-Colombia,colombia,POS,analysis,2,YES,generate_effective_reproductive_number,python,colombia geometry  54001 54261 54673 54874 54051 54099 54599 54109 54128 54172 54174 54223 54239 54245 54250 54313 54344 54347 54377 54405 54418 54003 54206 54398 54498 54518 54125 54480 54520 54553 54660 54670 54680 54720 54743 54800 54810 54820 54871
-Colombia,colombia,POS,analysis,2,NO,generate_effective_reproductive_number,python,colombia community 54001 54261 54673 54874 54051 54099 54599 54109 54128 54172 54174 54223 54239 54245 54250 54313 54344 54347 54377 54405 54418 54003 54206 54398 54498 54518 54125 54480 54520 54553 54660 54670 54680 54720 54743 54800 54810 54820 54871
-=======
->>>>>>> 5ac95703a8c1c0121a553aabdb68b3e1665f2073
 All,,POS,POS,6,NO,generate_website_files,python,
 All,,POS,POS,6,YES,copy_report_files,python,
