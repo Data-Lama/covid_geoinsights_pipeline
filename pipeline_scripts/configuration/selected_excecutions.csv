@@ -1,17 +1,17 @@
 location_name,locations_folder,stage,folder_location,position,excecute,script_name,script_type,script_parameters
-All,,PRE,PRE,1,NO,download_facebook,python,
+All,,PRE,PRE,1,YES,download_facebook,python,
 ALL,,PRE,extractors,1,NO,johns_hopkins_extractor,python,
 USA,usa,PRE,extractors,2,NO,usa_extractor,python,
-Colombia,colombia,extract,extractors,1,NO,single_file_download_extractor,python,Colombia colombia 
-Colombia,colombia,unify,unifiers,1,NO,universal_generic_unifier,python,Colombia colombia 2020-11-06
-Colombia,colombia,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Colombia colombia 10
-Colombia,colombia,agglomerate,agglomerators,2,NO,universal_community_agglomerate,python,Colombia colombia geometry
-Colombia,colombia,agglomerate,agglomerators,1,NO,universal_geometry_agglomerate,python,Colombia colombia False
-Colombia,colombia,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Colombia colombia all
-Colombia,colombia,analyse,analysis,1,NO,tda_script,r,Colombia colombia community
-Colombia,colombia,analyse,analysis,1,NO,graph_maps,r,Colombia colombia community
-Colombia,colombia,analyse,analysis,2,NO,movement_range_plots_script,python,Colombia colombia community
-Colombia,colombia,analyse,analysis,3,NO,neighbors_location_extraction,python,Colombia colombia community
+Colombia,colombia,extract,extractors,1,YES,single_file_download_extractor,python,Colombia colombia 
+Colombia,colombia,unify,unifiers,1,YES,universal_generic_unifier,python,Colombia colombia 2020-11-06
+Colombia,colombia,agglomerate,agglomerators,1,YES,universal_radius_agglomerate,python,Colombia colombia 10
+Colombia,colombia,agglomerate,agglomerators,2,YES,universal_community_agglomerate,python,Colombia colombia geometry
+Colombia,colombia,agglomerate,agglomerators,1,YES,universal_geometry_agglomerate,python,Colombia colombia False
+Colombia,colombia,construct,constructors,1,YES,universal_daily_graphs_constructor,python,Colombia colombia all
+Colombia,colombia,analyse,analysis,1,YES,tda_script,r,Colombia colombia community
+Colombia,colombia,analyse,analysis,1,YES,graph_maps,r,Colombia colombia community
+Colombia,colombia,analyse,analysis,2,YES,movement_range_plots_script,python,Colombia colombia community
+Colombia,colombia,analyse,analysis,3,YES,neighbors_location_extraction,python,Colombia colombia community
 Peru,peru,extract,extractors,1,NO,single_file_download_extractor,python,Peru peru
 Peru,peru,unify,unifiers,1,NO,universal_generic_unifier,python,Peru peru
 Peru,peru,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Peru peru 10
@@ -83,8 +83,8 @@ Colombia,colombia,POS,wrappers,2,NO,polygon_union_wrapper,python,colombia geomet
 Colombia,colombia,POS,wrappers,2,NO,polygon_union_wrapper,python,colombia community Tolima tolima 73001 73030 73055 73270 73283 73349 73443 73520 73148 73226 73352 73449 73873 73067 73168 73217 73483 73504 73555 73616 73622 73675 73026 73043 73124 73200 73268 73275 73547 73624 73678 73854 73024 73236 73319 73563 73585 73671 73770 73152 73347 73408 73411 73461 73686 73861 73870
 Colombia,colombia,POS,wrappers,2,NO,polygon_union_wrapper,python,colombia geometry Quindio quindio 63001 63111 63130 63302 63401 63470 63594 63690 63190 63212 63548 63272
 Colombia,colombia,POS,wrappers,2,NO,polygon_union_wrapper,python,colombia community Quindio quindio 63001 63111 63130 63302 63401 63470 63594 63690 63190 63212 63548 63272
-Colombia,colombia,POS,wrappers,2,YES,single_polygon_wrapper,python,colombia geometry Palmira palmira 76520
-Colombia,colombia,POS,wrappers,2,NO,single_polygon_wrapper,python,colombia geometry Popayán popayan 19001
+Colombia,colombia,POS,wrappers,2,NO,single_polygon_wrapper,python,colombia geometry Palmira palmira 76520
+Colombia,colombia,POS,wrappers,2,YES,single_polygon_wrapper,python,colombia geometry Popayán popayan 19001
 Colombia,colombia,POS,wrappers,3,NO,polygon_union_prediction_wrapper,python,colombia community 0.8 20 Colombia
 Colombia,colombia,POS,analysis,1,NO,polygon_info_timewindow,python,colombia geometry 5 days
 Colombia,colombia,POS,analysis,2,NO,generate_mobility_threshold,python,colombia community
