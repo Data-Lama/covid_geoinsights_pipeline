@@ -208,6 +208,11 @@ def get_corresponding_function(function_declaration):
         fun = lambda s : estimate_gamma_delay(s)
         return(fun)
     
+    if name == 'attr_time-delay_dist_mix':
+        weight = function_declaration['secondary_attr']
+        attr = function_declaration['attr_name']
+        fun = lambda df : finite_mixture_dist(df[attr], df[weight], params["sep"])
+        return(fun)
     
     if name == "merge_geometry":
         
@@ -262,6 +267,28 @@ def estimate_gamma_delay(series):
     pdf_fitted = stats.gamma.pdf(x, *(fit_alpha, fit_loc, fit_beta))
     pdf_list = [str(i) for i in pdf_fitted.tolist()]
     return "|".join(pdf_list)
+
+def finite_mixture_dist(series_dist, series_weights, sep):
+    '''
+    Take sin a series
+    Returns the probability distribution of a random variable that is derived from a collection of other random variables
+    by calculating an weighted average bin by bin of the histogram. 
+    '''
+    dists = list(series_dist)
+    dists_list = [set(i.split(sep)) for i in dists]
+    df_dist = pd.DataFrame(dists_list)
+
+    if df_dist.shape[0] != len(weights.values):
+        raise Exception("The number of distributions and number of weights do not match.")
+    df_dist["weights"] = series_weights.values
+    
+    mixed_dist = []
+    for col in df_dist.columns:
+        mixed_val = (df_dist[col] * df_dist["weights"]).sum() / sales["weights"].sum()
+        mixed_dist.append(mixed_val)
+        
+    return "|".join(mixed_dist)
+    
 
 def merge_geometry(series):
     
