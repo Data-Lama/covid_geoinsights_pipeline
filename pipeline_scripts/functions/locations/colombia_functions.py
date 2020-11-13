@@ -105,7 +105,7 @@ class Unifier(GenericUnifier):
 		Loads the cases downloaded from: https://www.datos.gov.co/
 		https://www.datos.gov.co/api/views/gt2j-8ykr/rows.csv?accessType=DOWNLOAD
 		'''
-		aggl_scheme = pd.read_csv(os.path.join(self.unified_folder, "aggl_scheme.csv"))
+
 		file_name = os.path.join(self.raw_folder, 'cases', self.get('cases_file_name'))
 
 		cols = {}
@@ -122,15 +122,10 @@ class Unifier(GenericUnifier):
 		df = pd.read_csv(file_name, parse_dates = ['Fecha de diagnóstico','Fecha de inicio de síntomas','Fecha de muerte','Fecha de recuperación'], date_parser = lambda x: pd.to_datetime(x, errors="coerce", dayfirst = dayfirst), low_memory = False)
 		df = df.rename(columns=cols)
 
-		# Adds delay
-		df["attr_time_delay"] = df["DIAG"] - df["FIS"]
-		df.dropna(subset = ['DIAG', 'attention', 'attr_time_delay'], inplace = True)
-		df["attr_time_delay"] = df["attr_time_delay"].astype('timedelta64[D]').astype(int)
-		df = df.loc[(df["attr_time_delay"] > 0) & (df["attr_time_delay"] <= 60)].copy()
-
 		# Rounds to day
 		df['date_time'] = df['DIAG'].dt.round('D')
 		df.geo_id = df.geo_id.apply(str).astype(str)
+		df.set_index(["date_time", "geo_id"], inplace=True)
 
 		df['num_cases'] = 1
 		df.loc[df.attention == 'Fallecido', 'num_diseased'] = 1
@@ -141,37 +136,59 @@ class Unifier(GenericUnifier):
 		df['num_infected'] = df.num_infected_in_hospital + df.num_infected_in_house
 
 		# Unifies
-		
-		# Calculates attr_time-delay_union
-		groupby_cols = ['geo_id']
-		agglomerate_cols = ['attr_time_delay']
-
-		df_aggr = attr_agg.agglomerate(df, aggl_scheme, groupby_cols, agglomerate_cols)
-		df_aggr.rename(columns={"attr_time_delay": "attr_time-delay_union"}, inplace=True)
-
 
 		# Groups by date and geoi_id to save space
+		df.reset_index(inplace=True)
 		df = df[['date_time', 'geo_id','num_cases','num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house']].copy()				
 		df = df.groupby(['date_time', 'geo_id']).sum().reset_index()
-		
-		# Adds the attr_time-delay_union
-		df = df.merge(df_aggr, on=['geo_id'])
-		
 
 		# Adds lat and lon from the polyfons of the shapefile
 		polygons_final = self.build_polygons()
 		polygons_final = polygons_final[['poly_id', 'poly_lon', 'poly_lat', 'poly_name']].rename(columns = {'poly_id':'geo_id', 'poly_lon':'lon', 'poly_lat':'lat', 'poly_name':'location'})
-
 		df = df.merge(polygons_final, on = 'geo_id', how = 'right')
 		df.loc[df.date_time.isna(), 'date_time'] = df.date_time.min()
 		df.fillna(0, inplace = True)
-		df = df[['date_time','geo_id','location','lon','lat', 'num_cases', 'num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house', 'attr_time-delay_union']]
+		df = df[['date_time','geo_id','location','lon','lat', 'num_cases', 'num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house']]
 
 		return(df)	
 
 
 
 	def build_polygons(self):
+
+		# Load cases and agglomeration scheme to build time delay per polygon
+		'''
+		Loads the cases downloaded from: https://www.datos.gov.co/
+		https://www.datos.gov.co/api/views/gt2j-8ykr/rows.csv?accessType=DOWNLOAD
+		'''
+		aggl_scheme = pd.read_csv(os.path.join(self.unified_folder, "aggl_scheme.csv"))
+		file_name = os.path.join(self.raw_folder, 'cases', self.get('cases_file_name'))
+
+		cols = {}
+		cols['ID de caso'] = 'ID' 
+		cols['Código DIVIPOLA municipio'] = 'geo_id'		
+		cols['Ubicación del caso'] = 'attention'
+		cols[FIS_COLUMN] = 'FIS'
+		cols[DATE_DEATH_COLUMN] = 'date_death'
+		cols[DIAG_COLUMN] = 'DIAG'
+		cols[DATE_RECOVERED_COLUMN] = 'date_recovered'
+		cols[DATE_REPORTED_WEB] = 'date_reported_web'
+        
+		df = pd.read_csv(file_name, parse_dates = ['Fecha de diagnóstico','Fecha de inicio de síntomas','Fecha de muerte','Fecha de recuperación'], date_parser = lambda x: pd.to_datetime(x, errors="coerce", dayfirst = dayfirst), low_memory = False)
+		df = df.rename(columns=cols)
+
+		# Adds delay
+		df["attr_time_delay"] = df["DIAG"] - df["FIS"]
+		df.dropna(subset = ['DIAG', 'attention', 'attr_time_delay'], inplace = True)
+		df["attr_time_delay"] = df["attr_time_delay"].astype('timedelta64[D]').astype(int)
+		df = df.loc[(df["attr_time_delay"] > 0) & (df["attr_time_delay"] <= 60)].copy()
+
+		# Calculates attr_time-delay_union
+		groupby_cols = ['geo_id']
+		agglomerate_cols = ['attr_time_delay']
+
+		df_aggr = attr_agg.agglomerate(df, aggl_scheme, groupby_cols, agglomerate_cols)
+		df_aggr.rename(columns={"attr_time_delay": "attr_time-delay_union"}, inplace=True)
 
 		# Loads the data
 		shape_file = os.path.join(self.raw_folder, 'geo', self.get('shape_file_name'))
@@ -183,7 +200,6 @@ class Unifier(GenericUnifier):
 		# Polygons
 		polygons = polygons[['Codigo_Dan','Shape_Area','geometry','Total_2018']].rename(columns = {'Codigo_Dan':'poly_id','Shape_Area':'attr_area', 'Total_2018': 'attr_population' })
 		polygons.poly_id = polygons.poly_id.astype(int)
-
 
 		# Polygon Info
 		polygons_info['poly_name'] = polygons_info.apply(lambda row: '{}-{}'.format(row.muni_name, row.dep_name), axis = 1)
@@ -198,9 +214,13 @@ class Unifier(GenericUnifier):
 		# Adjusts geometry  to latiude and longitud
 		polygons_final = polygons_final.to_crs('epsg:4326')
 
-
 		# Converts to string
 		polygons_final['poly_id'] = polygons_final['poly_id'].astype(str)
+
+		# Adds time-delay to polygons_final
+		df_aggr['geo_id'] = df_aggr['geo_id'].astype(str)
+		polygons_final = polygons_final.merge(df_aggr[['geo_id', 'attr_time-delay_union']], left_on="poly_id", right_on="geo_id", how="outer")
+		polygons_final.drop(columns="geo_id", inplace=True)
 
 		# Manually adjusts adjusts Bogota
 		polygons_final.loc[polygons_final.poly_id == '11001', 'poly_lon'] = -74.0939301
@@ -213,7 +233,6 @@ class Unifier(GenericUnifier):
 		# Manually adjusts Valledupar
 		polygons_final.loc[polygons_final.poly_id == '20001', 'poly_lon'] = -73.2548254
 		polygons_final.loc[polygons_final.poly_id == '20001', 'poly_lat'] = 10.4686143			
-
 
 		return(polygons_final)
 
