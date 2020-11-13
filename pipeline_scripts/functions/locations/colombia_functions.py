@@ -220,6 +220,7 @@ class Unifier(GenericUnifier):
 		# Adds time-delay to polygons_final
 		df_aggr['geo_id'] = df_aggr['geo_id'].astype(str)
 		polygons_final = polygons_final.merge(df_aggr[['geo_id', 'attr_time-delay_union']], left_on="poly_id", right_on="geo_id", how="outer")
+		polygons_final.dropna(subset=["poly_id"], inplace=True)
 		polygons_final.drop(columns="geo_id", inplace=True)
 
 		# Manually adjusts adjusts Bogota
