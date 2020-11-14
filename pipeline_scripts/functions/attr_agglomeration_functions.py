@@ -140,6 +140,8 @@ def get_corresponding_function(function_declaration):
                                     "null_handling":"drop_na",
                                     "fill_null":""},
                       'attr_weighted_average': {},
+                      'attr_dist_mix_weighted': {"sep": "|"},
+                      'attr_dist_mix': {"sep": "|"},
                     }
     
 
@@ -208,12 +210,20 @@ def get_corresponding_function(function_declaration):
         fun = lambda s : estimate_gamma_delay(s)
         return(fun)
     
-    if name == 'attr_time-delay_dist_mix':
+    if name == 'attr_dist_mix_weighted':
+        input_params = function_declaration['aggl_parameters'].split(";")
+        params = get_params(default_params[name], input_params)
         weight = function_declaration['secondary_attr']
         attr = function_declaration['attr_name']
-        fun = lambda df : finite_mixture_dist(df[attr], df[weight], params["sep"])
+        fun = lambda df : weighted_finite_mixture_dist(df[attr], df[weight], params["sep"])
         return(fun)
     
+    if name == 'attr_dist_mix':
+        input_params = function_declaration['aggl_parameters'].split(";")
+        params = get_params(default_params[name], input_params)
+        fun = lambda s : finite_mixture_dist(s, params["sep"])
+        return(fun)
+
     if name == "merge_geometry":
         
         fun = lambda s : merge_geometry(s)
@@ -268,7 +278,7 @@ def estimate_gamma_delay(series):
     pdf_list = [str(i) for i in pdf_fitted.tolist()]
     return "|".join(pdf_list)
 
-def finite_mixture_dist(series_dist, series_weights, sep):
+def weighted_finite_mixture_dist(series_dist, series_weights, sep):
     '''
     Take sin a series
     Returns the probability distribution of a random variable that is derived from a collection of other random variables
@@ -278,14 +288,27 @@ def finite_mixture_dist(series_dist, series_weights, sep):
     dists_list = [set(i.split(sep)) for i in dists]
     df_dist = pd.DataFrame(dists_list)
 
-    if df_dist.shape[0] != len(weights.values):
+    if df_dist.shape[0] != len(series_weights.values):
         raise Exception("The number of distributions and number of weights do not match.")
     df_dist["weights"] = series_weights.values
     
     mixed_dist = []
     for col in df_dist.columns:
-        mixed_val = (df_dist[col] * df_dist["weights"]).sum() / sales["weights"].sum()
+        mixed_val = (df_dist[col] * df_dist["weights"]).sum() / df_dist["weights"].sum()
         mixed_dist.append(mixed_val)
+        
+    return "|".join(mixed_dist)
+
+def finite_mixture_dist(series_dist, sep):
+    '''
+    Take sin a series
+    Returns the probability distribution of a random variable that is derived from a collection of other random variables
+    by calculating an average bin by bin of the histogram. 
+    '''
+    dists = list(series_dist)
+    dists_list = [set(i.split(sep)) for i in dists]
+    df_dist = pd.DataFrame(dists_list)
+    mixed_dist = list(df_dist.mean())
         
     return "|".join(mixed_dist)
     

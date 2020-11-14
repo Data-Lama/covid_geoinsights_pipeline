@@ -188,7 +188,7 @@ class Unifier(GenericUnifier):
 		agglomerate_cols = ['attr_time_delay']
 
 		df_aggr = attr_agg.agglomerate(df, aggl_scheme, groupby_cols, agglomerate_cols)
-		df_aggr.rename(columns={"attr_time_delay": "attr_time-delay_union"}, inplace=True)
+		df_aggr.rename(columns={"attr_time_delay": "attr_time-delay_dist_mix"}, inplace=True)
 
 		# Loads the data
 		shape_file = os.path.join(self.raw_folder, 'geo', self.get('shape_file_name'))
@@ -219,7 +219,7 @@ class Unifier(GenericUnifier):
 
 		# Adds time-delay to polygons_final
 		df_aggr['geo_id'] = df_aggr['geo_id'].astype(str)
-		polygons_final = polygons_final.merge(df_aggr[['geo_id', 'attr_time-delay_union']], left_on="poly_id", right_on="geo_id", how="outer")
+		polygons_final = polygons_final.merge(df_aggr[['geo_id', 'attr_time-delay_dist_mix']], left_on="poly_id", right_on="geo_id", how="outer")
 		polygons_final.dropna(subset=["poly_id"], inplace=True)
 		polygons_final.drop(columns="geo_id", inplace=True)
 

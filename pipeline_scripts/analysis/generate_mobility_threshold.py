@@ -51,18 +51,23 @@ cases_path        = os.path.join(agglomerated_path, 'cases.csv')
 mov_range_path    = os.path.join(agglomerated_path, 'movement_range.csv')
 polygons_path     = os.path.join(agglomerated_path, 'polygons.csv')
 
-time_delay_path = os.path.join(data_dir, "data_stages", location_name, "unified", "cases.csv")
+# time_delay_path = os.path.join(data_dir, "data_stages", location_name, "unified", "cases.csv")
 
-df_time_delay = pd.read_csv(time_delay_path, parse_dates=["date_time"])
-df_time_delay["attr_time-delay_union"] = df_time_delay.apply(lambda x: np.fromstring(x["attr_time-delay_union"], sep="|"), axis=1)
+# df_time_delay = pd.read_csv(time_delay_path, parse_dates=["date_time"])
+# df_time_delay["attr_time-delay_union"] = df_time_delay.apply(lambda x: np.fromstring(x["attr_time-delay_union"], sep="|"), axis=1)
 
-df_time_delay = df_time_delay.rename(columns={'geo_id': 'poly_id'})
-df_cases_diag = df_time_delay[["date_time", "poly_id", "num_cases"]]
+# df_time_delay = df_time_delay.rename(columns={'geo_id': 'poly_id'})
+# df_cases_diag = df_time_delay[["date_time", "poly_id", "num_cases"]]
 
 # Load dataframes
 df_mov_ranges = pd.read_csv(mov_range_path, parse_dates=["date_time"])
 df_cases      = pd.read_csv(cases_path, parse_dates=["date_time"])
 df_polygons   = pd.read_csv(polygons_path)
+df_cases_diag = df_cases[["date_time", "poly_id", "num_cases"]]
+
+# Loads time-delay
+df_polygons["attr_time-delay_dist_mix"] = df_polygons.apply(lambda x: np.fromstring(x["attr_time-delay_dist_mix"], sep="|"), axis=1)
+df_time_delay = df_polygons[["poly_id", "attr_time-delay_dist_mix"]]
 
 # Add polygon names
 df_mov_ranges = df_mov_ranges.merge(df_polygons[["poly_name", "poly_id"]], on="poly_id", how="outer").dropna()
@@ -99,9 +104,9 @@ for poly_id in df_mov_ranges.poly_id.unique():
     all_cases_id = df_cases_diag_id['num_cases'].sum()
 
     try:
-        p_delay      = df_time_delay.loc[poly_id]['attr_time-delay_union'].iloc[0]
+        p_delay      = df_time_delay.loc[poly_id]['attr_time-delay_dist_mix'].iloc[0]
     except: 
-        p_delay      = df_time_delay.loc[DEFAULT_DELAY_DIST]['attr_time-delay_union'].iloc[0]
+        p_delay      = df_time_delay.loc[DEFAULT_DELAY_DIST]['attr_time-delay_dist_mix'].iloc[0]
 
     path_to_save_tr = os.path.join(output_folder, 'MCMC', str(poly_id) )
 
@@ -159,9 +164,9 @@ df_mov_poly_id   = df_mov_ranges[["date_time", "poly_id", "movement_change"]].so
 df_cases_diag_id = df_cases_diag[["date_time", "num_cases"]].copy()
 all_cases_id     = df_cases_diag_id.num_cases.sum()
 try:
-    p_delay      = df_time_delay.loc[poly_id]['attr_time-delay_union'].iloc[0]
+    p_delay      = df_time_delay.loc[poly_id]['attr_time-delay_dist_mix'].iloc[0]
 except: 
-    p_delay      = df_time_delay.loc[DEFAULT_DELAY_DIST]['attr_time-delay_union'].iloc[0]
+    p_delay      = df_time_delay.loc[DEFAULT_DELAY_DIST]['attr_time-delay_dist_mix'].iloc[0]
 
 if all_cases_id > 100:
     df_mov_poly_id.set_index("date_time", inplace=True)
