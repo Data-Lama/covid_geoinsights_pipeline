@@ -305,11 +305,14 @@ def finite_mixture_dist(series_dist, sep):
     Returns the probability distribution of a random variable that is derived from a collection of other random variables
     by calculating an average bin by bin of the histogram. 
     '''
+    series_dist = series_dist.dropna()
     dists = list(series_dist)
     dists_list = [set(i.split(sep)) for i in dists]
     df_dist = pd.DataFrame(dists_list)
-    mixed_dist = list(df_dist.mean())
-        
+    df_dist = df_dist.astype('float').dropna()
+    if df_dist.empty:
+        return ""
+    mixed_dist = df_dist.mean().astype('str')
     return "|".join(mixed_dist)
     
 

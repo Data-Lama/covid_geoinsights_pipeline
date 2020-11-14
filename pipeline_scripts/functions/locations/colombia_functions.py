@@ -243,12 +243,12 @@ class Unifier(GenericUnifier):
 		aggl_scheme["^attr.*wvg-pop$"] = ["attr_weighted_average", "attr_population",""]
 		aggl_scheme["^attr.*time_delay$"] = ["estimate_gamma_delay", "", ""]
 		aggl_scheme["attr_area"] = ["attr_addition", "", ""]
+		aggl_scheme["^attr.*dist_mix$"] = ["attr_dist_mix", "", "sep=|"]
 		aggl_scheme["geometry"] = ["merge_geometry", "", ""]
 		aggl_scheme["poly_name"] = ["attr_with_max", "attr_population",""]
 		aggl_scheme["poly_lat"] = ["attr_with_max", "attr_population",""]
 		aggl_scheme["poly_lon"] = ["attr_with_max", "attr_population",""]
 
-		
 		return aggl_scheme
 
 
