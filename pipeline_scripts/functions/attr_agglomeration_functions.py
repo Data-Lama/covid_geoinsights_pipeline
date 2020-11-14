@@ -266,14 +266,21 @@ def attr_intersection(series, sep):
     return intersection
 
 def estimate_gamma_delay(series):
+    '''
+    sires = [1dia, 2dia, ..., 60 dia ]
+    Returns the probability distribution of a random variable that is derived from a collection of other random variables
+    by calculating an weighted average bin by bin of the histogram. 
+    '''    
     try:
         fit_alpha, fit_loc, fit_beta = stats.gamma.fit(series, floc = -1)
     except ValueError:
         return np.nan
+
     mean_g =  fit_alpha*fit_beta
     var_g  = fit_alpha*fit_beta**2
 
-    x = np.linspace(-1, series.max(), 61)
+    x = np.arange(-1, 61, 1)
+
     pdf_fitted = stats.gamma.pdf(x, *(fit_alpha, fit_loc, fit_beta))
     pdf_list = [str(i) for i in pdf_fitted.tolist()]
     return "|".join(pdf_list)
