@@ -20,7 +20,7 @@ analysis_dir = config.get_property('analysis_dir')
 
 # Reads the parameters from excecution
 location_name  =  sys.argv[1] # location name
-location_folder =  sys.argv[2] # agglomeration method
+agglomeration_method =  sys.argv[2] # agglomeration method
 
 if len(sys.argv) <= 3:
 	selected_polygons_boolean = False
@@ -70,8 +70,8 @@ COLORS_ = {'#b30000':'ROJO',
 '#d4d4d4':'BLANCO'}
 
 # Get name of files
-agglomerated_file_path = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', location_folder)
-output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'alerts')
+agglomerated_file_path = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', agglomeration_method)
+output_file_path = os.path.join(analysis_dir, location_name, agglomeration_method, 'alerts')
 cases = os.path.join(agglomerated_file_path, 'cases.csv')
 movement_range = os.path.join(agglomerated_file_path, 'movement_range.csv')
 movement = os.path.join(agglomerated_file_path, 'movement.csv')
@@ -85,17 +85,14 @@ shape_file_path = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'g
 
 # If polygon_union_wrapper
 if selected_polygons_boolean:
-    rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", selected_polygon_name)
-    time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', selected_polygon_name)
-    threshold = os.path.join(analysis_dir, location_name, location_folder, "r_t", selected_polygon_name, "mobility_thresholds.csv")
-elif location_folder == "geometry":
-    time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', "entire_location")
-    rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", "entire_location")
-    threshold = os.path.join(analysis_dir, location_name, "community", "r_t", "entire_location", "mobility_thresholds.csv")
+    rt = os.path.join(analysis_dir, location_name, agglomeration_method, "r_t", selected_polygon_name)
+    time_window_file_path = os.path.join(analysis_dir, location_name, agglomeration_method, 'polygon_info_window', selected_polygon_name)
+    threshold = os.path.join(analysis_dir, location_name, agglomeration_method, "mobility_threshold", selected_polygon_name, "mobility_thresholds.csv")
 else:
-    time_window_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window', "entire_location")
-    rt = os.path.join(analysis_dir, location_name, location_folder, "r_t", "entire_location")
-    threshold = os.path.join(analysis_dir, location_name, location_folder, "r_t", "entire_location", "mobility_thresholds.csv")
+    time_window_file_path = os.path.join(analysis_dir, location_name, agglomeration_method, 'polygon_info_window', "entire_location")
+    # To improve number of polygons with calculated RT use community rts
+    rt = os.path.join(analysis_dir, location_name, "community", "r_t", "entire_location")
+    threshold = os.path.join(analysis_dir, location_name, "community", "mobility_threshold", "entire_location", "mobility_thresholds.csv")
 
 total_window = os.path.join(time_window_file_path, 'deltas_forward_window_5days.csv')
 
@@ -302,7 +299,7 @@ def set_movement_range_alert(mov_range, threshold):
 # ---------------------------------------- #
 
 # Expand rt and thresholds to geometries
-if location_folder == "geometry" and not selected_polygons_boolean:
+if agglomeration_method == "geometry" and not selected_polygons_boolean:
     df_community.set_index("poly_id", inplace=True)
     #RT
     df_rt_geometry = pd.DataFrame({"poly_id":df_community.index})

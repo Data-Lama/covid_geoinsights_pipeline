@@ -66,6 +66,7 @@ df_polygons   = pd.read_csv(polygons_path)
 df_cases_diag = df_cases[["date_time", "poly_id", "num_cases"]]
 
 # Loads time-delay
+df_polygons["attr_time-delay_dist_mix"] = df_polygons["attr_time-delay_dist_mix"].fillna("")
 df_polygons["attr_time-delay_dist_mix"] = df_polygons.apply(lambda x: np.fromstring(x["attr_time-delay_dist_mix"], sep="|"), axis=1)
 df_time_delay = df_polygons[["poly_id", "attr_time-delay_dist_mix"]]
 
@@ -77,18 +78,13 @@ if selected_polygons_boolean:
     df_cases      = df_cases[ df_cases["poly_id"].isin(selected_polygons)]
     df_cases_diag = df_cases_diag[df_cases_diag["poly_id"].isin(selected_polygons)]
     df_polygons   = df_polygons[df_polygons["poly_id"].isin(selected_polygons)]
-    output_folder = os.path.join(analysis_dir, location_name, agglomeration_folder, "r_t", selected_polygon_name)
+    output_folder = os.path.join(analysis_dir, location_name, agglomeration_folder, "mobility_threshold", selected_polygon_name)
 else:
-    output_folder = os.path.join(analysis_dir, location_name, agglomeration_folder, "r_t", "entire_location")
+    output_folder = os.path.join(analysis_dir, location_name, agglomeration_folder, "mobility_threshold", "entire_location")
 
 # Check if folder exists
 if not os.path.isdir(output_folder):
         os.makedirs(output_folder)
-
-# Get time delay
-print(f"    Extracts time delay per polygon")
-time_delays = {}
-df_time_delay.set_index("poly_id", inplace=True)
 
 # Loop over polygons to run model and calculate thresholds
 print(f"    Runs model and calculates mobility thresholds")
@@ -96,6 +92,10 @@ df_mob_thresholds            = pd.DataFrame(columns =['poly_id', 'R0', 'Beta', '
 df_mob_thresholds['poly_id'] = list(df_mov_ranges.poly_id.unique())+['aggregated']
 df_mob_thresholds            = df_mob_thresholds.set_index('poly_id')
 
+
+# Get time delay
+print(f"    Extracts time delay per polygon")
+time_delays = {}
 for poly_id in df_mov_ranges.poly_id.unique():
 
     df_mov_poly_id   = df_mov_ranges[df_mov_ranges['poly_id'] == poly_id][["date_time", "poly_id", "movement_change"]].sort_values("date_time").copy()
@@ -104,9 +104,9 @@ for poly_id in df_mov_ranges.poly_id.unique():
     all_cases_id = df_cases_diag_id['num_cases'].sum()
 
     try:
-        p_delay      = df_time_delay.loc[poly_id]['attr_time-delay_dist_mix'].iloc[0]
+        p_delay      = df_time_delay.set_index("poly_id").at[poly_id, 'attr_time-delay_dist_mix']
     except: 
-        p_delay      = df_time_delay.loc[DEFAULT_DELAY_DIST]['attr_time-delay_dist_mix'].iloc[0]
+        p_delay      = df_time_delay.set_index("poly_id").at[DEFAULT_DELAY_DIST, 'attr_time-delay_dist_mix']
 
     path_to_save_tr = os.path.join(output_folder, 'MCMC', str(poly_id) )
 
