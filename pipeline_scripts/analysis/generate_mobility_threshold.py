@@ -92,6 +92,8 @@ df_mob_thresholds            = pd.DataFrame(columns =['poly_id', 'R0', 'Beta', '
 df_mob_thresholds['poly_id'] = list(df_mov_ranges.poly_id.unique())+['aggregated']
 df_mob_thresholds            = df_mob_thresholds.set_index('poly_id')
 
+# Get aggregated time-delay
+agg_p_delay = pd.DataFrame(list(df_time_delay['attr_time-delay_dist_mix'])).mean().to_numpy()
 
 # Get time delay
 print(f"    Extracts time delay per polygon")
@@ -105,8 +107,12 @@ for poly_id in df_mov_ranges.poly_id.unique():
 
     try:
         p_delay      = df_time_delay.set_index("poly_id").at[poly_id, 'attr_time-delay_dist_mix']
-    except: 
-        p_delay      = df_time_delay.set_index("poly_id").at[DEFAULT_DELAY_DIST, 'attr_time-delay_dist_mix']
+        if p_delay.empty:
+            p_delay      = agg_p_delay
+    except:
+        p_delay      = agg_p_delay
+#         p_delay      = df_time_delay.set_index("poly_id").at[DEFAULT_DELAY_DIST, 'attr_time-delay_dist_mix']
+
 
     path_to_save_tr = os.path.join(output_folder, 'MCMC', str(poly_id) )
 
@@ -139,7 +145,13 @@ for poly_id in df_mov_ranges.poly_id.unique():
         mt           = mt_resampled.rolling(7).mean(std=2).fillna(0)
         mt[mt==0]    = mt_resampled[mt==0] 
         mt           = mt.rolling(7).mean(std=2).fillna(0)
-        mt[mt==0]    = mt_resampled[mt==0] 
+        mt[mt==0]    = mt_resampled[mt==0]
+        if mt.empty:
+            dict_result = {'poly_id': poly_id}
+            df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
+            df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
+            df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
+            continue
         mt           = (mt-mt.values.min())/(mt.values.max()-mt.values.min())
 
         min_date = max(min(mt.index.values), min(onset.index.values))
@@ -163,17 +175,13 @@ for poly_id in df_mov_ranges.poly_id.unique():
 df_mov_poly_id   = df_mov_ranges[["date_time", "poly_id", "movement_change"]].sort_values("date_time").copy()
 df_cases_diag_id = df_cases_diag[["date_time", "num_cases"]].copy()
 all_cases_id     = df_cases_diag_id.num_cases.sum()
-try:
-    p_delay      = df_time_delay.loc[poly_id]['attr_time-delay_dist_mix'].iloc[0]
-except: 
-    p_delay      = df_time_delay.loc[DEFAULT_DELAY_DIST]['attr_time-delay_dist_mix'].iloc[0]
 
 if all_cases_id > 100:
     df_mov_poly_id.set_index("date_time", inplace=True)
     df_cases_diag_id.set_index("date_time", inplace=True)
     
     df_cases_diag_id = df_cases_diag_id.resample('D').sum().fillna(0)
-    df_cases_diag_id = confirmed_to_onset(df_cases_diag_id, p_delay, "num_cases", min_onset_date=None)
+    df_cases_diag_id = confirmed_to_onset(df_cases_diag_id, agg_p_delay, "num_cases", min_onset_date=None)
 
     min_date = max(min(df_mov_poly_id.index.values), min(df_cases_diag_id.index.values))
     max_date = min(max(df_mov_poly_id.index.values), max(df_cases_diag_id.index.values))
@@ -191,24 +199,30 @@ if all_cases_id > 100:
     mt[mt==0]    = mt_resampled[mt==0] 
     mt           = mt.rolling(7).mean(std=2).fillna(0)
     mt[mt==0]    = mt_resampled[mt==0] 
-    mt           = (mt-mt.values.min())/(mt.values.max()-mt.values.min())
+    if mt.empty:
+        dict_result = {'poly_id': "aggregated"}
+        df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
+        df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
+        df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
+    else:
+        mt           = (mt-mt.values.min())/(mt.values.max()-mt.values.min())
 
-    min_date = max(min(mt.index.values), min(onset.index.values))
-    max_date = min(max(mt.index.values), max(onset.index.values))
-    
-    onset = onset.loc[min_date:max_date]
-    onset = onset.resample('1D').sum().fillna(0)
-    mt    = mt.loc[min_date:max_date]
+        min_date = max(min(mt.index.values), min(onset.index.values))
+        max_date = min(max(mt.index.values), max(onset.index.values))
 
-    if not os.path.isdir(path_to_save_tr):
-        os.makedirs(path_to_save_tr)
+        onset = onset.loc[min_date:max_date]
+        onset = onset.resample('1D').sum().fillna(0)
+        mt    = mt.loc[min_date:max_date]
 
-    dict_result = estimate_mob_th(mt, onset+1, 'aggregated', os.path.join(path_to_save_tr, 'mob_th_trace.pymc3.pkl'))
-    df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
-    df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
-    df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']
+        if not os.path.isdir(path_to_save_tr):
+            os.makedirs(path_to_save_tr)
+
+        dict_result = estimate_mob_th(mt, onset+1, 'aggregated', os.path.join(path_to_save_tr, 'mob_th_trace.pymc3.pkl'))
+        df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
+        df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
+        df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']
 else:
-    dict_result = {'poly_id': poly_id}
+    dict_result = {'poly_id': "aggregated"}
     df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
     df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
     df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
