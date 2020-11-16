@@ -10,7 +10,8 @@ import pickle
 import warnings
 
 import logging
-logger = logging.getLogger("pymc3")
+logger = logging.getLogger('pymc3')
+logger.setLevel(logging.ERROR)
 logger.propagate = False
 warnings.filterwarnings("ignore")
 warnings.simplefilter("ignore")
@@ -107,7 +108,7 @@ for poly_id in df_mov_ranges.poly_id.unique():
 
     try:
         p_delay      = df_time_delay.set_index("poly_id").at[poly_id, 'attr_time-delay_dist_mix']
-        if p_delay.empty:
+        if p_delay.size == 0:
             p_delay      = agg_p_delay
     except:
         p_delay      = agg_p_delay
@@ -226,5 +227,6 @@ else:
     df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
     df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
     df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
-
+    
+print(f"    Writes thresholds to file.")
 df_mob_thresholds.to_csv( os.path.join( output_folder ,'mobility_thresholds.csv'))
