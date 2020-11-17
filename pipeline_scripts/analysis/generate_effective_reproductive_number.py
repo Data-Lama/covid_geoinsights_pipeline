@@ -188,6 +188,11 @@ if not selected_polygons_boolean:
 
             df_poly_id = prepare_cases(df_poly_id, col='num_cases', cutoff=0)
             min_time = df_poly_id.index[0]
+            
+            # Print plots for capitals
+            if str(poly_id)[-3:] == "001":
+                path_to_save = os.path.join(export_folder_location, str(poly_id)+'_Rt.png')
+                (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'smoothed_num_cases' , key_df='date', pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
 
             result.to_csv(os.path.join(export_folder_location, str(poly_id)+'_Rt.csv'))
             plt.close()
