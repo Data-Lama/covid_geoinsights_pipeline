@@ -52,14 +52,6 @@ cases_path        = os.path.join(agglomerated_path, 'cases.csv')
 mov_range_path    = os.path.join(agglomerated_path, 'movement_range.csv')
 polygons_path     = os.path.join(agglomerated_path, 'polygons.csv')
 
-# time_delay_path = os.path.join(data_dir, "data_stages", location_name, "unified", "cases.csv")
-
-# df_time_delay = pd.read_csv(time_delay_path, parse_dates=["date_time"])
-# df_time_delay["attr_time-delay_union"] = df_time_delay.apply(lambda x: np.fromstring(x["attr_time-delay_union"], sep="|"), axis=1)
-
-# df_time_delay = df_time_delay.rename(columns={'geo_id': 'poly_id'})
-# df_cases_diag = df_time_delay[["date_time", "poly_id", "num_cases"]]
-
 # Load dataframes
 df_mov_ranges = pd.read_csv(mov_range_path, parse_dates=["date_time"])
 df_cases      = pd.read_csv(cases_path, parse_dates=["date_time"])
@@ -112,7 +104,6 @@ for poly_id in df_mov_ranges.poly_id.unique():
             p_delay      = agg_p_delay
     except:
         p_delay      = agg_p_delay
-#         p_delay      = df_time_delay.set_index("poly_id").at[DEFAULT_DELAY_DIST, 'attr_time-delay_dist_mix']
 
 
     path_to_save_tr = os.path.join(output_folder, 'MCMC', str(poly_id) )
