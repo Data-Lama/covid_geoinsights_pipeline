@@ -24,6 +24,7 @@ df_export_files = pd.read_csv(export_file)
 # Get countries
 countries = list(selected_polygons["location_name"].unique())
 
+
 # Graphs
 def graph_indicators(files):
     data = pd.DataFrame(columns=["vars", "Nacional"]).set_index(["vars", "Nacional"])
