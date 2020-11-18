@@ -10,6 +10,8 @@ from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
+# Constants
+indent = "\t"
 
 # import scripts
 from pipeline_scripts.functions.adjust_cases_observations_function import prepare_cases, adjust_onset_for_right_censorship, confirmed_to_onset
@@ -27,24 +29,29 @@ countries = list(selected_polygons["location_name"].unique())
 
 # Get polygons per country to avoid loading data over and over 
 for idx, r in selected_polygons.iterrows():
-    idx, r = next(iter(selected_polygons.iterrows()))
+    print(indent + indent + f"{r['location_name']}." + f" {r['poly_id']}.", end="\r")
 
     export_folder_location = os.path.join(analysis_dir, r['location_name'],  r['agglomeration'], 'r_t', 'entire_location')
 
     # Get cases
-    df_cases = pd.read_csv( os.path.join(data_dir, 'data_stages', r['location_name'], 'agglomerated', r['agglomeration'], 'cases.csv'), index_col='poly_id')
-    df_poly_id = df_cases.loc[r['poly_id']]
+    df_cases = pd.read_csv( os.path.join(data_dir, 'data_stages', r['location_name'], 'agglomerated', r['agglomeration'], 'cases.csv'), index_col='poly_id', parse_dates=['date_time'])
+    df_poly_id = df_cases.loc[r['poly_id']].reset_index()
 
     all_cases = df_poly_id['num_cases'].sum()
 
     if all_cases > 100:
 
         df_polygons   = pd.read_csv( os.path.join(data_dir, 'data_stages', r['location_name'], 'agglomerated',r['agglomeration'] ,  "polygons.csv"), index_col='poly_id')
-        df_polygons = df_polygons.loc[r['poly_id']]
+        try: 
+            df_polygons = df_polygons.loc[r['poly_id']]
+            p_delay = np.fromstring(df_polygons["attr_time-delay_dist_mix"], sep="|")
+        except:
+            df_polygons["attr_time-delay_dist_mix"] = df_polygons["attr_time-delay_dist_mix"].fillna("")
+            df_polygons["attr_time_delay"] = df_polygons.apply(lambda x: np.fromstring(x["attr_time-delay_dist_mix"], sep="|"), axis=1)
+            p_delay = pd.DataFrame(list(df_polygons['attr_time_delay'])).mean().to_numpy()
 
-        p_delay = np.fromstring(df_polygons["attr_time-delay_dist_mix"], sep="|")
-        df_poly_id['date_time'] = pd.to_datetime( df_poly_id['date_time'] )
-
+        
+        df_poly_id['date_time'] =   pd.to_datetime(df_poly_id['date_time'])
         df_poly_id = df_poly_id.reset_index().set_index('date_time').resample('D').sum().fillna(0)
         df_poly_id = confirmed_to_onset(df_poly_id['num_cases'], p_delay, min_onset_date=None)
 
