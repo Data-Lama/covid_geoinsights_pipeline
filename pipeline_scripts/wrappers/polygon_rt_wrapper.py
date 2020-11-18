@@ -27,6 +27,9 @@ df_export_files = pd.read_csv(export_file)
 # Get countries
 countries = list(selected_polygons["location_name"].unique())
 
+skipped_polygons = []
+computed_polygons = []
+
 # Get polygons per country to avoid loading data over and over 
 for idx, r in selected_polygons.iterrows():
     print(indent + indent + f"{r['location_name']}." + f" {r['poly_id']}.", end="\r")
@@ -40,7 +43,7 @@ for idx, r in selected_polygons.iterrows():
     all_cases = df_poly_id['num_cases'].sum()
 
     if all_cases > 100:
-
+        computed_polygons.append(r['poly_id'])
         df_polygons   = pd.read_csv( os.path.join(data_dir, 'data_stages', r['location_name'], 'agglomerated',r['agglomeration'] ,  "polygons.csv"), index_col='poly_id')
         try: 
             df_polygons = df_polygons.loc[r['poly_id']]
@@ -64,4 +67,10 @@ for idx, r in selected_polygons.iterrows():
         result.to_csv(os.path.join(export_folder_location, str(r['poly_id'])+'_Rt.csv'))
         plt.close()
     else:
+        skipped_polygons.append(r['poly_id'])
         print('\nWARNING: Rt was not computed for polygon: {}'.format(r['poly_id']))
+
+print(indent + indent + f"Writting computation stats for rt.")
+with open(os.path.join(export_folder_location,'rt_computation_stats.txt'), "w") as fp:
+    fp.write(f"computed polygons: {computed_polygons}\n")
+    fp.write(f"skipped polygons: {skipped_polygons}\n")
