@@ -43,7 +43,7 @@ def mob_th_mcmcm_model(mt, onset, poly_id, path_to_save_trace=None):
             N_SAMPLES = 10000
             # Using Metropolis Hastings Sampling
             step     = pm.Metropolis(vars=[ Rt_mobility_model.beta, Rt_mobility_model.R0 ], S = np.array([ (100+100)**2 , (5-2)**2 ]), target_accept=.85,)
-            Rt_trace = pm.sample( 5000, chains=2, tune=2000, step=step )
+            Rt_trace = pm.sample( 5000, chains=2, tune=2000, step=step, progressbar=False, compute_convergence_checks=False)
 
 
         BURN_IN = 2000
