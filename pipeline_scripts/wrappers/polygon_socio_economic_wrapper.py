@@ -11,7 +11,7 @@ analysis_dir = config.get_property('analysis_dir')
 
 import general_functions as gf
 
-# import scripts
+#import scripts
 import pipeline_scripts.analysis.polygon_socio_economic_analysis as polygon_socio_economic_analysis
 
 # Import selected polygons
@@ -52,7 +52,6 @@ def graph_indicators(files):
     # ax1.scatter(data.iloc[4,1:], [5, 5, 5, 5, 5, 5, 5, 5, 5, 5], s=10, marker="s", label=data.index[5])
     plt.legend(loc='upper left')
     plt.show()
-
     # plt.scatter(data.iloc[:,1:], data.iloc[:,0])
 
     raise Exception("DONE")
