@@ -55,7 +55,7 @@ polygons_path     = os.path.join(agglomerated_path, 'polygons.csv')
 # Load dataframes
 df_mov_ranges = pd.read_csv(mov_range_path, parse_dates=["date_time"])
 df_cases      = pd.read_csv(cases_path, parse_dates=["date_time"])
-df_polygons   = pd.read_csv(polygons_path)
+df_polygons   = pd.read_csv( polygons_path )
 df_cases_diag = df_cases[["date_time", "poly_id", "num_cases"]]
 
 # Loads time-delay
@@ -184,13 +184,13 @@ if all_cases_id > 100:
 
     # Smooths cases rolilng window
     df_cases_diag_id = prepare_cases(df_cases_diag_id, col='num_cases', cutoff=0)
-
     onset        = df_onset_mcmc
     mt_resampled = df_mov_df_mcmc.resample('1D').sum()
     mt           = mt_resampled.rolling(7).mean(std=2).fillna(0)
     mt[mt==0]    = mt_resampled[mt==0] 
     mt           = mt.rolling(7).mean(std=2).fillna(0)
     mt[mt==0]    = mt_resampled[mt==0] 
+    
     if mt.empty:
         dict_result = {'poly_id': "aggregated"}
         df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan

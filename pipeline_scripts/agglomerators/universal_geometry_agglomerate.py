@@ -52,8 +52,6 @@ if not os.path.exists(agglomeration_folder):
 ident = '         '
 
 
-
-
 print(ident + 'Agglomerates for {}'.format(location_name))
 print()
 
@@ -189,8 +187,6 @@ agg_population.to_csv(os.path.join(agglomeration_folder, 'population.csv'), inde
 if agg_movement_range is not None:
 	print(ident + '      Movement Range')
 	agg_movement_range.to_csv(os.path.join(agglomeration_folder, 'movement_range.csv'), index = False)
-
-
 
 print(ident + '   Saves Statistics:')
 

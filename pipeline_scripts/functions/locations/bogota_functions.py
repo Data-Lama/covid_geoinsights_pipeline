@@ -17,8 +17,6 @@ import general_functions as gf
 #Directories
 from global_config import config
 
-
-
 class Unifier(GenericUnifier):
 	'''
 	Unifier class
@@ -27,8 +25,6 @@ class Unifier(GenericUnifier):
 	def __init__(self):
 		# Initilizes
 		GenericUnifier.__init__(self, 'Bogota', 'bogota')
-
-
 
 	def build_cases_geo(self):
 

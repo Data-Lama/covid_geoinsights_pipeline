@@ -6,8 +6,7 @@ import pdb
 import json
 import matplotlib.pyplot as plt
 from pipeline_scripts.functions.adjust_cases_observations_function import prepare_cases, adjust_onset_for_right_censorship, confirmed_to_onset
-from pipeline_scripts.functions.Rt_plot     import plot_cases_rt
-
+from pipeline_scripts.functions.Rt_plot import plot_cases_rt
 from tqdm import tqdm
 
 import warnings

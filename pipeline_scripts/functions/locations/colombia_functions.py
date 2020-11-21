@@ -1,4 +1,3 @@
-
 # Script for Colombia 
 
 # Necesary imports
@@ -18,11 +17,11 @@ import attr_agglomeration_functions as attr_agg
 
 
 # Constants
-FIS_COLUMN = 'Fecha de inicio de síntomas'
-DATE_DEATH_COLUMN = 'Fecha de muerte'
-DIAG_COLUMN = 'Fecha de diagnóstico'
+FIS_COLUMN            = 'Fecha de inicio de síntomas'
+DATE_DEATH_COLUMN     = 'Fecha de muerte'
+DIAG_COLUMN           = 'Fecha de diagnóstico'
 DATE_RECOVERED_COLUMN = 'Fecha de recuperación'
-DATE_REPORTED_WEB = 'fecha reporte web'
+DATE_REPORTED_WEB     = 'fecha reporte web'
 
 # Dates Start with day
 dayfirst = True
@@ -107,7 +106,7 @@ class Unifier(GenericUnifier):
 		'''
 
 		file_name = os.path.join(self.raw_folder, 'cases', self.get('cases_file_name'))
-
+		
 		cols = {}
 		cols['ID de caso'] = 'ID' 
 		cols['Código DIVIPOLA municipio'] = 'geo_id'		
@@ -117,7 +116,6 @@ class Unifier(GenericUnifier):
 		cols[DIAG_COLUMN] = 'DIAG'
 		cols[DATE_RECOVERED_COLUMN] = 'date_recovered'
 		cols[DATE_REPORTED_WEB] = 'date_reported_web'
-        
         
 		df = pd.read_csv(file_name, parse_dates = ['Fecha de diagnóstico','Fecha de inicio de síntomas','Fecha de muerte','Fecha de recuperación'], date_parser = lambda x: pd.to_datetime(x, errors="coerce", dayfirst = dayfirst), low_memory = False)
 		df = df.rename(columns=cols)
@@ -162,7 +160,14 @@ class Unifier(GenericUnifier):
 		https://www.datos.gov.co/api/views/gt2j-8ykr/rows.csv?accessType=DOWNLOAD
 		'''
 		aggl_scheme = pd.read_csv(os.path.join(self.unified_folder, "aggl_scheme.csv"))
+
+		aggl_scheme = pd.read_csv(os.path.join('/Users/chaosdonkey06/Dropbox/covid_fb/data/data_stages/colombia/unified', "aggl_scheme.csv"))
+
+
 		file_name = os.path.join(self.raw_folder, 'cases', self.get('cases_file_name'))
+
+		file_name = os.path.join('/Users/chaosdonkey06/Dropbox/covid_fb/data/data_stages/colombia/raw', 'cases', 'cases_raw.csv')
+
 
 		cols = {}
 		cols['ID de caso'] = 'ID' 
@@ -174,21 +179,33 @@ class Unifier(GenericUnifier):
 		cols[DATE_RECOVERED_COLUMN] = 'date_recovered'
 		cols[DATE_REPORTED_WEB] = 'date_reported_web'
         
-		df = pd.read_csv(file_name, parse_dates = ['Fecha de diagnóstico','Fecha de inicio de síntomas','Fecha de muerte','Fecha de recuperación'], date_parser = lambda x: pd.to_datetime(x, errors="coerce", dayfirst = dayfirst), low_memory = False)
+		df = pd.read_csv(file_name, parse_dates = ['Fecha de diagnóstico','Fecha de inicio de síntomas','Fecha de muerte','Fecha de recuperación'], 
+						date_parser = lambda x: pd.to_datetime(x, errors="coerce", dayfirst = dayfirst), low_memory = False)
 		df = df.rename(columns=cols)
 
-		# Adds delay
+		# Adds delay between FIS (symptom onset) and DIAg (diagnosis confirmation)
 		df["attr_time_delay"] = df["DIAG"] - df["FIS"]
 		df.dropna(subset = ['DIAG', 'attention', 'attr_time_delay'], inplace = True)
 		df["attr_time_delay"] = df["attr_time_delay"].astype('timedelta64[D]').astype(int)
-		df = df.loc[(df["attr_time_delay"] > 0) & (df["attr_time_delay"] <= 60)].copy()
+		df = df.loc[(df["attr_time_delay"] >= 0) & (df["attr_time_delay"] <= 60)].copy()
+
+
+		# Adds delay between FIS (symptom onset) and DIAg (diagnosis confirmation)
+		df["attr_death_time_delay"] = df["date_death"] - df["FIS"]
+		df.dropna(subset = ['DIAG', 'attention', 'attr_death_time_delay'], inplace = True)
+		df["attr_death_time_delay"] = df["attr_death_time_delay"].astype('timedelta64[D]').astype(int)
+		df = df.loc[(df["attr_death_time_delay"] > 0) ].copy()
+
+
 
 		# Calculates attr_time-delay_union
 		groupby_cols = ['geo_id']
-		agglomerate_cols = ['attr_time_delay']
+		agglomerate_cols = ['attr_time_delay', 'attr_death_time_delay']
 
 		df_aggr = attr_agg.agglomerate(df, aggl_scheme, groupby_cols, agglomerate_cols)
+
 		df_aggr.rename(columns={"attr_time_delay": "attr_time-delay_dist_mix"}, inplace=True)
+		df_aggr.rename(columns={"attr_death_time_delay": "attr_time_death-delay_dist_mix"}, inplace=True)
 
 		# Loads the data
 		shape_file = os.path.join(self.raw_folder, 'geo', self.get('shape_file_name'))
@@ -219,7 +236,7 @@ class Unifier(GenericUnifier):
 
 		# Adds time-delay to polygons_final
 		df_aggr['geo_id'] = df_aggr['geo_id'].astype(str)
-		polygons_final = polygons_final.merge(df_aggr[['geo_id', 'attr_time-delay_dist_mix']], left_on="poly_id", right_on="geo_id", how="outer")
+		polygons_final = polygons_final.merge(df_aggr[['geo_id', 'attr_time-delay_dist_mix', 'attr_time_death-delay_dist_mix']], left_on="poly_id", right_on="geo_id", how="outer")
 		polygons_final.dropna(subset=["poly_id"], inplace=True)
 		polygons_final.drop(columns="geo_id", inplace=True)
 

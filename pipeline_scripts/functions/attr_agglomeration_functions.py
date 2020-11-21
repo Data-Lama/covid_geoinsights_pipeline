@@ -40,7 +40,7 @@ def agglomerate(df, aggl_scheme, groupby_cols, agglomerate_cols, df_polygons = N
     # Gets the function for each column
     functions = {}
     for col in agglomerate_cols:
-        functions[col] = get_corresponding_function_declaration(col,aggl_scheme)
+        functions[col] = get_corresponding_function_declaration(col, aggl_scheme)
         
     
     # First agglomerates the columns with single parameter
@@ -234,7 +234,7 @@ def get_corresponding_function(function_declaration):
 
 
 
-
+# ------------------
 # Support Functions
 # ------------------
 
@@ -267,7 +267,7 @@ def attr_intersection(series, sep):
 
 def estimate_gamma_delay(series):
     '''
-    sires = [1dia, 2dia, ..., 60 dia ]
+    Series = [1dia, 2dia, ..., 60 dia ]
     Returns the probability distribution of a random variable that is derived from a collection of other random variables
     by calculating an weighted average bin by bin of the histogram. 
     '''    
@@ -338,7 +338,6 @@ def merge_geometry(series):
 
 
 
-
 def get_generic_attr_agglomeration_scheme():
     '''
     Method that builds the generic dictionary for attribute agglomeration.
@@ -372,6 +371,5 @@ def get_generic_attr_agglomeration_scheme():
     "poly_lat": ["attr_with_max", "num_cases",""], # Polygon lat
     "poly_lon": ["attr_with_max", "num_cases",""] # Polygon lon
     }
-
 
     return aggl_scheme

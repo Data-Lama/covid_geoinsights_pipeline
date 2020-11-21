@@ -4,7 +4,7 @@ import pandas as pd
 from shapely import wkt
 import geopandas as gpd
 
-# Direcotries
+# Directories
 from global_config import config
 data_dir = config.get_property('data_dir')
 
