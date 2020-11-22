@@ -104,6 +104,8 @@ if selected_polygons_boolean:
         # If polygon not in polygons use aggregated p_delay
         if poly_id in df_polygons.index.values:
             p_delay = df_polygons.at[poly_id, "attr_time_delay"]
+            p_delay[0] = 0
+
         else:
             p_delay = agg_p_delay
         
@@ -176,6 +178,7 @@ if not selected_polygons_boolean:
         # If polygon not in polygons use aggregated p_delay
         if poly_id in df_polygons.poly_id.values:
             p_delay = df_polygons.set_index("poly_id").at[poly_id, "attr_time_delay"]
+            p_delay[0] = 0
         else:
             p_delay = agg_p_delay
 
