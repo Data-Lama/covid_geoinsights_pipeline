@@ -59,8 +59,12 @@ df_polygons   = pd.read_csv( polygons_path )
 df_cases_diag = df_cases[["date_time", "poly_id", "num_cases"]]
 
 # Loads time-delay
-df_polygons["attr_time-delay_dist_mix"] = df_polygons["attr_time-delay_dist_mix"].fillna("")
-df_polygons["attr_time-delay_dist_mix"] = df_polygons.apply(lambda x: np.fromstring(x["attr_time-delay_dist_mix"], sep="|"), axis=1)
+df_polygons = pd.read_csv( os.path.join( agglomerated_folder ,  "polygons.csv") )
+df_polygons = df_polygons.dropna(subset=['attr_time-delay_dist_mix'], axis=0) 
+df_polygons["attr_time_delay"] = df_polygons.apply(lambda x: np.fromstring(x["attr_time-delay_dist_mix"], sep="|"), axis=1)
+df_polygons = df_polygons[df_polygons['attr_time_delay'].map(lambda x: len(x)) > 0]
+df_polygons = df_polygons[df_polygons['attr_time_delay'].map(lambda x: ~np.isnan(list(x)[0] ))]
+
 df_time_delay = df_polygons[["poly_id", "attr_time-delay_dist_mix"]]
 
 # Add polygon names
@@ -106,6 +110,7 @@ for poly_id in df_mov_ranges.poly_id.unique():
         p_delay      = df_time_delay.set_index("poly_id").at[poly_id, 'attr_time-delay_dist_mix']
         if p_delay.size == 0:
             p_delay      = agg_p_delay
+        p_delay[0] = 0            
     except:
         p_delay      = agg_p_delay
 
