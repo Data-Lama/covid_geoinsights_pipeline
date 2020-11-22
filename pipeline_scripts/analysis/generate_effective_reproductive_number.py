@@ -80,6 +80,7 @@ computed_polygons = []
 # Get agg_time_delay
 df_polygons_agg = df_polygons.copy()
 agg_p_delay = pd.DataFrame(list(df_polygons_agg['attr_time_delay'])).mean().to_numpy()
+agg_p_delay[0] = 0
 
 
 if selected_polygons_boolean:
