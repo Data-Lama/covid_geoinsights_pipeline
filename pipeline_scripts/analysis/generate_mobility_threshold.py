@@ -91,8 +91,12 @@ agg_p_delay = pd.DataFrame(list(df_time_delay['attr_time-delay_dist_mix'])).mean
 # Get time delay
 print(f"    Extracts time delay per polygon")
 time_delays = {}
+total = len(df_mov_ranges.poly_id.unique())
+ite = 0
 for poly_id in df_mov_ranges.poly_id.unique():
-
+    
+    ite += 1
+    
     df_mov_poly_id   = df_mov_ranges[df_mov_ranges['poly_id'] == poly_id][["date_time", "poly_id", "movement_change"]].sort_values("date_time").copy()
     df_cases_diag_id = df_cases_diag[df_cases_diag["poly_id"] == poly_id][["date_time", "num_cases"]]
 
@@ -114,7 +118,7 @@ for poly_id in df_mov_ranges.poly_id.unique():
         if not os.path.isdir(path_to_save_tr):
                 os.makedirs(path_to_save_tr)
 
-        print(f"        Running model for {poly_id}")
+        print(f"        Running model for {poly_id} ({ite} of {total})")
         df_mov_poly_id.set_index("date_time", inplace=True)
         df_cases_diag_id.set_index("date_time", inplace=True)
         
