@@ -42,14 +42,16 @@ else :
 # Agglomerated folder location
 agglomerated_folder = os.path.join(data_dir, 'data_stages', location_folder, 'agglomerated', agglomeration_method )
 
-
 # Get cases
 df_cases = pd.read_csv( os.path.join( agglomerated_folder, 'cases.csv' ) )
 
 ## add time delta
-df_polygons   = pd.read_csv( os.path.join( agglomerated_folder ,  "polygons.csv") )
-df_polygons["attr_time-delay_dist_mix"] = df_polygons["attr_time-delay_dist_mix"].fillna("")
+df_polygons = pd.read_csv( os.path.join( agglomerated_folder ,  "polygons.csv") )
+df_polygons = df_polygons.dropna(subset=['attr_time-delay_dist_mix'], axis=0) 
 df_polygons["attr_time_delay"] = df_polygons.apply(lambda x: np.fromstring(x["attr_time-delay_dist_mix"], sep="|"), axis=1)
+df_polygons = df_polygons[df_polygons['attr_time_delay'].map(lambda x: len(x)) > 0]
+df_polygons = df_polygons[df_polygons['attr_time_delay'].map(lambda x: ~np.isnan(list(x)[0] ))]
+
 
 if selected_polygons_boolean:
     print(indent + f"Calculating rt for {len(selected_polygons)} polygons in {selected_polygon_name}")
@@ -109,9 +111,6 @@ if selected_polygons_boolean:
         else:
             p_delay = agg_p_delay
         
-        # if delay is not enough use aggregated p_delay
-        if p_delay.shape[0]<30:
-            p_delay = agg_p_delay
 
         if all_cases > 100:
             df_poly_id = df_poly_id.reset_index().set_index('date_time').resample('D').sum().fillna(0)
