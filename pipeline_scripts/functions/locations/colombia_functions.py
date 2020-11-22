@@ -161,13 +161,7 @@ class Unifier(GenericUnifier):
 		'''
 		aggl_scheme = pd.read_csv(os.path.join(self.unified_folder, "aggl_scheme.csv"))
 
-		aggl_scheme = pd.read_csv(os.path.join('/Users/chaosdonkey06/Dropbox/covid_fb/data/data_stages/colombia/unified', "aggl_scheme.csv"))
-
-
 		file_name = os.path.join(self.raw_folder, 'cases', self.get('cases_file_name'))
-
-		file_name = os.path.join('/Users/chaosdonkey06/Dropbox/covid_fb/data/data_stages/colombia/raw', 'cases', 'cases_raw.csv')
-
 
 		cols = {}
 		cols['ID de caso'] = 'ID' 
