@@ -118,7 +118,7 @@ if selected_polygons_boolean:
             min_time = df_poly_id.index[0]
 
             path_to_save = os.path.join(export_folder_location, str(poly_id)+'_Rt.png')
-            (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'smoothed_num_cases' , key_df='date', pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+            (_, _, result) = plot_cases_rt(df_poly_id+1, 'num_cases', 'smoothed_num_cases' , key_df='date', pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
             
             result.to_csv(os.path.join(export_folder_location, str(poly_id)+'_Rt.csv'))
             plt.close()
@@ -150,7 +150,7 @@ if all_cases > 100:
 
     path_to_save = os.path.join(export_folder_location, 'aggregated_Rt.png')
     df_all.iloc[-10:]['num_cases_adjusted'] = df_all.iloc[-10:]['smoothed_num_cases_adjusted']
-    (_, _, result) = plot_cases_rt(df_all, 'num_cases_adjusted', 'num_cases_adjusted', key_df='date', pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+    (_, _, result) = plot_cases_rt(df_all+1, 'num_cases_adjusted', 'num_cases_adjusted', key_df='date', pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
     result.to_csv(os.path.join(export_folder_location,'aggregated_Rt.csv'))
 else:
     print('WARNING: for poly_id {} Rt was not computed...'.format(poly_id))
@@ -192,7 +192,7 @@ if not selected_polygons_boolean:
             # Print plots for capitals
             if str(poly_id)[-3:] == "001":
                 path_to_save = os.path.join(export_folder_location, str(poly_id)+'_Rt.png')
-                (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'smoothed_num_cases' , key_df='date', pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
+                (_, _, result) = plot_cases_rt(df_poly_id+1, 'num_cases', 'smoothed_num_cases' , key_df='date', pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
 
             result.to_csv(os.path.join(export_folder_location, str(poly_id)+'_Rt.csv'))
             plt.close()
