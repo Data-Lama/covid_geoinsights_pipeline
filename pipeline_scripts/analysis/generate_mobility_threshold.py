@@ -59,13 +59,17 @@ df_polygons   = pd.read_csv( polygons_path )
 df_cases_diag = df_cases[["date_time", "poly_id", "num_cases"]]
 
 # Loads time-delay
-df_polygons = pd.read_csv( os.path.join( agglomerated_folder ,  "polygons.csv") )
+df_polygons = pd.read_csv( os.path.join( agglomerated_path ,  "polygons.csv") )
 df_polygons = df_polygons.dropna(subset=['attr_time-delay_dist_mix'], axis=0) 
 df_polygons["attr_time_delay"] = df_polygons.apply(lambda x: np.fromstring(x["attr_time-delay_dist_mix"], sep="|"), axis=1)
 df_polygons = df_polygons[df_polygons['attr_time_delay'].map(lambda x: len(x)) > 0]
 df_polygons = df_polygons[df_polygons['attr_time_delay'].map(lambda x: ~np.isnan(list(x)[0] ))]
 
-df_time_delay = df_polygons[["poly_id", "attr_time-delay_dist_mix"]]
+df_time_delay = df_polygons[["poly_id", "attr_time_delay"]]
+
+# Get aggregated time-delay
+agg_p_delay = pd.DataFrame(list(df_time_delay['attr_time_delay'])).mean().to_numpy()
+agg_p_delay[0] = 0
 
 # Add polygon names
 df_mov_ranges = df_mov_ranges.merge(df_polygons[["poly_name", "poly_id"]], on="poly_id", how="outer").dropna()
@@ -89,8 +93,6 @@ df_mob_thresholds            = pd.DataFrame(columns =['poly_id', 'R0', 'Beta', '
 df_mob_thresholds['poly_id'] = list(df_mov_ranges.poly_id.unique())+['aggregated']
 df_mob_thresholds            = df_mob_thresholds.set_index('poly_id')
 
-# Get aggregated time-delay
-agg_p_delay = pd.DataFrame(list(df_time_delay['attr_time-delay_dist_mix'])).mean().to_numpy()
 
 # Get time delay
 print(f"    Extracts time delay per polygon")
