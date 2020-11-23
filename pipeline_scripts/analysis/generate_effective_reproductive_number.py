@@ -51,6 +51,7 @@ df_polygons = df_polygons.dropna(subset=['attr_time-delay_dist_mix'], axis=0)
 df_polygons["attr_time_delay"] = df_polygons.apply(lambda x: np.fromstring(x["attr_time-delay_dist_mix"], sep="|"), axis=1)
 df_polygons = df_polygons[df_polygons['attr_time_delay'].map(lambda x: len(x)) > 0]
 df_polygons = df_polygons[df_polygons['attr_time_delay'].map(lambda x: ~np.isnan(list(x)[0] ))]
+df_polygons = df_polygons[df_polygons['attr_time_delay'].map(lambda x: ~np.isinf(  x.sum() ))]
 
 
 if selected_polygons_boolean:
