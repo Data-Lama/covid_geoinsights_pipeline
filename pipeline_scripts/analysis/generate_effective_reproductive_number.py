@@ -60,8 +60,8 @@ if selected_polygons_boolean:
     df_polygons = df_polygons[df_polygons["poly_id"].isin(selected_polygons)]
     selected_polygons_folder_name = selected_polygon_name
     df_cases = df_cases[df_cases["poly_id"].isin(selected_polygons)].copy()
-
 else:
+
     print(indent + f"Calculating rt for {location_folder} entire location.")
     selected_polygons_folder_name = "entire_location"
 
@@ -81,8 +81,8 @@ computed_polygons = []
 
 # Get agg_time_delay
 df_polygons_agg = df_polygons.copy()
+df_polygons_agg = df_polygons_agg[df_polygons_agg['attr_time_delay'].map(lambda x: ~np.isinf(  x.sum() ))]
 agg_p_delay = pd.DataFrame(list(df_polygons_agg['attr_time_delay'])).mean().to_numpy()
-agg_p_delay[0] = 0
 
 
 if selected_polygons_boolean:
