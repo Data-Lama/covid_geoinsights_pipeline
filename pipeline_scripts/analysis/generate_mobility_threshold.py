@@ -31,6 +31,8 @@ analysis_dir = config.get_property('analysis_dir')
 # Contants
 DEFAULT_DELAY_DIST = 11001
 
+print_every_per = 0.05
+
 # Reads the parameters from excecution
 location_name        =  sys.argv[1] # location name
 agglomeration_folder =  sys.argv[2] # agglomeration folder
@@ -95,8 +97,9 @@ df_mob_thresholds            = pd.DataFrame(columns =['poly_id', 'R0', 'Beta', '
 df_mob_thresholds['poly_id'] = list(df_mov_ranges.poly_id.unique())+['aggregated']
 df_mob_thresholds            = df_mob_thresholds.set_index('poly_id')
 
-
+# For printing
 total = len(df_mov_ranges.poly_id.unique())
+print_every = max(1, int(np.round(total*print_every_per)))
 ite = 0
 for poly_id in df_mov_ranges.poly_id.unique():
     
@@ -117,6 +120,9 @@ for poly_id in df_mov_ranges.poly_id.unique():
 
 
     path_to_save_tr = os.path.join(output_folder, 'MCMC', str(poly_id) )
+
+    if ite % print_every == 1 or (ite) == total:
+            print(f"        Running model for {poly_id} ({ite} of {total})")
 
     if all_cases_id > 100:
 
