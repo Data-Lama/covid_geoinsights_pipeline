@@ -67,9 +67,11 @@ df_polygons = df_polygons[df_polygons['attr_time_delay'].map(lambda x: ~np.isnan
 
 df_time_delay = df_polygons[["poly_id", "attr_time_delay"]]
 
-# Get aggregated time-delay
-agg_p_delay = pd.DataFrame(list(df_time_delay['attr_time_delay'])).mean().to_numpy()
-agg_p_delay[0] = 0
+# Get agg_time_delay
+df_polygons_agg = df_time_delay.copy()
+df_polygons_agg = df_polygons_agg[df_polygons_agg['attr_time_delay'].map(lambda x: ~np.isinf(  x.sum() ))]
+agg_p_delay = pd.DataFrame(list(df_polygons_agg['attr_time_delay'])).mean().to_numpy()
+
 
 # Add polygon names
 df_mov_ranges = df_mov_ranges.merge(df_polygons[["poly_name", "poly_id"]], on="poly_id", how="outer").dropna()
