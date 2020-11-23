@@ -101,7 +101,7 @@ df_mob_thresholds            = df_mob_thresholds.set_index('poly_id')
 total = len(df_mov_ranges.poly_id.unique())
 print_every = max(1, int(np.round(total*print_every_per)))
 ite = 0
-for poly_id in df_mov_ranges.poly_id.unique():
+for idx, poly_id in enumerate(df_mov_ranges.poly_id.unique()):
     
     ite += 1
     
@@ -123,65 +123,70 @@ for poly_id in df_mov_ranges.poly_id.unique():
 
     if ite % print_every == 1 or (ite) == total:
             print(f"        Running model for {poly_id} ({ite} of {total})")
+    try:
+        if all_cases_id > 100:
 
-    if all_cases_id > 100:
+            # Check if folder exists
+            if not os.path.isdir(path_to_save_tr):
+                    os.makedirs(path_to_save_tr)
 
-        # Check if folder exists
-        if not os.path.isdir(path_to_save_tr):
-                os.makedirs(path_to_save_tr)
+            print(f"        Running model for {poly_id} ({ite} of {total})")
+            df_mov_poly_id.set_index("date_time", inplace=True)
+            df_cases_diag_id.set_index("date_time", inplace=True)
+            
+            df_cases_diag_id = df_cases_diag_id.resample('1D').sum().fillna(0)
+            df_cases_diag_id = confirmed_to_onset(df_cases_diag_id, p_delay, "num_cases", min_onset_date=None)
+            df_cases_diag_id = df_cases_diag_id.resample('1D').sum().fillna(0)
 
-        print(f"        Running model for {poly_id} ({ite} of {total})")
-        df_mov_poly_id.set_index("date_time", inplace=True)
-        df_cases_diag_id.set_index("date_time", inplace=True)
-        
-        df_cases_diag_id = df_cases_diag_id.resample('1D').sum().fillna(0)
-        df_cases_diag_id = confirmed_to_onset(df_cases_diag_id, p_delay, "num_cases", min_onset_date=None)
-        df_cases_diag_id = df_cases_diag_id.resample('1D').sum().fillna(0)
+            min_date = max(min(df_mov_poly_id.index.values), min(df_cases_diag_id.index.values))
+            max_date = min(max(df_mov_poly_id.index.values), max(df_cases_diag_id.index.values))
 
-        min_date = max(min(df_mov_poly_id.index.values), min(df_cases_diag_id.index.values))
-        max_date = min(max(df_mov_poly_id.index.values), max(df_cases_diag_id.index.values))
+            df_onset_mcmc  = df_cases_diag_id.loc[min_date:max_date]['num_cases']
+            df_mov_df_mcmc = df_mov_poly_id.loc[min_date:max_date]['movement_change']
+            df_mcmc        = pd.Series(df_cases_diag_id['num_cases'], name='num_cases')
 
-        df_onset_mcmc  = df_cases_diag_id.loc[min_date:max_date]['num_cases']
-        df_mov_df_mcmc = df_mov_poly_id.loc[min_date:max_date]['movement_change']
-        df_mcmc        = pd.Series(df_cases_diag_id['num_cases'], name='num_cases')
+            # Smooths cases rolling window
+            df_cases_diag_id = prepare_cases(df_cases_diag_id, col='num_cases', cutoff=0)
 
-        # Smooths cases rolling window
-        df_cases_diag_id = prepare_cases(df_cases_diag_id, col='num_cases', cutoff=0)
+            onset        = df_onset_mcmc
+            mt_resampled = df_mov_df_mcmc.resample('1D').sum()
+            mt           = mt_resampled.rolling(7).mean(std=2).fillna(0)
+            mt[mt==0]    = mt_resampled[mt==0] 
+            mt           = mt.rolling(7).mean(std=2).fillna(0)
+            mt[mt==0]    = mt_resampled[mt==0]
 
-        onset        = df_onset_mcmc
-        mt_resampled = df_mov_df_mcmc.resample('1D').sum()
-        mt           = mt_resampled.rolling(7).mean(std=2).fillna(0)
-        mt[mt==0]    = mt_resampled[mt==0] 
-        mt           = mt.rolling(7).mean(std=2).fillna(0)
-        mt[mt==0]    = mt_resampled[mt==0]
+            if mt.empty:
+                dict_result = {'poly_id': poly_id}
+                df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
+                df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
+                df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
+                continue
+            
+            mt           = (mt-mt.values.min())/(mt.values.max()-mt.values.min())
 
-        if mt.empty:
+            min_date = max(min(mt.index.values), min(onset.index.values))
+            max_date = min(max(mt.index.values), max(onset.index.values))
+            
+            onset = onset.loc[min_date:max_date]
+            mt    = mt.loc[min_date:max_date]
+
+            dict_result = estimate_mob_th(mt, onset+1, poly_id, None)
+                
+            df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
+            df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
+            df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']
+
+        else:
             dict_result = {'poly_id': poly_id}
             df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
             df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
             df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
-            continue
-        
-        mt           = (mt-mt.values.min())/(mt.values.max()-mt.values.min())
-
-        min_date = max(min(mt.index.values), min(onset.index.values))
-        max_date = min(max(mt.index.values), max(onset.index.values))
-        
-        onset = onset.loc[min_date:max_date]
-        mt    = mt.loc[min_date:max_date]
-
-        dict_result = estimate_mob_th(mt, onset+1, poly_id, None)
-            
-        df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = dict_result['R0']
-        df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = dict_result['beta']
-        df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = -dict_result['mob_th']
-
-    else:
+    except: 
         dict_result = {'poly_id': poly_id}
         df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
         df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
         df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
-
+        
 df_mov_poly_id   = df_mov_ranges[["date_time", "poly_id", "movement_change"]].sort_values("date_time").copy()
 df_cases_diag_id = df_cases_diag[["date_time", "num_cases"]].copy()
 all_cases_id     = df_cases_diag_id.num_cases.sum()
