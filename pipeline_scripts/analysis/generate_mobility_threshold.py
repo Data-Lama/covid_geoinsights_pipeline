@@ -96,9 +96,6 @@ df_mob_thresholds['poly_id'] = list(df_mov_ranges.poly_id.unique())+['aggregated
 df_mob_thresholds            = df_mob_thresholds.set_index('poly_id')
 
 
-# Get time delay
-print(f"    Extracts time delay per polygon")
-time_delays = {}
 total = len(df_mov_ranges.poly_id.unique())
 ite = 0
 for poly_id in df_mov_ranges.poly_id.unique():
@@ -111,7 +108,7 @@ for poly_id in df_mov_ranges.poly_id.unique():
     all_cases_id = df_cases_diag_id['num_cases'].sum()
 
     try:
-        p_delay      = df_time_delay.set_index("poly_id").at[poly_id, 'attr_time-delay_dist_mix']
+        p_delay      = df_time_delay.set_index("poly_id").at[poly_id, 'attr_time_delay']
         if p_delay.size == 0:
             p_delay      = agg_p_delay
         p_delay[0] = 0            
@@ -151,12 +148,14 @@ for poly_id in df_mov_ranges.poly_id.unique():
         mt[mt==0]    = mt_resampled[mt==0] 
         mt           = mt.rolling(7).mean(std=2).fillna(0)
         mt[mt==0]    = mt_resampled[mt==0]
+
         if mt.empty:
             dict_result = {'poly_id': poly_id}
             df_mob_thresholds.loc[dict_result['poly_id']]['R0']     = np.nan
             df_mob_thresholds.loc[dict_result['poly_id']]['Beta']   = np.nan
             df_mob_thresholds.loc[dict_result['poly_id']]['mob_th'] = np.nan
             continue
+        
         mt           = (mt-mt.values.min())/(mt.values.max()-mt.values.min())
 
         min_date = max(min(mt.index.values), min(onset.index.values))
