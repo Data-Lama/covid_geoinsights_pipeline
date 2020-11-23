@@ -69,6 +69,10 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed, pop=None, CI=50, key_
         tick_loc = 8000 
     elif 35000<max_cases_tick<=40000:
         tick_loc = 10000 
+    elif 40000<max_cases_tick<=45000:
+        tick_loc = 12000 
+    elif 45000<max_cases_tick<=50000:
+        tick_loc = 15000 
     else:    
         tick_loc = np.round( max_cases_tick/100+0.1*100//5 )  
 
@@ -158,7 +162,7 @@ def plot_cases_rt(cases_df, col_cases, col_cases_smoothed, pop=None, CI=50, key_
     # plt.show()
 
     if path_to_save:
-        plt.tight_layout()
+        #plt.tight_layout()
         fig.savefig(path_to_save, dpi=400)
         
     return (lowfn, highfn, result)

@@ -111,7 +111,6 @@ if selected_polygons_boolean:
         else:
             p_delay = agg_p_delay
         
-
         if all_cases > 100:
             df_poly_id = df_poly_id.reset_index().set_index('date_time').resample('D').sum().fillna(0)
             df_poly_id = confirmed_to_onset(df_poly_id, p_delay, min_onset_date=None)
