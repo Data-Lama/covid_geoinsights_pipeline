@@ -114,12 +114,11 @@ max_time = min(max_date_cases, max_date_mov)
 date_zero = min(date_zero_mov, date_zero_cases)
 
 # Fill missing dates with zero
-# iterables = [pd.date_range(df_cases.date_time.min(), max_time), df_cases.poly_id.unique()]
-# empty_idx = pd.MultiIndex.from_product(iterables, names=['date_time', 'poly_id'])
-# df_cases.set_index(["date_time", "poly_id"], inplace=True)
-# df_cases = df_cases.reindex(empty_idx, fill_value=0)
-
-print(df_cases.head())
+iterables = [pd.date_range(df_cases.date_time.min(), max_time), df_cases.poly_id.unique()]
+empty_idx = pd.MultiIndex.from_product(iterables, names=['date_time', 'poly_id'])
+df_empty = pd.DataFrame(index=empty_idx)
+df_cases_full = df_cases.set_index(["date_time", "poly_id"]).merge(df_empty, left_index=True, right_index=True, how="outer").fillna(0)
+df_cases_full.reset_index(inplace=True)
 
 print(ident + "Getting information for {} with {} agglomeration between {} and {}".format(location_name, agglomeration_method, min_time, max_time))
 
@@ -211,9 +210,15 @@ with open(output_readme_file, 'w') as f:
     f.write("max_date: {}\n".format(max_time))
     f.write("date_zero: {}\n".format(date_zero))
 
+try:
+    windows = get_window_information(df_cases, date_zero, min_time, max_time)
+    deltas = get_window_deltas(df_cases, windows[0], windows[1], windows[2], windows[3])
+except:
+    print(ident + ident + "Some of the values in the cases dataframe are missing. Using a dataframe where missing dates have been included.")
+    windows = get_window_information(df_cases_full, date_zero, min_time, max_time)
+    deltas = get_window_deltas(df_cases_full, windows[0], windows[1], windows[2], windows[3])
+    
 
-windows = get_window_information(df_cases, date_zero, min_time, max_time)
-deltas = get_window_deltas(df_cases, windows[0], windows[1], windows[2], windows[3])
 
 # # Write to file
 deltas[0].to_csv(output_backward_delta_file)
