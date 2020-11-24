@@ -36,7 +36,7 @@ analysis_dir = config.get_property('analysis_dir')
 
 # Reads the parameters from excecution
 location_name  =  sys.argv[1] # location name
-location_folder =  sys.argv[2] # polygon name
+agglomeration_method =  sys.argv[2] # polygon name
 window_size_parameter = sys.argv[3] # window size
 time_unit = sys.argv[4] # time unit for window [days, hours]
 
@@ -52,8 +52,8 @@ else :
     selected_polygon_name = selected_polygons.pop(0)
 
 # Get name of files
-agglomerated_file_path = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', location_folder)
-output_file_path = os.path.join(analysis_dir, location_name, location_folder, 'polygon_info_window')
+agglomerated_file_path = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', agglomeration_method)
+output_file_path = os.path.join(analysis_dir, location_name, agglomeration_method, 'polygon_info_window')
 cases = os.path.join(agglomerated_file_path, 'cases.csv')
 movement = os.path.join(agglomerated_file_path, 'movement.csv')
 
@@ -61,9 +61,9 @@ date_zero = None
 ident = '         '
 
 # Import README
-readme_file_path = os.path.join(data_dir, 'data_stages', location_name, 'constructed', location_folder, 'daily_graphs', 'README.txt')
+readme_file_path = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', agglomeration_method, 'README.txt')
 if os.path.exists(readme_file_path):
-    readme = load_README(readme_file_path)
+    readme_dict = load_README(readme_file_path)
 else:
     raise Exception('No README.txt found for {}'.format(readme_file_path))
 
@@ -92,26 +92,36 @@ except:
 margin = margins[time_unit] 
 
 # Date zero
-if date_zero == None:
-    date_zero = pd.Timestamp('today') - margin
-else:
-    date_zero = datetime.datetime.strptime(date_zero, '%Y-%m-%d')
+# Set window size
+max_date_mov = readme_dict["Movement"].split(",")[1].strip()
+max_date_mov = max_date_mov.split(" ")[1].strip()
+max_date_mov = datetime.datetime.strptime(max_date_mov, '%Y-%m-%d')
+date_zero_mov = pd.Timestamp(max_date_mov) - datetime.timedelta(days = window_size)
+
+# Set window size
+max_date_cases = readme_dict["Cases"].split(",")[1].strip()
+max_date_cases = max_date_cases.split(" ")[1].strip()
+max_date_cases = datetime.datetime.strptime(max_date_cases, '%Y-%m-%d')
+date_zero_cases = pd.Timestamp(max_date_cases) - datetime.timedelta(days = window_size)
+
 
 # Get minimun and maximun datetimes
-min_time = date_zero - margin
-max_time = date_zero + margin + margin
+min_time_mov = date_zero_mov - margin
+min_time_cases = date_zero_cases - margin
 
-# Check that there is data for the stablished window
-min_data_avail = datetime.datetime.strptime(readme['Min_Date'], '%Y-%m-%d %H:%M:%S')
-max_data_avail = datetime.datetime.strptime(readme['Max_Date'], '%Y-%m-%d %H:%M:%S')
+min_time = min(min_time_cases, min_time_mov)
+max_time = min(max_date_cases, max_date_mov)
+date_zero = min(date_zero_mov, date_zero_cases)
 
-# #Check date_zero has data
-if max_time > max_data_avail:
-    max_time = max_data_avail
-    date_zero = max_time - margin - margin
-    min_time = date_zero - margin
+# Fill missing dates with zero
+# iterables = [pd.date_range(df_cases.date_time.min(), max_time), df_cases.poly_id.unique()]
+# empty_idx = pd.MultiIndex.from_product(iterables, names=['date_time', 'poly_id'])
+# df_cases.set_index(["date_time", "poly_id"], inplace=True)
+# df_cases = df_cases.reindex(empty_idx, fill_value=0)
 
-print(ident + "Getting information for {} with {} agglomeration between {} and {}".format(location_name, location_folder, min_time, max_time))
+print(df_cases.head())
+
+print(ident + "Getting information for {} with {} agglomeration between {} and {}".format(location_name, agglomeration_method, min_time, max_time))
 
 
 def calculate_delta(t_0, t_1):
@@ -126,11 +136,12 @@ def calculate_delta(t_0, t_1):
 def get_window_information(df_cases, date_zero, min_time, max_time):
 
     # Get windows
-    df_backward_window = df_cases.loc[(df_cases['date_time'] < date_zero) & (df_cases['date_time'] >= min_time)].copy()
-    df_middle_window = df_cases.loc[(df_cases['date_time'] >= date_zero) & (df_cases['date_time'] < max_time - margin)].copy()
-    df_forward_window = df_cases.loc[(df_cases['date_time'] >= date_zero + margin) & (df_cases['date_time'] <= max_time)].copy()
+    df_backward_window = df_cases.loc[(df_cases['date_time'] < min_time) & (df_cases['date_time'] >= min_time - margin)].copy()
+    df_middle_window = df_cases.loc[(df_cases['date_time'] >= min_time) & (df_cases['date_time'] < date_zero)].copy()
+    df_forward_window = df_cases.loc[(df_cases['date_time'] >= date_zero) & (df_cases['date_time'] <= max_time)].copy()
     df_total_window = df_cases.loc[(df_cases['date_time'] > min_time) & (df_cases['date_time'] <= max_time)].copy()
 
+        
     # Add neighbor_cases_average backward window
     df_backward_window["external_num_cases"] = df_backward_window.apply(lambda x: get_neighbor_cases_total(x.poly_id, x.date_time, df_movement, df_cases), axis=1)
     df_backward_window =  df_backward_window.groupby("poly_id")[["num_cases", "external_num_cases"]].mean()

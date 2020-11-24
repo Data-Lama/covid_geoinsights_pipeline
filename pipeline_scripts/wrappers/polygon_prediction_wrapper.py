@@ -21,7 +21,7 @@ import general_functions as gf
 # Constants
 k = 20
 
-gap_hours = 20
+gap_hours = 10
 
 if gap_hours >= 24:
     print(f'WARNING: Gap hours is set to {gap_hours} please check if excecuting in production!!!!')
