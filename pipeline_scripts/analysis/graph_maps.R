@@ -28,7 +28,7 @@ if(debug)
 {   
 cat("\n\n\n\n\n\n\n\n\n\n\n¡¡¡¡¡DEBUG IS ON!!!!\n\n\n\n\n\n\n\n\n")
 setwd("~/Dropbox/Projects/covid_fb_pipeline/covid_geoinsights_pipeline")
-args = c('Colombia', 'colombia','community','NorteDeSantander','norte_de_santander','54001','54261','54673','54874','54051','54099','54599','54109','54128','54172','54174','54223','54239','54245','54250','54313','54344','54347','54377','54405','54418','54003','54206','54398','54498','54518','54125','54480','54520','54553','54660','54670','54680','54720','54743','54800','54810','54820','54871')
+args = c('Colombia','colombia','geometry','popayan','19001','19130','19256','19397','19473','19532','19548','19585','19622','19698','19743','19807','19824','52001','76001')
 
 }
 
@@ -233,7 +233,7 @@ for(day in c(start_day,end_day))
   p = p + scale_size(limits=c(internal_min, internal_max))
   p = p + scale_alpha(limits=c(external_min, external_max))
   p = p + labs(color = "Casos", alpha = "Mov. Externo", size = "Mov. Interno")
-  p = p + ggtitle(paste0('COVID-19 Dinámicas Promedio en el Día: ', day,' (',curr_date,')'))
+  p = p + ggtitle(paste0('COVID-19\nDinámicas Promedio en el Día: ', day,' (',curr_date,')'))
   
   ggsave(file.path( export_folder, "maps_on_day", paste0("map_on_",day,".jpeg")), plot = p, dpi = dpi, width = width, height = height, device = 'jpeg')
   
@@ -334,7 +334,7 @@ for(day in c(start_day,end_day))
   p = p + scale_size(limits=c(internal_min, internal_max))
   p = p + scale_alpha(limits=c(external_min, external_max))
   p = p + labs(color = "Casos", alpha = "Mov. Externo", size = "Mov. Interno")
-  p = p + ggtitle(paste0('COVID-19 Dinámicas Promedio al Día: ', day,' (',curr_date,')',' (Casos Acumulados)'))
+  p = p + ggtitle(paste0('COVID-19\nDinámicas Promedio al Día: ', day,' (',curr_date,')','\n(Casos Acumulados)'))
   
   ggsave(file.path( export_folder, "maps_by_day", paste0("map_by_",day,".jpeg")), plot = p, dpi = dpi, width = width, height = height, device = 'jpeg')
     
