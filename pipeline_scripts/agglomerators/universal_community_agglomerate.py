@@ -215,6 +215,7 @@ if df_movement_range is not None:
     
 # 4 -- Saves the dataframes
 print(ident + '   Saves')
+print(ident + '      Models')
 # Cases
 df_cases_final.to_csv(os.path.join(destination_agglomeration_folder, 'cases.csv'), index = False)
 cases_date = df_cases_final.date_time.max()
@@ -234,10 +235,10 @@ if df_movement_range_final is not None:
     movement_change_date = df_movement_range_final.date_time.max()
 
 
-print(ident + '   Saves Statistics:')
+print(ident + '      Statistics')
 
 #Saves the dates
-with open(os.path.join(agglomeration_folder, 'README.txt'), 'w') as file:
+with open(os.path.join(destination_agglomeration_folder, 'README.txt'), 'w') as file:
 
     file.write('Parameters For Community Agglomeration:' + '\n')
     file.write('   Source Agglomeration: {}'.format(source_agglomeration) + '\n')
