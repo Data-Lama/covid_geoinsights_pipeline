@@ -217,16 +217,35 @@ if df_movement_range is not None:
 print(ident + '   Saves')
 # Cases
 df_cases_final.to_csv(os.path.join(destination_agglomeration_folder, 'cases.csv'), index = False)
+cases_date = df_cases_final.date_time.max()
 # Movement
 df_movement_final.to_csv(os.path.join(destination_agglomeration_folder, 'movement.csv'), index = False)
+movement_date = df_movement_final.date_time.max()
 # Population
 df_population_final.to_csv(os.path.join(destination_agglomeration_folder, 'population.csv'), index = False)
+population_date = df_population_final.date_time.max()
 # Polygons
 df_polygons_final.to_csv(os.path.join(destination_agglomeration_folder, 'polygons.csv'), index = False)
 
 # Movement Change
+movement_change_date = None
 if df_movement_range_final is not None:
     df_movement_range_final.to_csv(os.path.join(destination_agglomeration_folder, 'movement_range.csv'), index = False)
-    
-    
+    movement_change_date = df_movement_range_final.date_time.max()
+
+
+print(ident + '   Saves Statistics:')
+
+#Saves the dates
+with open(os.path.join(agglomeration_folder, 'README.txt'), 'w') as file:
+
+    file.write('Parameters For Community Agglomeration:' + '\n')
+    file.write('   Source Agglomeration: {}'.format(source_agglomeration) + '\n')
+    file.write('Current max dates for databases:' + '\n')
+    file.write('   Cases: {}'.format(cases_date) + '\n')
+    file.write('   Movement: {}'.format(movement_date) + '\n')
+    file.write('   Movement Change: {}'.format(movement_change_date) + '\n')
+    file.write('   Population: {}'.format(population_date) + '\n')
+
+
 print(ident + 'Done')    
