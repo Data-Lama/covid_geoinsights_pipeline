@@ -93,15 +93,11 @@ margin = margins[time_unit]
 
 # Date zero
 # Set window size
-max_date_mov = readme_dict["Movement"].split(",")[1].strip()
-max_date_mov = max_date_mov.split(" ")[1].strip()
-max_date_mov = datetime.datetime.strptime(max_date_mov, '%Y-%m-%d')
+max_date_mov = df_movement.date_time.max()
 date_zero_mov = pd.Timestamp(max_date_mov) - datetime.timedelta(days = window_size)
 
 # Set window size
-max_date_cases = readme_dict["Cases"].split(",")[1].strip()
-max_date_cases = max_date_cases.split(" ")[1].strip()
-max_date_cases = datetime.datetime.strptime(max_date_cases, '%Y-%m-%d')
+max_date_cases = df_cases.date_time.max()
 date_zero_cases = pd.Timestamp(max_date_cases) - datetime.timedelta(days = window_size)
 
 
