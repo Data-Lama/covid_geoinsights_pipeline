@@ -326,6 +326,7 @@ def extract_all_timeseries_cases(locations, agglomeration_method, lag = 0, accum
 			df_cases = df_cases.iloc[lag:]
 			
 			# Creates day
+			#print(f"{location} {polygon_id}")
 			df_cases['day'] = (df_cases.date_time - df_cases.date_time.min()).apply(lambda dif: dif.days)
 
 			# Fills in the blanks

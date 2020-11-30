@@ -89,7 +89,7 @@ cases_date = df_cases.date_time.max()
 
 # Saves
 if not encrypted:
-	df_cases.to_csv(os.path.join(unified_dir, 'cases.csv'), index = False)
+	df_cases.to_csv(os.path.join(unified_dir, 'cases.csv'), index = False, date_format = con.date_format)
 else:
 	gf.encrypt_df(df_cases, os.path.join(unified_dir, 'cases.csv'), key_string)
 

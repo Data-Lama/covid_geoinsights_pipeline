@@ -40,8 +40,14 @@ class Unifier(GenericUnifier):
 
 		file_name = os.path.join(self.raw_folder, 'cases', self.get('cases_file_name'))
 
-		df = pd.read_csv(file_name, parse_dates = ['FECHA_RESULTADO'], dayfirst = True)
+		df = pd.read_csv(file_name, dayfirst = False)
 		df = df.rename(columns = columns)
+		
+		# Parses the datetime_column
+		df = df.dropna(subset = ['date_time'])
+		df.date_time = df.date_time.astype(int)
+		df.date_time = df.date_time.apply(lambda s: pd.to_datetime( str(s), format = "%Y%m%d", errors = 'coerce' ))
+		df = df.dropna(subset = ['date_time'])
 
 		df_cases = df[['date_time','departement', 'province']].copy()
 		df_cases['num_cases'] = 1

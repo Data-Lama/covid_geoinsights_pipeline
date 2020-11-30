@@ -28,6 +28,8 @@ days_back = 5
 days_ahead = 8
 smooth_days = 5
 
+date_format = "%Y-%m-%d"
+
 def get_unifier_class(location):
 
 	if location == "germany":
