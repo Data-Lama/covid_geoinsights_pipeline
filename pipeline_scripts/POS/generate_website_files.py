@@ -28,7 +28,6 @@ def save_pandas(df, name, folder):
     df.to_csv(os.path.join(final_folder, name), index = False)
 
 
-
 ident = '         '
 
 
@@ -51,6 +50,7 @@ print(ident + '      Incidences')
 # Summary
 file_location = os.path.join(analysis_dir,'colombia/geometry/incidence_maps/entire_location/incidences.csv')
 df = pd.read_csv(file_location)
+df.rename(columns={"poly_name":"Unidad Administrativa"}, inplace=True)
 save_pandas(df, 'incidences.csv', 'nacional/cuadro_2/')
 
 # Map
@@ -70,8 +70,8 @@ save_pandas(df, 'alerts.csv', 'nacional/cuadro_3/')
 
 # Map
 file_location = os.path.join(analysis_dir,'colombia/geometry/alerts/entire_location/map_data.csv')
-#df = pd.read_csv(file_location)
-#save_pandas(df, 'map_data.csv', 'nacional/figura_9/')
+df = pd.read_csv(file_location)
+save_pandas(df, 'map_data.csv', 'nacional/figura_9/')
 
 
 # Movement Range
@@ -100,13 +100,12 @@ print(ident + '      Cloropleth Maps')
 
 # Map
 file_location = os.path.join(analysis_dir,'colombia/geometry/polygon_info_window/entire_location/choropleth_map_colombia_15-day-window_data.csv')
-#df = pd.read_csv(file_location)
-#save_pandas(df, 'choropleth_map_colombia_15-day-window_data.csv', 'nacional/figura_3/')
+df = pd.read_csv(file_location)
+save_pandas(df, 'choropleth_map_colombia_15-day-window_data.csv', 'nacional/figura_3/')
 
 file_location = os.path.join(analysis_dir,'colombia/geometry/polygon_info_window/entire_location/choropleth_map_colombia_historic_data.csv')
-#df = pd.read_csv(file_location)
-#save_pandas(df, 'choropleth_map_colombia_historic_data.csv', 'nacional/figura_3/')
-
+df = pd.read_csv(file_location)
+save_pandas(df, 'choropleth_map_colombia_historic_data.csv', 'nacional/figura_3/')
 
 # Situation Maps
 # -------------------
