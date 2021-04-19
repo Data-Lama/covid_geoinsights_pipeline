@@ -150,7 +150,7 @@ if os.path.exists(mov_range_file):
 
 	print(ident + '      Movement Range')
 	df_movement_range_unified = pd.read_csv(mov_range_file)
-	
+
 	# Computes the movement range by polygon
 	gadm_polygons = geo.get_gadm_polygons(location_folder_name)
 	gadm_polygons.rename(columns = {f'poly_id':'external_polygon_id'}, inplace = True)

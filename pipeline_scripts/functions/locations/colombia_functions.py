@@ -137,7 +137,7 @@ class Unifier(GenericUnifier):
 
 		# Groups by date and geoi_id to save space
 		df.reset_index(inplace=True)
-		df = df[['date_time', 'geo_id','num_cases','num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house']].copy()				
+		df = df[['date_time', 'geo_id','num_cases','num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house']].copy()
 		df = df.groupby(['date_time', 'geo_id']).sum().reset_index()
 
 		# Adds lat and lon from the polyfons of the shapefile
@@ -148,7 +148,7 @@ class Unifier(GenericUnifier):
 		df.fillna(0, inplace = True)
 		df = df[['date_time','geo_id','location','lon','lat', 'num_cases', 'num_diseased', 'num_recovered', 'num_infected', 'num_infected_in_hospital', 'num_infected_in_house']]
 
-		return(df)	
+		return(df)
 
 
 
@@ -218,7 +218,7 @@ class Unifier(GenericUnifier):
 		polygons_final = polygons.merge(polygons_info, on = 'poly_id')
 
 		# Extracts the center
-		centroids = geo.get_centroids(polygons_final.geometry) 
+		centroids = geo.get_centroids(polygons_final.geometry)
 		polygons_final['poly_lon'] = centroids.x
 		polygons_final['poly_lat'] = centroids.y
 

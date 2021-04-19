@@ -28,7 +28,6 @@ class Unifier(GenericUnifier):
 
 	def build_cases_geo(self):
 
-		
 		# Reads cases
 		cases = gf.decrypt_df(os.path.join(self.raw_folder,'cases', self.get('cases_file_name')), config.get_property('key_string') )
 
@@ -81,7 +80,7 @@ class Unifier(GenericUnifier):
 
 			# Sorts and drops
 			polygons = polygons.sort_values('Shape_Area', ascending = False).drop_duplicates(subset = ['MANCODIGO'], keep = 'first')
-			
+
 
 			# Selects columns and renames
 			polygons = polygons[['MANCODIGO','Shape_Area','geometry']].rename(columns = {'MANCODIGO':'poly_id','Shape_Area':'attr_area'})

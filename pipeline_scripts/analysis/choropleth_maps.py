@@ -53,12 +53,12 @@ RIVERS_DICT = {'sinu':'RÍO SINÚ',
 RIVERS = ['RÍO SINÚ','RÍO MAGDALENA','RÍO CAUCA','RÍO META','RÌO AMAZONAS']
 
 scheme = "user_defined"
-bins = {'bins':[0, 0.49, 1, 2, 5, 10, 50], 'bins_rt':[0, 0.5, 0.8, 1, 1.5, 2, 5]} 
-colors = [(1, 0.96, 0.94), (0.99, 0.83, 0.76), (0.98, 0.62, 0.51), (0.98, 0.41, 0.29), (0.89, 0.18, 0.15), (0.69, 0.07, 0.09), (0.37, 0.04, 0.1)] 
+bins = {'bins':[0, 0.49, 1, 2, 5, 10, 50], 'bins_rt':[0, 0.5, 0.8, 1, 1.5, 2, 5]}
+colors = [(1, 0.96, 0.94), (0.99, 0.83, 0.76), (0.98, 0.62, 0.51), (0.98, 0.41, 0.29), (0.89, 0.18, 0.15), (0.69, 0.07, 0.09), (0.37, 0.04, 0.1)]
 colors_rt = [(0, 0.28, 0.16),(0.66, 0.85, 0.55), (0.86, 0.94, 0.65),(0.98, 0.99, 0.78), (0.89, 0.18, 0.15), (0.69, 0.07, 0.09), (0.37, 0.04, 0.1)]
 grey = (0.83,0.83,0.83)
 
-# colors_rt = [(0.98, 0.99, 0.78), (0.86, 0.94, 0.65), (0.66, 0.85, 0.55), (0.42, 0.75, 0.45), (0.11, 0.49, 0.25), (0, 0.41, 0.21), (0, 0.28, 0.16)] 
+# colors_rt = [(0.98, 0.99, 0.78), (0.86, 0.94, 0.65), (0.66, 0.85, 0.55), (0.42, 0.75, 0.45), (0.11, 0.49, 0.25), (0, 0.41, 0.21), (0, 0.28, 0.16)]
 
 # Get name of files
 movement = os.path.join(data_dir, 'data_stages', location_name, 'agglomerated', location_folder, 'movement.csv')
@@ -79,7 +79,7 @@ r_t_files = []
 
 for i in files:
     if i[-4:] == ".csv":
-       r_t_files.append(i) 
+       r_t_files.append(i)
 
 df_rt = pd.DataFrame(columns=["date_time", "poly_id", "ML", "Low_50", "High_50"])
 
@@ -100,8 +100,8 @@ geo_df['Codigo_Dan'] = geo_df['Codigo_Dan'].astype(int) # To allow for indexing
 rivers_df = gpd.read_file(river_file_path)
 rivers_df = rivers_df.to_crs('epsg:3116')
 
-#Load movement 
-try:  
+#Load movement
+try:
     df_movement = pd.read_csv(movement, low_memory=False, parse_dates=['date_time'])
 except:
     df_movement = pd.read_csv(movement, low_memory=False, encoding = 'latin-1', parse_dates=['date_time'])
@@ -161,7 +161,7 @@ def set_color(x, bins, colors):
 
 def construct_legend(bins):
        l = []
-       for i in range(len(bins)):              
+       for i in range(len(bins)):
               if i == 0:
                      label = "(-10, {}]".format(bins[i])
               else:
@@ -225,7 +225,7 @@ df_deltas_historic = calculate_delta(df_municipalites_t0, df_municipalites_t2)
 df_deltas_historic = df_deltas_historic.replace([np.inf, -np.inf], np.nan).dropna(axis=0)
 
 df_deltas_recent = calculate_delta(df_municipalites_t1, df_municipalites_t2)
-df_deltas_recent = df_deltas_recent.replace([np.inf, -np.inf], np.nan).dropna(axis=0)                                                                    
+df_deltas_recent = df_deltas_recent.replace([np.inf, -np.inf], np.nan).dropna(axis=0)
 
 # If asked for specific polygons, get subset
 if selected_polygons_boolean:
@@ -243,7 +243,7 @@ if selected_polygons_boolean:
        if not os.path.isdir(output_file_path):
               os.makedirs(output_file_path)
 else :
-     output_file_path = os.path.join(output_file_path, "entire_location") 
+     output_file_path = os.path.join(output_file_path, "entire_location")
 
 print(ident+"   Building choropleth map for last week's RT")
 # Plot rt_choroplet

@@ -14,10 +14,9 @@ import os
 from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
-key_string = config.get_property('key_string') 
+key_string = config.get_property('key_string')
 
 ident = '         '
-
 
 def get_population_density(polygon, gdf):
     polygons = gdf[['poly_id', 'attr_population', 'attr_area', 'geometry']].copy()
@@ -40,7 +39,7 @@ def get_population_density(polygon, gdf):
     df_intersections = df_intersections.replace([np.inf, -np.inf], np.nan).dropna(axis=0)
     pop_tot = df_intersections["population"].sum()
     pop_density = pop_tot / area
-    
+
     return pop_density
 
 def get_intersection_areas_pop_density(polygon, gdf):
@@ -120,11 +119,11 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
         calc_inter = False
     else:
         raise Exception("calculate_intersections parameter must be boolean")
-    
+
 
     intersections_path = os.path.join(data_dir, "geo", "mov_range_intersections", location)
     if not os.path.exists(intersections_path):
-	    os.makedirs(intersections_path)  
+	    os.makedirs(intersections_path)
 
     print(ident + "      Constructing movement range by polygon.")
     print("{}Adjusting crs to equal area projection".format(ident))
@@ -142,7 +141,7 @@ def construct_movement_range_by_polygon(df_movement_range, gdf_polygons, gdf_ext
     df_movement_range.drop(columns=cols_to_drop, inplace=True)
 
     if ("attr_population" in gdf_polygons.columns) and ("attr_area" in gdf_polygons.columns):
-        
+
         if calc_inter:
             # Add population_density to external ids
             print("{}      Area and population attributes detected. Calculating population density".format(ident))

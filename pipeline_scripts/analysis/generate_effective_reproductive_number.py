@@ -24,13 +24,12 @@ data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
 # Reads the parameters from excecution
-location_folder   =  sys.argv[1]    # location name  ### Colombia 
+location_folder      =  sys.argv[1]    # location name  ### Colombia
 agglomeration_method =  sys.argv[2] # agglomeration method ### geometry for example
 
 if len(sys.argv) <= 3:
 	selected_polygons_boolean = False
 else :
-    
     selected_polygons_boolean = True
     selected_polygons = []
     i = 3
@@ -87,7 +86,7 @@ agg_p_delay = pd.DataFrame(list(df_polygons_agg['attr_time_delay'])).mean().to_n
 
 
 if selected_polygons_boolean:
-        
+
     df_all = df_cases.copy()
     df_polygons = df_polygons[['poly_id', 'attr_time_delay']].set_index('poly_id')
     df_polygons = df_polygons.dropna()
@@ -139,7 +138,6 @@ if all_cases > 100:
 
     df_all = df_all.reset_index().set_index('date_time').resample('D').sum().fillna(0)
 
-    
     df_all = confirmed_to_onset(df_all, agg_p_delay, min_onset_date=None)
 
     df_all, _ = adjust_onset_for_right_censorship(df_all, agg_p_delay, col_name='num_cases')
@@ -154,6 +152,7 @@ if all_cases > 100:
     df_all.iloc[-10:]['num_cases_adjusted'] = df_all.iloc[-10:]['smoothed_num_cases_adjusted']
     (_, _, result) = plot_cases_rt(df_all+1, 'num_cases_adjusted', 'num_cases_adjusted', key_df='date', pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
     result.to_csv(os.path.join(export_folder_location,'aggregated_Rt.csv'))
+
 else:
     print('WARNING: for poly_id {} Rt was not computed...'.format(poly_id))
 

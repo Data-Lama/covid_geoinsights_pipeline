@@ -18,8 +18,6 @@ def clean_name(name):
 	'''
 	Removes non essential characters from string
 	'''
-
-
 	name = name.split("/")[0]
 	return(name)
 
