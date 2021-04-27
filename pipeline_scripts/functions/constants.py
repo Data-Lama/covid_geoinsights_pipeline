@@ -22,6 +22,20 @@ hopkins_country_names = {"equatorial_guinea":"Equatorial Guinea",
                         "cameroon":"Cameroon",
                         "gabon":"Gabon"}
 
+
+# Description file constants
+# -----------------------------
+
+# id for the google trends geographical code in the description
+DECRIPTION_ID_GOOGLE_TRENDS_GEO_CODE = 'google_trends_geo_code'
+
+# id for the first case reported
+DECRIPTION_ID_FIRST_CASE = 'first_case'
+
+# id for the main language of the location
+DECRIPTION_ID_MAIN_LANGUAGE = "main_language"
+
+# -------------------
                         
 # For prediction
 days_back = 5

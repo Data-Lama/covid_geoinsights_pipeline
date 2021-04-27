@@ -10,7 +10,8 @@ Rplots.pdf
 # All pdf's
 *.pdf
 
-
+#Notes
+Notes.ipynb
 
 #Excel locks
 .~lock*
