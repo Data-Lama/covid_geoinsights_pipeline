@@ -39,13 +39,19 @@ pwd = config.get_property('fb_pwd')
 data_stages_location = os.path.join(data_dir, 'data_stages')
 
 
+MOVEMENT_COLS = set(['geometry', 'date_time', 'start_polygon_id', 'start_polygon_name','end_polygon_id', 
+					 'end_polygon_name', 'length_km', 'tile_size','country', 'level', 'n_crisis', 'n_baseline', 
+					 'n_difference','percent_change', 'is_statistically_significant', 'z_score','start_lat', 
+					 'start_lon', 'end_lat', 'end_lon', 'start_quadkey','end_quadkey'])
+
+
 def get_driver(download_dir):
 	'''
 	Gets the dirver with the automatic download options to the received directory
 	'''
 
 
-	desktop = False
+	desktop = True
 
 	if desktop:
 
@@ -93,6 +99,17 @@ def login_driver(driver):
 	# Random Sleeps
 	time.sleep(np.random.randint(1,3))
 
+	# Accept cookies (if found)
+	try:
+		driver.find_element_by_xpath("//button[@data-cookiebanner='accept_button']").click()
+
+	except NoSuchElementException:
+		# Doe nothig
+		pass
+
+
+	time.sleep(np.random.randint(1,3))
+
 	# User
 	inputElement = driver.find_element_by_id("email")
 	inputElement.clear()
@@ -115,7 +132,7 @@ def login_driver(driver):
 
 
 
-def download_fb_file(driver, type_data, dataset_id, date, extra_param = None, timeout = 45):
+def download_fb_file(driver, type_data, dataset_id, date, extra_param = None, timeout = 20):
 	'''
 	Downloads the given date for the dataset
 	'''
@@ -326,6 +343,59 @@ def build_movement(location_folder_name, stage = 'raw'):
 	return(df)
 
 
+def export_movement_batch(final_file_location, location_folder_name, stage = 'raw', max_date = None, dropna = False, ident = '    '):
+	'''
+	Method that exports all the files in a given location into a single file.
+
+	This method does the same thing that build_movment, but lowering the memory consumption. 
+
+	Returns the max date
+	'''
+
+	header = False
+
+	global_max_date = None
+	
+	# Declares the directory
+	directory = os.path.join(data_stages_location, location_folder_name, stage, 'movement_between_tiles/')
+
+	for file in os.listdir(directory):
+		file_name = os.path.join(directory, file)
+		if file_name.endswith('.csv') and os.stat(file_name).st_size > 0:		
+			
+			df = read_single_file(file_name, dropna = dropna, parse_dates = True)
+
+			# Adds geometry
+			if set(df.columns) != MOVEMENT_COLS:
+				print(ident + f"File {file} is corrupted\n"  + ident + "   Will remove.")
+				os.remove(file_name)
+				continue
+
+
+			df['start_movement_lon'] = df.geometry.apply(lambda g: geo.extract_lon(g, pos = 1))
+			df['start_movement_lat'] = df.geometry.apply(lambda g: geo.extract_lat(g, pos = 1))
+			df['end_movement_lon'] = df.geometry.apply(lambda g: geo.extract_lon(g, pos = 2))
+			df['end_movement_lat'] = df.geometry.apply(lambda g: geo.extract_lat(g, pos = 2))
+
+			# Checks if max date is given
+			df.date_time = pd.to_datetime(df.date_time)
+			if max_date is not None:
+				df = df[df.date_time < max_date]
+
+
+			if not header: #overwrite
+				df.to_csv(final_file_location, index = False)
+				header = True
+			else: # Append
+				df.to_csv(final_file_location, index = False, mode='a', header=False)
+
+			# Computes global date max
+			if global_max_date is None:
+				global_max_date = df.date_time.max()
+			else:
+				global_max_date = max(global_max_date, df.date_time.max())
+
+	return global_max_date
 
 def build_population(location_folder_name, stage = 'raw', dropna = True):
 	'''
