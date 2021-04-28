@@ -92,13 +92,12 @@ for poly_id in df_cases.poly_id.unique():
 
 
     #### función que retorne forecast ####
-
-    forecast_date_poly_id = 
+    forecast_date_poly_id =
     df_ml_forecast = create_df_response(samples, time, date_init ='2020-03-06',  quantiles = [50, 80, 95], forecast_horizon=27, use_future=False)
     df_ml_forecast = df_ml_forecast[df_ml_forecast.type=='forecast']
 
     df_forecast = pd.DataFrame(columns=[ 'location', 'poly_id', 'horizon', 'temporal_res', 'target_variable', 'forecast_date', 'type', 'quantile', 'value'])
-    df_forecast 
+    df_forecast[]
 
 
 def create_df_response(samples, time, date_init ='2020-03-06',  quantiles = [50, 80, 95], forecast_horizon=27, use_future=False):

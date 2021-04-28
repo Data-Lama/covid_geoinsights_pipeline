@@ -12,16 +12,15 @@ from shapely.geometry import Point, LineString, Polygon
 # Local functions
 from pipeline_scripts.functions.geo_functions import get_GADM_polygon
 
-
 # Direcotries
 from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
 # Reads the parameters from excecution
-location_name  =  sys.argv[1] # location name
+location_name   =  sys.argv[1] # location name
 location_folder =  sys.argv[2] # polygon name
-date_str = sys.argv[3] # date
+date_str        = sys.argv[3] # date
 
 # Get files
 movement_range_file = os.path.join(data_dir, 'data_stages', location_name, 'raw', 'movement_range', 'Movement Range_COL_gadm_2_{}.csv'.format(date_str))
