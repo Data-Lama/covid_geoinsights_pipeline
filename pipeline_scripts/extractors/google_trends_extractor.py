@@ -32,7 +32,7 @@ output_folder_name = "digital_statistics"
 # Search terms
 # Declared in English and are translated afterwards
 # TODO SAMAUEL
-main_search_terms = ["covid","fever"] # MOCK
+main_search_terms = ["covid","fever"] # MOOC
 
 
 # Reads the parameters from excecution
