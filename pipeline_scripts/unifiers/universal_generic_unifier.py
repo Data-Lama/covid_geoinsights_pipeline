@@ -98,18 +98,10 @@ else:
 # ---- Movement -----
 # -------------------
 print(ident + '   Movement')
-df_movement = fb.build_movement(location_folder_name)
 
-# Checks if max date is given
-if max_date is not None:
-	df_movement.date_time = pd.to_datetime(df_movement.date_time)
-	df_movement = df_movement[df_movement.date_time < max_date]
+final_file_location = os.path.join(unified_dir, 'movement.csv')
+movement_date = fb.export_movement_batch(final_file_location, location_folder_name, max_date = max_date, ident = ident + "      ")
 
-# Extracts date
-movement_date = df_movement.date_time.max()
-
-# Saves
-df_movement.to_csv(os.path.join(unified_dir, 'movement.csv'), index = False)
 
 
 # -------------------
