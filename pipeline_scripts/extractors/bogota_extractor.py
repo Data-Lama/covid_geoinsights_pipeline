@@ -43,9 +43,10 @@ cases_file = os.path.join(cases_folder, df_description.loc['cases_file_name','va
 
 
 # Declares the query for extraction
+
 query = """
     
-    SELECT * 
+    SELECT fechainici, recuperado, ubicacion, upzgeo, nomupz_1, x, y
     FROM `servinf-unacast-prod.AlcaldiaBogota.positivos_agg_fecha`     
 
 """

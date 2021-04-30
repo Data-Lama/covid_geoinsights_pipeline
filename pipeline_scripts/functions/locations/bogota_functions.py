@@ -66,7 +66,7 @@ class Unifier(GenericUnifier):
         cases.loc[(cases[current_state_col]== 'Infectado') & (~cases[location_col].isin(['Hospital UCI', 'Hospital'])),'num_infected_in_house'] = 1
 
         # Removes temporary columns
-        cases = cases.fillna(0).drop(['Recuperado','Ubicacion'], axis = 1)
+        cases = cases.fillna(0).drop([current_state_col,location_col], axis = 1)
         
         # Convert to numeric
         cases.lon = cases.lon.apply(lambda l: float(str(l).replace(',','.')))
@@ -82,7 +82,7 @@ class Unifier(GenericUnifier):
     def build_polygons(self):
 
         # MOCK
-        definition = 'manzana'
+        definition = 'localidad'
 
         if definition == 'manzana':
             # Polygons
