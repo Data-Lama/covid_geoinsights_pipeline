@@ -17,6 +17,18 @@ import general_functions as gf
 #Directories
 from global_config import config
 
+
+
+# Constants for columns
+symptoms_start_col = "fechainici"
+current_state_col = "recuperado"
+location_col = "ubicacion"
+x_coord_col = "x"
+y_coord_col = "y"
+geo_id_col = "upzgeo"
+geo_name_col = "nomupz_1"
+
+
 class Unifier(GenericUnifier):
     '''
     Unifier class
@@ -32,27 +44,26 @@ class Unifier(GenericUnifier):
         # Reads cases
         cases = gf.decrypt_df(os.path.join(self.raw_folder,'cases', self.get('cases_file_name')), config.get_property('key_string') )
 
-        cases['FechaInicioSintomas'] = cases['FechaInicioSintomas'].apply(lambda x: pd.to_datetime(x, errors="coerce"))
+        cases[symptoms_start_col] = cases[symptoms_start_col].apply(lambda x: pd.to_datetime(x, errors="coerce"))
 
-        #cases = pd.read_excel(os.path.join(self.raw_folder,'cases', self.get('cases_file_name')), parse_dates = ['Fecha de Inicio de Síntomas'], date_parser = lambda x: pd.to_datetime(x, errors="coerce"))
-        cases = cases[['FechaInicioSintomas','Recuperado','UPZGeo', 'NOMUPZ_1', 'X','Y', 'Ubicacion']].rename(columns = {'FechaInicioSintomas':'date_time', 'UPZGeo':'geo_id','NOMUPZ_1':'location','X':'lon','Y':'lat'})
+        cases = cases[[symptoms_start_col,current_state_col,geo_id_col, geo_name_col, x_coord_col, y_coord_col, location_col]].rename(columns = {symptoms_start_col:'date_time', geo_id_col:'geo_id',geo_name_col:'location',x_coord_col:'lon',y_coord_col:'lat'})
 
         # Cleans the state
-        cases.Recuperado.fillna('Infectado', inplace = True)
-        cases.Recuperado = cases.Recuperado.apply(lambda s: s.replace(' ',''))
-        cases.loc[cases.Recuperado == '', 'Recuperado'] = 'Infectado'
-        cases = cases[cases.Recuperado.isin(['Recuperado','Fallecido','Infectado'])].dropna()
+        cases[current_state_col].fillna('Infectado', inplace = True)
+        cases[current_state_col] = cases[current_state_col].apply(lambda s: s.replace(' ',''))
+        cases.loc[cases[current_state_col] == '', current_state_col] = 'Infectado'
+        cases = cases[cases[current_state_col].isin(['Recuperado','Fallecido','Infectado'])].dropna()
         
         
         # Discriminates by status
         cases['num_cases'] = 1
-        cases.loc[cases.Recuperado == 'Recuperado','num_recovered'] = 1
-        cases.loc[cases.Recuperado == 'Infectado','num_infected'] = 1
-        cases.loc[cases.Recuperado == 'Fallecido','num_diseased'] = 1
+        cases.loc[cases[current_state_col] == 'Recuperado','num_recovered'] = 1
+        cases.loc[cases[current_state_col] == 'Infectado','num_infected'] = 1
+        cases.loc[cases[current_state_col] == 'Fallecido','num_diseased'] = 1
 
         # Add in Hospital
-        cases.loc[(cases.Recuperado == 'Infectado') & (cases['Ubicacion'].isin(['Hospital UCI', 'Hospital'])),'num_infected_in_hospital'] = 1
-        cases.loc[(cases.Recuperado == 'Infectado') & (~cases['Ubicacion'].isin(['Hospital UCI', 'Hospital'])),'num_infected_in_house'] = 1
+        cases.loc[(cases[current_state_col] == 'Infectado') & (cases[location_col].isin(['Hospital UCI', 'Hospital'])),'num_infected_in_hospital'] = 1
+        cases.loc[(cases[current_state_col]== 'Infectado') & (~cases[location_col].isin(['Hospital UCI', 'Hospital'])),'num_infected_in_house'] = 1
 
         # Removes temporary columns
         cases = cases.fillna(0).drop(['Recuperado','Ubicacion'], axis = 1)
@@ -62,18 +73,16 @@ class Unifier(GenericUnifier):
         cases.lat = cases.lat.apply(lambda l: float(str(l).replace(',','.')))
         
         # Groups
-        cases = cases.groupby(['date_time','geo_id','location','lon','lat']).sum().reset_index()
-        
+        cases = cases.groupby(['date_time','geo_id','location','lon','lat']).sum().reset_index()        
 
         return(cases)
         
 
 
-
     def build_polygons(self):
 
         # MOCK
-        definition = 'localidad'
+        definition = 'manzana'
 
         if definition == 'manzana':
             # Polygons

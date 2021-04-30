@@ -2,6 +2,10 @@ location_name,locations_folder,stage,folder_location,position,excecute,script_na
 All,,PRE,PRE,1,NO,download_facebook,python,
 ALL,,PRE,extractors,1,NO,johns_hopkins_extractor,python,
 USA,usa,PRE,extractors,2,NO,usa_extractor,python,
+Bogota,bogota,extract,extractors,1,YES,bogota_extractor,python,
+Bogota,bogota,unify,unifiers,1,NO,universal_generic_unifier,python,Bogota bogota
+Bogota,bogota,agglomerate,agglomerators,2,NO,universal_community_agglomerate,python,Bogota bogota geometry
+Bogota,bogota,analyse,special_reports/bogota,1,NO,edgelist_detection_bogota,python,
 Peru,peru,extract,extractors,1,NO,single_file_download_extractor,python,Peru peru
 Peru,peru,unify,unifiers,1,NO,universal_generic_unifier,python,Peru peru
 Peru,peru,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Peru peru 10
@@ -62,7 +66,7 @@ Mexico,mexico,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python
 Mexico,mexico,agglomerate,agglomerators,2,NO,universal_community_agglomerate,python,Mexico mexico radial
 Mexico,mexico,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Mexico mexico all
 Colombia,colombia,extract,extractors,1,NO,single_file_download_extractor,python,Colombia colombia
-Colombia,colombia,extract,extractors,1,YES,google_trends_extractor,python,Colombia colombia
+Colombia,colombia,extract,extractors,1,NO,google_trends_extractor,python,Colombia colombia
 Colombia,colombia,unify,unifiers,1,NO,universal_generic_unifier,python,Colombia colombia
 Colombia,colombia,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Colombia colombia 10
 Colombia,colombia,agglomerate,agglomerators,2,NO,universal_community_agglomerate,python,Colombia colombia geometry
@@ -74,7 +78,7 @@ Colombia,colombia,analyse,analysis,2,NO,movement_range_plots_script,python,Colom
 Colombia,colombia,analyse,analysis,3,NO,neighbors_location_extraction,python,Colombia colombia community
 Colombia,colombia,POS,wrappers,1,NO,polygon_prediction_wrapper,python,
 Colombia,colombia,POS,wrappers,1,NO,polygon_socio_economic_wrapper,python,
-,colombia,POS,wrappers,1,NO,polygon_rt_wrapper,python,
+Colombia,colombia,POS,wrappers,1,NO,polygon_rt_wrapper,python,
 Colombia,colombia,POS,wrappers,3,NO,polygon_union_prediction_wrapper,python,colombia community 0.8 20 Colombia
 Colombia,colombia,POS,analysis,1,NO,polygon_info_timewindow,python,colombia geometry 5 days
 Colombia,colombia,POS,analysis,1,NO,polygon_info_timewindow,python,colombia community 5 days

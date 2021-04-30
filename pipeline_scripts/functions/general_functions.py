@@ -100,6 +100,9 @@ def load_README(path):
 			
 
 def encrypt_df(df, filename, key_string):
+    '''
+    Encrypts a given dataframe
+    '''
     
 	# coverts to bytes
 	key = bytes(key_string, 'utf-8')

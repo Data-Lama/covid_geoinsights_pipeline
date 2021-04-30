@@ -16,3 +16,6 @@ fastdtw==0.3.4
 seaborn==0.11.1
 mapclassify==2.4.2
 contextily==1.1.0
+python-igraph==0.8.2
+google-api-python-client==1.9.3
+google-cloud-bigquery==1.24.0
