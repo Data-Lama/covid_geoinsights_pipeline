@@ -51,7 +51,7 @@ def get_driver(download_dir):
 	'''
 
 
-	desktop = True
+	desktop = False
 
 	if desktop:
 
@@ -71,8 +71,8 @@ def get_driver(download_dir):
 		fp.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv")
 
 		cap = DesiredCapabilities().FIREFOX
-		cap["marionette"] = True
-		binary = '/opt/conda/bin/FirefoxApp/firefox' 
+		cap["marionette"] = False
+		binary = '/usr/bin/firefox' 
 
 		options = Options()
 		options.set_headless(headless=True)
