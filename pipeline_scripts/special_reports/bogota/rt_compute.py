@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 # Local imports
 import bogota_constants as cons
 
-sys.path.insert(0,'pipeline_scripts/special_reports/bogota')
+sys.path.insert(0,'../../..')
 
 from global_config import config
 
@@ -40,3 +40,5 @@ df_cases = pd.read_csv(cases_path, parse_dates=["date_time"])
 df_polygons = pd.read_csv(polygons_path)
 df_polygons["geometry"] = df_polygons["geometry"].apply(wkt.loads)
 gdf_polygons = gpd.GeoDataFrame(df_polygons)
+
+from special_functions.rt_estim import Rt_model

@@ -4,8 +4,8 @@ import scipy.stats as stats
 from scipy.stats import gamma
 import warnings
 
-class Rt_model(col_cases='num_cases'):
-    def __init__(self, col_cases=col_cases):
+class Rt_model():
+    def __init__(self, col_cases='num_cases'):
         self.col_parse = col_cases
     # This is our estimated Rt object when using the parametric function
     class ParametricOutput:
