@@ -5,7 +5,7 @@
 import os, sys
 from pathlib import Path
 import pandas as pd
-
+from datetime import datetime, timedelta, date, time
 
 # Imports constants
 import constants as cons
@@ -32,7 +32,7 @@ output_folder_name = "digital_statistics"
 # Search terms
 # Declared in English and are translated afterwards
 # TODO SAMAUEL
-main_search_terms = ["covid","fever"] # MOOC
+main_search_terms = ["covid","fever","cough","anosmia"] # MOOC
 
 
 # Reads the parameters from excecution
@@ -88,14 +88,18 @@ main_language = df_description.loc[cons.DECRIPTION_ID_MAIN_LANGUAGE,'value']
 # Todo suyo Samuel. Ahi está todo lo que creo que necesita, la idea es que guarde en final_file_location
 # la tabla actualizada, sientase libre de cambiar lo que necesite para que funcione mejor.
 
-print("NOT IMPLEMENTED YET!!!!!!")
+# End and start dates
+start_date = cons.DECRIPTION_ID_FIRST_CASE
+end_date   = date.today() - timedelta(days=1) ; end_date = end_date.strftime('%Y-%m-%d')
 
-    
+# Translate terms to lenguage
+main_terms_in_leng = gtf.translate_terms(main_search_terms, dest_len=cons.DECRIPTION_ID_MAIN_LANGUAGE)
 
+# Get geo location
+geo = cons.DECRIPTION_ID_GOOGLE_TRENDS_GEO_CODE
 
+# Get trends
+df_trends, _ = gtf.get_trends(geo, start_date, end_date, main_terms_in_leng)
 
-
-
-
-
-
+# Save trends
+df_trends.to_csv(final_file_location)
