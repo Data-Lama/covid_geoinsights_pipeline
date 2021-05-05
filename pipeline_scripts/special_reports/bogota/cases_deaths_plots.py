@@ -106,5 +106,5 @@ axes[1].set_yticks( [len(df_cases_hm.index.values)-1 - idx + 0.5 for idx, loc in
 axes[1].set_yticklabels([loc for loc in df_cases_hm.index.values], rotation='horizontal',
                     va='center')
 plt.tight_layout()
-fig.savefig(os.path.join(out_folder, 'cases_deaths_hm.png'), dpi=400, pad=0)
-plt.show()
+fig.savefig(os.path.join(out_folder, 'cases_deaths_hm.png'), dpi=400, transà)
+plt.close()
