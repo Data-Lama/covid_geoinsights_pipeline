@@ -57,12 +57,54 @@ df_cases["deaths_per10000"] = df_cases.apply(lambda x: x["num_diseased"] * 10000
 df_cases_hm = pd.pivot(df_cases.reset_index(), index='poly_name', columns='date_time', values='cases_per10000'); df_cases_hm = df_cases_hm.loc[df_polygons.poly_name]
 df_deaths_hm = pd.pivot(df_cases.reset_index(), index='poly_name', columns='date_time', values='deaths_per10000'); df_deaths_hm = df_deaths_hm.loc[df_polygons.poly_name]
 
+
+from matplotlib.dates import date2num, num2date
+from matplotlib.colors import ListedColormap
+from matplotlib import dates as mdates
+from matplotlib.patches import Patch
+from matplotlib import pyplot as plt
+from matplotlib import ticker
+
+
+
 fig, axes = plt.subplots(2, 1, figsize=(15.7, 10), sharex=True)
-axes[0].pcolormesh(df_cases_hm.keys(), df_cases_hm.index.values, df_cases_hm.to_numpy())
-axes[1].pcolormesh(df_deaths_hm.keys(), df_deaths_hm.index.values, df_deaths_hm.to_numpy(), cmap='afmhot_r')
+im1 = axes[0].pcolormesh(df_cases_hm, cmap='afmhot_r',  edgecolor='w', shading='auto')
+fig.colorbar(im1, ax=axes[0],  aspect=10)
+
+im2 = axes[1].pcolormesh(df_deaths_hm, cmap='afmhot_r',  edgecolor='w', shading='auto')
+fig.colorbar(im2, ax=axes[1],  aspect=10)
 
 axes[0].set_title('Casos por 10,000 Hab.')
 axes[1].set_title('Fallecidos por 10,000 Hab.')
-plt.tight_layout()
 
+
+axes[0].spines['top'].set_visible(False)
+axes[0].spines['right'].set_visible(False)
+axes[1].spines['top'].set_visible(False)
+axes[1].spines['right'].set_visible(False)
+axes[0].set_aspect('equal')
+axes[1].set_aspect('equal')
+
+#axes[0].xaxis.set_major_locator(mdates.MonthLocator())
+##axes[0].xaxis.set_major_formatter(mdates.DateFormatter('%b-%y'))
+axes[0].xaxis.set_minor_locator(mdates.WeekdayLocator())
+axes[0].xaxis.set_major_locator(mdates.WeekdayLocator())
+
+#axes[1].xaxis.set_major_locator(mdates.MonthLocator())
+##axes[1].xaxis.set_major_formatter(mdates.DateFormatter('%b-%y'))
+axes[1].xaxis.set_minor_locator(mdates.WeekdayLocator())
+axes[1].xaxis.set_major_locator(mdates.WeekdayLocator())
+
+xt = axes[1].get_xticks()
+axes[1].set_xticklabels([df_deaths_hm.keys()[min(int(i), len(df_deaths_hm.keys())-1) ].strftime('%b-%y') for i in xt])
+
+axes[0].set_yticks([len(df_cases_hm.index.values)-1 - idx + 0.5 for idx, loc in enumerate(df_cases_hm.index.values)])
+axes[0].set_yticklabels([loc for loc in df_cases_hm.index.values], rotation='horizontal',
+                    va='center')
+
+axes[1].set_yticks( [len(df_cases_hm.index.values)-1 - idx + 0.5 for idx, loc in enumerate(df_cases_hm.index.values)] )
+axes[1].set_yticklabels([loc for loc in df_cases_hm.index.values], rotation='horizontal',
+                    va='center')
+plt.tight_layout()
+fig.savefig(os.path.join(out_folder, 'cases_deaths_hm.png'), dpi=400, pad=0)
 plt.show()
