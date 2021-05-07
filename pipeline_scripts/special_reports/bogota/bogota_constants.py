@@ -7,8 +7,8 @@ WINDOW = 6
 BASELINE_DATE = "2020-04-20"
 
 # Values correspond to pandas.Weekday() -> 0: Monday, 6: Sunday
-WEEKDAY_LIST = [0, 1, 2, 3, 4]
-WEEKEND_LIST = [5, 6]
+WEEKDAY_LIST = [0, 1, 2, 3]
+WEEKEND_LIST = [4, 5, 6]
 
 # Layout and design
 COLORS = {'colombia_bogota_localidad_barrios_unidos': "#2D864A",
