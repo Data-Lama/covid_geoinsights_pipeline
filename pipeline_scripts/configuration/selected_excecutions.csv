@@ -1,10 +1,10 @@
 location_name,locations_folder,stage,folder_location,position,excecute,script_name,script_type,script_parameters
-All,,PRE,PRE,1,YES,download_facebook,python,
+All,,PRE,PRE,1,NO,download_facebook,python,
 ALL,,PRE,extractors,1,NO,johns_hopkins_extractor,python,
 USA,usa,PRE,extractors,2,NO,usa_extractor,python,
 Bogota,bogota,extract,extractors,1,YES,bogota_extractor,python,
-Bogota,bogota,unify,unifiers,1,YES,universal_generic_unifier,python,Bogota bogota
-Bogota,bogota,agglomerate,agglomerators,2,YES,universal_geometry_agglomerate,python,Bogota bogota
+Bogota,bogota,unify,unifiers,1,NO,universal_generic_unifier,python,Bogota bogota
+Bogota,bogota,agglomerate,agglomerators,2,NO,universal_geometry_agglomerate,python,Bogota bogota
 Bogota,bogota,analyse,special_reports/bogota,1,NO,edgelist_detection_bogota,python,
 Peru,peru,extract,extractors,1,NO,single_file_download_extractor,python,Peru peru
 Peru,peru,unify,unifiers,1,NO,universal_generic_unifier,python,Peru peru
@@ -68,9 +68,8 @@ Mexico,mexico,construct,constructors,1,NO,universal_daily_graphs_constructor,pyt
 Colombia,colombia,extract,extractors,1,NO,single_file_download_extractor,python,Colombia colombia
 Colombia,colombia,extract,extractors,1,NO,google_trends_extractor,python,Colombia colombia
 Colombia,colombia,unify,unifiers,1,NO,universal_generic_unifier,python,Colombia colombia
-Colombia,colombia,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Colombia colombia 10
-Colombia,colombia,agglomerate,agglomerators,2,NO,universal_community_agglomerate,python,Colombia colombia geometry
 Colombia,colombia,agglomerate,agglomerators,1,NO,universal_geometry_agglomerate,python,Colombia colombia False
+Colombia,colombia,agglomerate,agglomerators,2,NO,universal_community_agglomerate,python,Colombia colombia geometry
 Colombia,colombia,construct,constructors,1,NO,universal_daily_graphs_constructor,python,Colombia colombia all
 Colombia,colombia,analyse,analysis,1,NO,tda_script,r,Colombia colombia community
 Colombia,colombia,analyse,analysis,1,NO,graph_maps,r,Colombia colombia community
