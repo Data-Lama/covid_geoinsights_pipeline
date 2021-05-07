@@ -30,7 +30,7 @@ countries = list(selected_polygons["location_name"].unique())
 skipped_polygons = []
 computed_polygons = []
 
-# Get polygons per country to avoid loading data over and over 
+# Get polygons per country to avoid loading data over and over
 for idx, r in selected_polygons.iterrows():
     print(indent + indent + f"{r['location_name']}." + f" {r['poly_id']}.", end="\r")
 
@@ -53,7 +53,6 @@ for idx, r in selected_polygons.iterrows():
             df_polygons["attr_time_delay"] = df_polygons.apply(lambda x: np.fromstring(x["attr_time-delay_dist_mix"], sep="|"), axis=1)
             p_delay = pd.DataFrame(list(df_polygons['attr_time_delay'])).mean().to_numpy()
 
-        
         df_poly_id['date_time'] =   pd.to_datetime(df_poly_id['date_time'])
         df_poly_id = df_poly_id.reset_index().set_index('date_time').resample('D').sum().fillna(0)
         df_poly_id = confirmed_to_onset(df_poly_id['num_cases'], p_delay, min_onset_date=None)
@@ -63,7 +62,7 @@ for idx, r in selected_polygons.iterrows():
 
         path_to_save = os.path.join(export_folder_location, str(r['poly_id'])+'_Rt.png')
         (_, _, result) = plot_cases_rt(df_poly_id, 'num_cases', 'smoothed_num_cases' , key_df='date', pop=None, CI=50, min_time=min_time, state=None, path_to_save=path_to_save)
-        
+
         result.to_csv(os.path.join(export_folder_location, str(r['poly_id'])+'_Rt.csv'))
         plt.close()
     else:

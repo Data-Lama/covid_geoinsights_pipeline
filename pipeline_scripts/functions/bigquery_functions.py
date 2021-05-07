@@ -21,6 +21,8 @@ def get_client():
 
     return bigquery.Client(location="US")
 
+
+
 def run_simple_query(client, query, allow_large_results=False):
     '''
     Method that runs a simple query
@@ -153,6 +155,23 @@ def get_distance_to_infected(client, location_id, start_date, end_date):
             AND date <= "{end_date.strftime(bq_date_format)}"
             AND attribute_value IS NOT NULL
 
+    """
+
+    return run_simple_query(client, query, allow_large_results = True)
+
+
+
+def get_graph_attribute(client, location_id, attribute_id):
+    '''
+    Method that gets a certain attribute
+    '''
+
+    query = f"""
+        SELECT date, attribute_value as value
+        FROM {project_id}.graph_attributes.graph_attributes
+        WHERE location_id = "{location_id}"
+              AND attribute_name = "{attribute_id}"
+        ORDER BY date  
     """
 
     return run_simple_query(client, query, allow_large_results = True)

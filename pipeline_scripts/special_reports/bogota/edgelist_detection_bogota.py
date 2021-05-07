@@ -11,16 +11,17 @@ from datetime import timedelta
 import matplotlib.pyplot as plt
 from google.cloud import bigquery
 import os, sys
+from datetime import datetime
 
 import bigquery_functions as bqf
 import graph_functions as grf
+
 
 
 # Global Directories
 from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
-
 
 
 
@@ -34,8 +35,12 @@ eps = 0.001
 total_places = 10
 percentage = 0.1 # Percentage of top places
 round_number = 4 # 15m
-days_go_back = 15 # Two weeks
+days_go_back = 14 # Two weeks
 div = 1200 # in meters for the Soft Plus
+
+MAX_RESOLUTION = 5
+MAX_DISTANCE = 3
+MAX_TIME = 2
 
 ident = '   '
 
@@ -45,6 +50,14 @@ result_folder_name = "edgelist_detection"
 location_name = "Bogotá"
 location_folder_name = "bogota"
 location_graph_id = "colombia_bogota"
+
+# Edgelist dataset
+dataset_id = "edgelists_cities"
+
+
+shapefile_folder = "shapefile"
+shapefile_name = "superspreader_locations.shp"
+
 
 
 def filter(df_geo, min_lat, max_lat, min_lon, max_lon):
@@ -63,6 +76,10 @@ export_folder_location = os.path.join(analysis_dir,
 if not os.path.exists(export_folder_location):
     os.makedirs(export_folder_location)    
 
+# Creates the geofile export
+if not os.path.exists(os.path.join(export_folder_location, shapefile_folder)):
+    os.makedirs(os.path.join(export_folder_location, shapefile_folder))   
+
 
 print(ident + f"Computing Edgelist Extraction for {location_name}")
 
@@ -73,10 +90,10 @@ max_date = bqf.get_date_for_graph(client, location_graph_id)
 # Min date will be two weeks before max_date
 min_date = max_date - timedelta(days = days_go_back)
 
-
 # Extracts
 print(ident + "   Extracts the Distance to Infected")
-df_dist_infected = bqf.get_distance_to_infected(client, location_id, min_date, max_date)
+df_dist_infected = bqf.get_distance_to_infected(client, location_graph_id, min_date, max_date)
+df_dist_infected.date = pd.to_datetime(df_dist_infected.date)
 dist_infected_dates = df_dist_infected.date.unique() 
 
 
@@ -85,33 +102,40 @@ print(ident + f'   Computing Centralities from: {min_date.strftime(date_format)}
 
 location_centrality = []
 
-current_date = min_date
 
 # Main Loop
+current_date = min_date
 while current_date <= max_date:
 
 
     # First extracts the date closest to the curren for distance to infected
     date_closest_dist_infected = dist_infected_dates[np.argmin([np.abs((current_date - d).days) for d in dist_infected_dates])]
-
+    
     # Extracts the distaace to infected temporary
-    df_dist_infected_temp = df_dist_infected[df_dist_infected.date = date_closest_dist_infected]
+    df_dist_infected_temp = df_dist_infected[df_dist_infected.date == date_closest_dist_infected]
     
     print(ident + f'      Date: {current_date.strftime(date_format)}')
 
         
     for hour in range(6,22):
         
-        print(ident + f'         Hour:{hour}')
+        #print(ident + f'         Hour:{hour}')
         
         # Gets the contacts
-        edges = bqf.get_contacts(dataset_id, location_id, current_date_string, hour)
+        edges = bqf.get_contacts(client, 
+                                 dataset_id, 
+                                 location_graph_id, 
+                                 current_date.strftime(date_format), 
+                                 hour,
+                                 max_resolution = MAX_RESOLUTION,
+                                 max_distance = MAX_DISTANCE,
+                                 max_time = MAX_TIME)
 
         # Declares the edges
-        nodes = pd.concat((edges[['id1']].rename(columns = {'id1':'identifier'}), edges[['id2']].rename(columns = {'id2':'identifier'})), ignore_index = True).drop_duplicates()
+        nodes_from_edges = pd.concat((edges[['id1']].rename(columns = {'id1':'identifier'}), edges[['id2']].rename(columns = {'id2':'identifier'})), ignore_index = True).drop_duplicates()
         
         # Adds distance to infected
-        nodes = nodes.merge(df_dist_infected_temp[['identifier','distance_to_infected']], 
+        nodes = nodes_from_edges.merge(df_dist_infected_temp[['identifier','distance_to_infected']], 
                             on = 'identifier',
                             how = 'left')
 
@@ -125,28 +149,26 @@ while current_date <= max_date:
 
         # Edges
         # Groups
-        compact_edges = edges[['id1','id2']].groupby(['id1','id2']).count().reset_index()
-        compact_edges.columns = ['id1','id2','weight']
+        compact_edges = edges[['id1','id2']].copy()
+        compact_edges['weight'] = 1
+        compact_edges = compact_edges.groupby(['id1','id2']).count().reset_index()
+        
 
         # Gets the personalized pagerank
-        centrality = grf.get_personalized_ppr(nodes, compact_edges, weighted_edges = True)
-
-        # Adds it
-        nodes['centrality'] = ppr
+        nodes['centrality'] = grf.get_personalized_ppr(nodes, compact_edges, weighted_edges = True)
 
         # Sets the id 
         nodes.index = nodes.identifier
 
         # Sorts the original edges
-        edges['centrality'] = nodes.loc[edges.id1,'centrality'].values*
-                              nodes.loc[edges.id2,'centrality'].values
+        edges['centrality'] = nodes.loc[edges.id1,'centrality'].values*nodes.loc[edges.id2,'centrality'].values
 
         # Selects the top places by percentage
         edges = edges.sort_values('centrality', ascending = False)
         
         # Extract location
-        chunk = int(np.ceil(new_edges.shape[0]*percentage))
-        df_temp = new_edges.iloc[0:chunk]
+        chunk = int(np.ceil(edges.shape[0]*percentage))
+        df_temp = edges.iloc[0:chunk]
 
         # Selects lat and lon
         df_temp = df_temp[['lat','lon']].copy()
@@ -167,18 +189,48 @@ while current_date <= max_date:
 df_centrality = pd.concat(location_centrality, ignore_index = True)
 
 
+
+# --------------
+# Maps
+
+# Extracts the localities of bogota
+geo_localidades = gpd.read_file(os.path.join(data_dir,'data_stages', location_folder_name,'raw/geo/','localities_shapefile.shp'),)
+geo_localidades.geometry = geo_localidades.geometry.set_crs("EPSG:4326")
+
+# Constructs boundingbox
+centroids = geo_localidades.geometry.to_crs('EPSG:3395').centroid.to_crs("EPSG:4326")
+min_lon = centroids.x.min()
+max_lon = centroids.x.max()
+
+min_lat = centroids.y.min()
+max_lat = centroids.y.max()
+
+geo_localidades = geo_localidades.to_crs(epsg=3857)
+
+
 # NUM CONTACTS
 # ---------------------------
 # Calculate top places with more contacts
-df_locations = get_contacs_by_location(dataset_id, 
-                                        location_id, 
+df_locations = bqf.get_contacs_by_location(client,
+                                        dataset_id, 
+                                        location_graph_id, 
                                         min_date, 
                                         max_date, 
-                                        round_to = 4)
+                                        round_to = 4,
+                                        max_resolution = MAX_RESOLUTION,
+                                        max_distance = MAX_DISTANCE,
+                                        max_time = MAX_TIME)
 
 df_locations = df_locations.head(total_places)
 
 df1 = df_locations[['lat','lon','total_contacts']].rename(columns = {'total_contacts':'total'})
+
+
+# Maps
+# -------------
+
+# Crops to fit the localities
+df1 = filter(df1, min_lat, max_lat, min_lon, max_lon)
 
 # Adds noise
 df1.lat = df1.lat + np.random.normal(0,eps,df1.shape[0])
@@ -200,6 +252,9 @@ df2.lat = df2.lat.round(round_number)
 
 df2 = df2.groupby(['lat','lon']).sum().reset_index().sort_values('total', ascending = False).head(total_places)
 
+# Crops
+df2 = filter(df2, min_lat, max_lat, min_lon, max_lon)
+
 df2.lat = df2.lat + np.random.normal(0,eps,df2.shape[0])
 df2.lon = df2.lon + np.random.normal(0,eps,df2.shape[0])
 
@@ -214,37 +269,46 @@ geo_pagerank = geo_pagerank.to_crs(epsg=3857)
 # Calculate places 
 df3 = df_centrality[['lat','lon','total']].copy()
 df3 = df3.groupby(['lat','lon']).sum().reset_index()
+             
+# Crops
+df3 = filter(df3, min_lat, max_lat, min_lon, max_lon)
 
 geo_pagerank_trace = gpd.GeoDataFrame(df3,crs =  "EPSG:4326", geometry=gpd.points_from_xy(df3.lon, df3.lat))
 geo_pagerank_trace = geo_pagerank_trace.to_crs(epsg=3857)
 
 
 
+# Gets the boundary
+centr = geo_localidades.unary_union.centroid
+rotate = 0
+markersize = 40
+
 # Plots
-# ------------------
-ax = geo_pagerank_trace.plot(figsize=(12, 12), alpha=0.1, markersize = 17, color = 'green', label = 'Pagrank (Traza)')
-geo_pagerank.plot(alpha=1, markersize = 35, color = 'blue', ax = ax, label = 'Pagrank (Top)')
-geo_locations.plot(alpha=1, markersize = 35, color = 'red', ax = ax, label = 'Contactos (Top)')
+print(ident + "   Plots")
+ax = geo_localidades.rotate(rotate, origin=centr).plot(figsize=(6, 10), color = "black", alpha = 0.6, zorder = 1)
+geo_localidades.rotate(rotate, origin=centr).boundary.plot(ax = ax, color = "white", alpha = 0.4, zorder=1)
+geo_pagerank_trace.rotate(rotate, origin=centr).plot(alpha=0.01, markersize = 12, color = 'yellow', ax = ax, label = 'Pagrank (Traza)')
+geo_pagerank.rotate(rotate, origin=centr).plot(alpha=1, markersize = markersize, color = 'blue', ax = ax, label = 'Pagrank (Top)')
+geo_locations.rotate(rotate, origin=centr).plot(alpha=1, markersize = markersize, color = 'red', ax = ax, label = 'Contactos (Top)')
+
+
 ctx.add_basemap(ax, source=ctx.providers.OpenTopoMap)
 ax.set_axis_off()
-ax.set_title(f'Superdispersión ({min_date.strftime(date_format)} - {max_date.strftime(date_format)})')
-ax.legend()
+ax.set_title(f'Lugares de Superdispersión\n({min_date.strftime(date_format)} - {max_date.strftime(date_format)})')
+leg = ax.legend()
+for lh in leg.legendHandles: 
+    lh.set_alpha(1)
+    lh._sizes = [30]
+    
+
 ax.figure.savefig(os.path.join(export_folder_location, 'edge_detection.png'), dpi = 150)
 
 
-df_pagerank = geo_pagerank.to_crs(epsg=4326)[['geometry']]
-df_pagerank['tipo'] = 'Pagerank Top'
+# Saves the geofiles
+print(ident + "   Saves Geo File")
+geo_pagerank_trace['type'] = 'Pagerank Trace'
+geo_pagerank['type'] = 'Pagerank Top'
+geo_locations['type'] = 'Contacts Top'
 
-df_contactos = geo_locations.to_crs(epsg=4326)[['geometry']]
-df_contactos['tipo'] = 'Contactos Top'    
-
-df_pagerank_trace = geo_pagerank_trace.to_crs(epsg=4326)[['geometry']]
-df_pagerank_trace['tipo'] = 'Pagerank Traza'
-
-df_export = pd.concat((df_pagerank, df_contactos, df_pagerank_trace), ignore_index = False)
-df_export['lon'] = df_export.geometry.x
-df_export['lat'] = df_export.geometry.y
-
-df_export.to_csv(os.path.join(export_folder_location, 'edge_detection.csv'), index = False)
-    
-    
+df_final = pd.concat((geo_pagerank, geo_locations, geo_pagerank_trace), ignore_index = True)
+df_final.to_file(os.path.join(export_folder_location,shapefile_folder,shapefile_name))
