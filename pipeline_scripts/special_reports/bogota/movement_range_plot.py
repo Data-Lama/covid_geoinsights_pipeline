@@ -19,7 +19,6 @@ location_name  =  sys.argv[1] # location name
 agglomeration_folder = sys.argv[2] # agglomeration name
 
 movement_path = os.path.join(data_dir, "data_stages", "colombia", "agglomerated", agglomeration_folder, "movement_range.csv")
-
 out_folder = os.path.join(analysis_dir, location_name, agglomeration_folder, "movement_analysis")
 
 # Check if folder exists
