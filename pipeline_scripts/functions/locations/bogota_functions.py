@@ -82,7 +82,7 @@ class Unifier(GenericUnifier):
     def build_polygons(self):
 
         # MOCK
-        definition = 'upz'
+        definition = 'localidad'
 
         if definition == 'manzana':
             # Polygons
@@ -160,6 +160,9 @@ class Unifier(GenericUnifier):
 
             # Adjust names
             polygons.poly_name = polygons.poly_name.apply(lambda s: " ".join([(x[0] + x[1:].lower()) for x in s.split(" ")]))    
+
+            # Adjust poly id
+            polygons.poly_id = polygons.poly_id.apply(lambda s: s.replace("UPZ","colombia_bogota_upz_"))
 
             # Extracts the center
             centroids = geo.get_centroids(polygons.geometry)
