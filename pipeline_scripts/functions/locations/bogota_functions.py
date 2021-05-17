@@ -82,7 +82,7 @@ class Unifier(GenericUnifier):
     def build_polygons(self):
 
         # MOCK
-        definition = 'localidad'
+        definition = 'upz'
 
         if definition == 'manzana':
             # Polygons
@@ -149,8 +149,25 @@ class Unifier(GenericUnifier):
             polygons['poly_lat'] = centroids.y
 
             # Adjusts geometry  to latiude and longitud
-            polygons = polygons.to_crs('epsg:4326')         
+            polygons = polygons.to_crs('epsg:4326')     
 
+        elif definition == 'upz':
+            # Polygons
+            polygons = geopandas.read_file(os.path.join(self.raw_folder, 'geo', self.get('shape_upz_file_name')))
+            
+            # Polygon Info
+            polygons = polygons[['UPlCodigo','UPlNombre','geometry']].rename(columns = {'UPlCodigo':'poly_id', 'UPlNombre':'poly_name'})
+
+            # Adjust names
+            polygons.poly_name = polygons.poly_name.apply(lambda s: " ".join([(x[0] + x[1:].lower()) for x in s.split(" ")]))    
+
+            # Extracts the center
+            centroids = geo.get_centroids(polygons.geometry)
+            polygons['poly_lon'] = centroids.x
+            polygons['poly_lat'] = centroids.y
+
+            # Adjusts geometry  to latiude and longitud
+            polygons = polygons.to_crs('epsg:4326')        
 
 
         return(polygons)
