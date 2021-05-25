@@ -40,7 +40,7 @@ class Unifier(GenericUnifier):
 
     def build_cases_geo(self):
 
-        
+
         # Reads cases
         cases = gf.decrypt_df(os.path.join(self.raw_folder,'cases', self.get('cases_file_name')), config.get_property('key_string') )
 
@@ -53,8 +53,7 @@ class Unifier(GenericUnifier):
         cases[current_state_col] = cases[current_state_col].apply(lambda s: s.replace(' ',''))
         cases.loc[cases[current_state_col] == '', current_state_col] = 'Infectado'
         cases = cases[cases[current_state_col].isin(['Recuperado','Fallecido','Infectado'])].dropna()
-        
-        
+
         # Discriminates by status
         cases['num_cases'] = 1
         cases.loc[cases[current_state_col] == 'Recuperado','num_recovered'] = 1
@@ -65,19 +64,21 @@ class Unifier(GenericUnifier):
         cases.loc[(cases[current_state_col] == 'Infectado') & (cases[location_col].isin(['Hospital UCI', 'Hospital'])),'num_infected_in_hospital'] = 1
         cases.loc[(cases[current_state_col]== 'Infectado') & (~cases[location_col].isin(['Hospital UCI', 'Hospital'])),'num_infected_in_house'] = 1
 
+        # Add in ICU
+        cases.loc[(cases[current_state_col]== 'Infectado') & (cases[location_col].isin(['Hospital UCI'])),'num_infected_in_icu'] = 1
+
+
         # Removes temporary columns
         cases = cases.fillna(0).drop([current_state_col,location_col], axis = 1)
-        
+
         # Convert to numeric
         cases.lon = cases.lon.apply(lambda l: float(str(l).replace(',','.')))
         cases.lat = cases.lat.apply(lambda l: float(str(l).replace(',','.')))
-        
+
         # Groups
-        cases = cases.groupby(['date_time','geo_id','location','lon','lat']).sum().reset_index()        
+        cases = cases.groupby(['date_time','geo_id','location','lon','lat']).sum().reset_index()
 
         return(cases)
-        
-
 
     def build_polygons(self):
 
