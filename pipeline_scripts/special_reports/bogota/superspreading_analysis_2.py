@@ -13,6 +13,9 @@ from google.cloud import bigquery
 import os, sys
 from datetime import datetime
 
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
+
 import bigquery_functions as bqf
 import graph_functions as grf
 
@@ -86,6 +89,7 @@ print(ident + f"Computing Edgelist Extraction for {location_name}")
 print(ident + "   Extracts Max Date")
 # Extracts the max support date
 max_date = bqf.get_date_for_graph(client, location_graph_id)
+
 
 # Min date will be two weeks before max_date
 min_date = max_date - timedelta(days = days_go_back)
@@ -207,6 +211,28 @@ max_lat = centroids.y.max()
 
 geo_localidades = geo_localidades.to_crs(epsg=3857)
 
+# Gets the superspreading polygons
+
+# Polygons to include
+# Historic superpreading
+location_ids = ['colombia_bogota_super_spreading_1',
+                'colombia_bogota_super_spreading_2',
+                'colombia_bogota_super_spreading_4',
+                'colombia_bogota_super_spreading_6',
+                'colombia_bogota_super_spreading_8']
+
+geo_ss_polygons = bqf.get_location_geometries_by_ids(client, location_ids)
+
+
+# Health Polygons
+location_ids = ['colombia_bogota_poligono_salud_1',
+                'colombia_bogota_poligono_salud_2',
+                'colombia_bogota_poligono_salud_3',
+                'colombia_bogota_poligono_salud_4']
+
+geo_health_polygons = bqf.get_location_geometries_by_ids(client, location_ids)
+
+
 
 # NUM CONTACTS
 # ---------------------------
@@ -277,38 +303,69 @@ geo_pagerank_trace = gpd.GeoDataFrame(df3,crs =  "EPSG:4326", geometry=gpd.point
 geo_pagerank_trace = geo_pagerank_trace.to_crs(epsg=3857)
 
 
+# Merges both
+geo_top_both = pd.concat((geo_pagerank, geo_locations))
+
+
 
 # Gets the boundary
 centr = geo_localidades.unary_union.centroid
 rotate = 0
 markersize = 40
+buffer_polygons = 500
+buffer_lugares_superdispersion = 750
 
 # Plots
 print(ident + "   Plots")
+# Localities
 ax = geo_localidades.rotate(rotate, origin=centr).plot(figsize=(6, 10), color = "black", alpha = 0.6, zorder = 1)
 geo_localidades.rotate(rotate, origin=centr).boundary.plot(ax = ax, color = "white", alpha = 0.4, zorder=1)
-geo_pagerank_trace.rotate(rotate, origin=centr).plot(alpha=0.01, markersize = 12, color = 'yellow', ax = ax, label = 'Pagrank (Traza)')
-geo_pagerank.rotate(rotate, origin=centr).plot(alpha=1, markersize = markersize, color = 'blue', ax = ax, label = 'Pagrank (Top)')
-geo_locations.rotate(rotate, origin=centr).plot(alpha=1, markersize = markersize, color = 'red', ax = ax, label = 'Contactos (Top)')
 
+
+geo_pagerank_trace.rotate(rotate, origin=centr).plot(alpha=0.05, 
+                                                     markersize = 12, 
+                                                     color = 'Firebrick', 
+                                                     ax = ax, 
+                                                     label = 'Superdispersión')
+
+df = pd.DataFrame({'geometry':[geo_top_both.rotate(rotate, origin=centr).buffer(buffer_lugares_superdispersion).unary_union]})
+df = gpd.GeoDataFrame(df, geometry='geometry')
+df.geometry = df.geometry.set_crs("EPSG:3857")
+
+df_top_boundary = df.boundary
+
+df_top_boundary.plot(alpha=1, 
+                  color = 'red', 
+                  ax = ax, 
+                  label = 'Focos Superdispersión')
+
+
+# Polygons
+geo_health_polygons.rotate(rotate, origin=centr).buffer(buffer_polygons).plot(
+                                                                        alpha=0.9,  
+                                                                        color = 'blue', 
+                                                                        ax = ax, 
+                                                                        label = 'Pol. Salud')
+
+geo_ss_polygons.rotate(rotate, origin=centr).buffer(buffer_polygons).plot(alpha=0.9,  
+                                                                    color = 'yellow', 
+                                                                    ax = ax, 
+                                                                    label = 'Pol. Superdispersión Histórica')
+                                                                      
 
 ctx.add_basemap(ax, source=ctx.providers.OpenTopoMap)
 ax.set_axis_off()
 ax.set_title(f'Lugares de Superdispersión\n({min_date.strftime(date_format)} - {max_date.strftime(date_format)})')
-leg = ax.legend()
-for lh in leg.legendHandles: 
-    lh.set_alpha(1)
-    lh._sizes = [30]
-    
-
-ax.figure.savefig(os.path.join(export_folder_location, 'edge_detection.png'), dpi = 150)
 
 
-# Saves the geofiles
-print(ident + "   Saves Geo File")
-geo_pagerank_trace['type'] = 'Pagerank Trace'
-geo_pagerank['type'] = 'Pagerank Top'
-geo_locations['type'] = 'Contacts Top'
+legend_elements = [Line2D([0], [0], marker='o', color='w', label='Poligonos Salud', markerfacecolor='blue', markersize=10),
+                   Line2D([0], [0], marker='o', color='w', label='Poligonos Superdispersión', markerfacecolor='yellow', markersize=10),
+                   Line2D([0], [0], marker='o', color='w', label='Superdispersión', markerfacecolor='Firebrick', markersize=7),
+                   Line2D([0], [0], color='red', lw=2, label='Focos Superdispersión')]
 
-df_final = pd.concat((geo_pagerank, geo_locations, geo_pagerank_trace), ignore_index = True)
-df_final.to_file(os.path.join(export_folder_location,shapefile_folder,shapefile_name))
+ax.legend(handles=legend_elements)
+
+
+ax.figure.savefig(os.path.join(export_folder_location, 'superdispersion_bogota.png'), dpi = 150)
+
+

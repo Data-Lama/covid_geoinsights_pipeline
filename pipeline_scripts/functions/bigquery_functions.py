@@ -3,6 +3,7 @@
 
 from google.cloud import bigquery
 import pandas as pd
+import geopandas as gpd
 
 # Constants
 project_id = "grafos-alcaldia-bogota"
@@ -175,3 +176,33 @@ def get_graph_attribute(client, location_id, attribute_id):
     """
 
     return run_simple_query(client, query, allow_large_results = True)
+
+
+def get_location_geometries_by_ids(client, location_ids):
+    '''
+    Extract geometries from the specific location_ids
+
+    '''
+
+    if len(location_ids) == 0:
+        raise ValueError('Please provide at least one location')
+
+
+    where_string = "location_id = '" + "' OR location_id ='".join(location_ids) + "'"
+
+    query = f"""
+            SELECT location_id, name, geometry
+            FROM `grafos-alcaldia-bogota.geo.locations_geometries`
+            WHERE {where_string}
+    """
+
+
+    df = run_simple_query(client, query, allow_large_results = True) 
+    df['geometry'] = gpd.GeoSeries.from_wkt(df['geometry'])
+    df = gpd.GeoDataFrame(df, geometry='geometry')
+    df.geometry = df.geometry.set_crs("EPSG:4326")
+
+    # Projects
+    df = df.to_crs(epsg=3857)
+
+    return(df)
