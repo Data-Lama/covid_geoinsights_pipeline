@@ -51,7 +51,7 @@ def get_driver(download_dir):
 	'''
 
 
-	desktop = False
+	desktop = True
 
 	if desktop:
 

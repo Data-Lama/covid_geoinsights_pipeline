@@ -20,6 +20,10 @@ def get_personalized_ppr(nodes, edges, weighted_edges = False):
     if edges.shape[0] > 0:
         G.add_edges(edges.apply(lambda df: (df.id1, df.id2), axis = 1))
 
+    # Reset weights cannot be all zeros
+    if nodes.weight.sum() == 0:
+        nodes['weight'] = 1
+    
     # Checks if weighted
     if weighted_edges:
         G.es['weight'] = edges.weight.values        

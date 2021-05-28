@@ -1,6 +1,6 @@
 # Bogota Extractor
 # Extracts the cases from the BigQuery Database mantained by Servinformacion
-
+ 
 # Loads the different libraries
 import numpy as np
 import pandas as pd
@@ -8,7 +8,6 @@ import os, sys
 
 import bigquery_functions as bqf
 import general_functions as gf
-
 
 # Global Directories
 from global_config import config
