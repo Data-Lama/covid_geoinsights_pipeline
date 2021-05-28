@@ -354,4 +354,4 @@ if __name__ == "__main__":
                                     'display_name' : 'Cuadrantes de Salud'})
     
 
-    main(location_graph_id, dataset_id, location_folder_name, location_name, "2021-05-01", 7, other_geopandas_to_draw = other_geopandas_to_draw)
+    main(location_graph_id, dataset_id, location_folder_name, location_name, other_geopandas_to_draw = other_geopandas_to_draw)
