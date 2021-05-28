@@ -54,7 +54,7 @@ if not os.path.exists(export_folder_location):
 # ---------- FUNCTIONS ------------ #
 
 def calcualte_rank(idxs, df):
-    weights = {"Pagerank Top": 2,
+    weights = {"Pagerank Top": 1,
                 "Contacts Top": 1}
     rank = 0
     for idx in idxs:
