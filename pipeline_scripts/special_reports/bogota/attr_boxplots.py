@@ -3,17 +3,20 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# Set credentials explicitly for jupyter
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/andreaparra/Dropbox/4_Work/DataLamaCovid/gcp/andrea-grafos-bogota-key.json"
+
 from google.cloud import bigquery
 from google.api_core.exceptions import BadRequest
 from google.cloud.exceptions import NotFound
 
 # local imports
-import pipeline_scripts.special_reports.bogota.bogota_constants as cons
+import bogota_constants as cons
 
-# Global Directories
-from global_config import config
-data_dir = config.get_property('data_dir')
-analysis_dir = config.get_property('analysis_dir')
+# # Global Directories
+# from global_config import config
+# data_dir = config.get_property('data_dir')
+# analysis_dir = config.get_property('analysis_dir')
 
 # ------------- CONSTANTS -------------- #
 
@@ -35,6 +38,8 @@ ATTR_TRANSLATE = {"number_of_contacts": "Numero de contactos",
                  "pagerank_gini_index": "Indice Pagerank GINI",
                 "personalized_pagerank_gini_index": "Indice Pagerank GINI (ponderado)"}
 
+box_plots = True
+
 # ------------- FUNCTIONS -------------- #
 
 
@@ -52,11 +57,13 @@ location_folder_name = sys.argv[1]
 start_time = sys.argv[2]
 location_ids = sys.argv[3:]
 
-# Declares the export location
-export_folder_location = os.path.join(analysis_dir, location_folder_name)
+# # Declares the export location
+# export_folder_location = os.path.join(analysis_dir, location_folder_name)
 
-if not os.path.exists(export_folder_location):
-    os.makedirs(export_folder_location)    
+# if not os.path.exists(export_folder_location):
+#     os.makedirs(export_folder_location)    
+
+export_folder_location = os.path.join("/", "Users", "andreaparra", "Desktop", "attr_boxplots")
 
 # Gets data
 client = bigquery.Client(location="US")
@@ -111,24 +118,35 @@ for location in df_graph.location_id.unique():
     fig.subplots_adjust(bottom=0.5)  
 
     axes = [ax1, ax2, ax3]
-    for idx, attr in enumerate(attributes): 
 
-        ax = axes[idx]
-        data_to_plot = []
-        for window in df_tmp.window.unique():
-            df_window = df_graph[df_graph["window"] == window]
-            data_to_plot.append(df_window[attr])
+    if box_plots:
+        for idx, attr in enumerate(attributes): 
+
+            ax = axes[idx]
+            data_to_plot = []
             
+            for window in df_tmp.window.unique():
+                df_window = df_tmp[df_tmp["window"] == window]
+                data_to_plot.append(df_window[attr])
+                
 
-        # Create the boxplot
-        bp = ax.boxplot(data_to_plot)
-        if idx != (len(axes) - 1):
-            ax.set_xticklabels([])
-        else:
-            ax.set_xticklabels([d.strftime('%Y-%m-%d') for d in window_start_date], rotation=90)
+            # Create the boxplot
+            bp = ax.boxplot(data_to_plot)
+            if idx != (len(axes) - 1):
+                ax.set_xticklabels([])
+            else:
+                ax.set_xticklabels([d.strftime('%Y-%m-%d') for d in window_start_date], rotation=90)
+                
+
+            ax.set_title(ATTR_TRANSLATE[attr])
             
+        plt.suptitle(cons.TRANSLATE[location], fontsize=18)
+        fig.savefig(os.path.join(export_folder_location,f"{location}_boxplot.png"), bbox_inches='tight')    
 
-        ax.set_title(ATTR_TRANSLATE[attr])
-        
-    plt.suptitle(cons.TRANSLATE[location], fontsize=18)
-    fig.savefig(os.path.join(export_folder_location,f"{location}_boxplot.png"))    
+    else:
+        for idx, attr in enumerate(attributes): 
+            ax = axes[idx]
+            data_to_plot = []
+
+            df_graph.groupby(["window"]).mean()
+    

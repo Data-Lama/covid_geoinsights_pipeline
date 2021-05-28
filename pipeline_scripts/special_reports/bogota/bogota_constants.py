@@ -57,5 +57,11 @@ TRANSLATE = {'colombia_bogota_localidad_barrios_unidos': "Barrios Unidos",
              'colombia_bogota_localidad_usme': "Usme",
              'colombia_bogota_localidad_antonio_narino': "Antonio Nariño",
              'colombia_bogota_localidad_candelaria': "La Candelaria",
-             'colombia_bogota': 'Bogotá'}
+             'colombia_bogota': 'Bogotá',
+             'colombia_bogota_super_spreading_1': 'Teusaquillo - Clinica Palermo',
+             'colombia_bogota_super_spreading_2':'Engativa - Vivienda mixta',
+             'colombia_bogota_super_spreading_4': 'Suba - Parqueadero mulas',
+             'colombia_bogota_super_spreading_6': 'Kennedy Central - Plaza mercado',
+             'colombia_bogota_super_spreading_8': 'Los Cedros - Colegios privados'
+             }
 
