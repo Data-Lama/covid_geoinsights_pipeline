@@ -8,6 +8,7 @@ from shapely.geometry import Point
 
 # Local imports 
 import special_functions.geo_functions as gfun
+import superspreading_analysis as ss_analysis
 
 # Global Directories
 from global_config import config
@@ -262,6 +263,7 @@ gdf_super_spreading_aggl_caracterized[columns_to_save].to_file(out_file, index=F
 
 # Heatmap
 variables = ["COM-IND-TURI", "FUN-PUB", "SALUD", "TRANS", "EDUC", "TRANSMI"]
+variables_traducidas = ["Comercio, industria y turismo", "Función Pública", "Salúd", "Transporte", "Educación", "Transmilenio"]
 df_heatmap = gdf_super_spreading_aggl_caracterized[variables].copy()
 df_heatmap = df_heatmap.fillna(0)
 for col in df_heatmap.columns:
@@ -273,9 +275,74 @@ df_heatmap = df_heatmap.transpose()
 fig, ax = plt.subplots(1,1, figsize=(5,5))
 ax.imshow(df_heatmap, cmap='GnBu')
 ax.set_xticks(np.arange(0, df_heatmap.shape[1]))
+ax.set_xticklabels([str(i) for i in range(1, (df_heatmap.shape[1] + 1))])
 ax.xaxis.label.set_color('w')
 ax.set_yticks(np.arange(0, len(variables)))
 ax.yaxis.label.set_color('w')
-ax.set_yticklabels(variables)
-out_file = os.path.join(os.path.join(export_folder_location, "attributes.png"))
+ax.set_yticklabels(variables_traducidas)
+out_file = os.path.join(os.path.join(export_folder_location, "superspreading_detalles.png"))
 fig.savefig(out_file, bbox_inches='tight')
+
+# --------------- HISTORIC ---------------- #
+result_folder_name = "edgelist_detection"
+shapefile_folder = "shapefile_colombia_bogota_historic"
+shapefile_name = "superspreader_colombia_bogota_historic.shp"
+
+historic_folder_location = os.path.join(analysis_dir, 
+                                        location_folder_name, 
+                                        result_folder_name, 
+                                        shapefile_folder)
+
+if not os.path.exists(historic_folder_location):
+    os.makedirs(historic_folder_location) 
+
+days_go_back = 15
+frequency = f"{days_go_back + 1}D"
+
+file_name = os.path.join(historic_folder_location, shapefile_name)
+if os.path.isfile(file_name):
+    gdf_historic = gpd.read_file(file_name)
+    gdf_historic["date_time"] = gdf_historic.apply(lambda x: pd.Timestamp(x["date_time"]), axis=1)
+    start_date = gdf_historic["date_time"].max() + pd.Timedelta(days=days_go_back)
+    print(indent + f"Historic data found. Starting on {start_date} using {days_go_back} days window.")
+else:
+    df_empty = {"date_time": [],"lat": [], "lon": [], "geometry": []}   
+    gdf_historic = gpd.GeoDataFrame(df_empty, crs="EPSG:4326")
+    start_date = pd.Timestamp("2021-01-01") + pd.Timedelta(days = days_go_back)
+    print(indent + f"No file found for historic data. Creating new file. Starting on {start_date}")
+
+location_graph_id = "colombia_bogota" 
+dataset_id = "edgelists_cities" 
+location_folder_name = "bogota"
+location_name = "Bogotá"
+
+for d in pd.date_range(start_date, pd.to_datetime('today'), freq=frequency):
+    if gdf_historic["date_time"].max() >= pd.to_datetime('today') - pd.Timedelta(days=1):
+        print(indent + f"Data is up to date.")
+        break
+    
+    gdf = ss_analysis.main(location_graph_id, 
+                            dataset_id, 
+                            location_folder_name, 
+                            location_name, 
+                            max_date = d,
+                            days_go_back = days_go_back,
+                            other_geopandas_to_draw=[], 
+                            save=False)
+
+
+    gdf = gdf[gdf["type"].isin(["Pagerank Top", "Contacts Top"])]
+    gdf['geometry'] = gdf.apply(lambda x: Point(x["lon"], x["lat"]), axis=1)
+    gdf["date_time"] = (d - pd.Timedelta(days_go_back))
+
+    gdf.drop(columns=["type", "total"], inplace=True)
+    gdf_historic = pd.concat([gdf_historic, gdf], ignore_index=True, axis=0)
+
+    gdf_historic_save = gdf_historic.copy()
+    gdf_historic_save["date_time"] = gdf_historic_save.apply(lambda x: x["date_time"].strftime('%Y-%m-%d'), axis=1)
+
+    gdf_historic_save.to_file(file_name)
+  
+# saves
+gdf_historic["date_time"] = gdf_historic.apply(lambda x: x["date_time"].strftime('%Y-%m-%d'), axis=1)
+gdf_historic.to_file(file_name)

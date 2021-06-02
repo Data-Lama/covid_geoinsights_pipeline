@@ -3,8 +3,6 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Set credentials explicitly for jupyter
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/andreaparra/Dropbox/4_Work/DataLamaCovid/gcp/andrea-grafos-bogota-key.json"
 
 from google.cloud import bigquery
 from google.api_core.exceptions import BadRequest
@@ -13,10 +11,10 @@ from google.cloud.exceptions import NotFound
 # local imports
 import bogota_constants as cons
 
-# # Global Directories
-# from global_config import config
-# data_dir = config.get_property('data_dir')
-# analysis_dir = config.get_property('analysis_dir')
+# Global Directories
+from global_config import config
+data_dir = config.get_property('data_dir')
+analysis_dir = config.get_property('analysis_dir')
 
 # ------------- CONSTANTS -------------- #
 
@@ -53,17 +51,19 @@ def get_window(window_start_date, date):
 # -------------------------------------- #
 
 # Get args
-location_folder_name = sys.argv[1]
-start_time = sys.argv[2]
-location_ids = sys.argv[3:]
+location_folder_name = "bogota"             # sys.argv[1]
+start_time = "2021-01-01"                   # sys.argv[2]
+location_ids = cons.OBSERVATION_IDS         # sys.argv[3:]
 
-# # Declares the export location
-# export_folder_location = os.path.join(analysis_dir, location_folder_name)
+# Declares the export location
+export_folder_location = os.path.join(analysis_dir, location_folder_name, "pagerank")
 
-# if not os.path.exists(export_folder_location):
-#     os.makedirs(export_folder_location)    
+if not os.path.exists(export_folder_location):
+    os.makedirs(export_folder_location)    
 
 export_folder_location = os.path.join("/", "Users", "andreaparra", "Desktop", "attr_boxplots")
+
+print(f"{indent}Plotting attributes per location id.")
 
 # Gets data
 client = bigquery.Client(location="US")
@@ -81,6 +81,7 @@ WHERE
     date > "{start_time}"
 """
 
+print(f"{indent}Getting data")
 query_job = client.query(query, job_config=job_config) 
 
 # Return the results as a pandas DataFrame
@@ -108,8 +109,8 @@ for attr in attributes:
     columns.append(attr)
 
 df_graph = df_graph[columns].copy()
-
 for location in df_graph.location_id.unique():
+    print(f"{indent}{indent}{location}")
 
     df_tmp = df_graph[df_graph["location_id"] == location].copy()
 
@@ -119,34 +120,29 @@ for location in df_graph.location_id.unique():
 
     axes = [ax1, ax2, ax3]
 
-    if box_plots:
-        for idx, attr in enumerate(attributes): 
 
-            ax = axes[idx]
-            data_to_plot = []
+    for idx, attr in enumerate(attributes): 
+
+        ax = axes[idx]
+        data_to_plot = []
+        
+        for window in df_tmp.window.unique():
+            df_window = df_tmp[df_tmp["window"] == window]
+            data_to_plot.append(df_window[attr])
             
-            for window in df_tmp.window.unique():
-                df_window = df_tmp[df_tmp["window"] == window]
-                data_to_plot.append(df_window[attr])
-                
 
-            # Create the boxplot
-            bp = ax.boxplot(data_to_plot)
-            if idx != (len(axes) - 1):
-                ax.set_xticklabels([])
-            else:
-                ax.set_xticklabels([d.strftime('%Y-%m-%d') for d in window_start_date], rotation=90)
-                
-
-            ax.set_title(ATTR_TRANSLATE[attr])
+        # Create the boxplot
+        bp = ax.boxplot(data_to_plot)
+        if idx != (len(axes) - 1):
+            ax.set_xticklabels([])
+        else:
+            ax.set_xticklabels([d.strftime('%Y-%m-%d') for d in window_start_date], rotation=90)
             
-        plt.suptitle(cons.TRANSLATE[location], fontsize=18)
-        fig.savefig(os.path.join(export_folder_location,f"{location}_boxplot.png"), bbox_inches='tight')    
 
-    else:
-        for idx, attr in enumerate(attributes): 
-            ax = axes[idx]
-            data_to_plot = []
+        ax.set_title(ATTR_TRANSLATE[attr])
+        
+    plt.suptitle(cons.TRANSLATE[location], fontsize=18)
+    fig.savefig(os.path.join(export_folder_location,f"{location}_boxplot.png"), bbox_inches='tight')    
 
-            df_graph.groupby(["window"]).mean()
+
     
