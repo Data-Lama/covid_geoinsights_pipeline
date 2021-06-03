@@ -40,7 +40,7 @@ class Unifier(GenericUnifier):
 
     def build_cases_geo(self):
 
-        
+
         # Reads cases
         cases = gf.decrypt_df(os.path.join(self.raw_folder,'cases', self.get('cases_file_name')), config.get_property('key_string') )
 
@@ -53,8 +53,7 @@ class Unifier(GenericUnifier):
         cases[current_state_col] = cases[current_state_col].apply(lambda s: s.replace(' ',''))
         cases.loc[cases[current_state_col] == '', current_state_col] = 'Infectado'
         cases = cases[cases[current_state_col].isin(['Recuperado','Fallecido','Infectado'])].dropna()
-        
-        
+
         # Discriminates by status
         cases['num_cases'] = 1
         cases.loc[cases[current_state_col] == 'Recuperado','num_recovered'] = 1
@@ -65,19 +64,21 @@ class Unifier(GenericUnifier):
         cases.loc[(cases[current_state_col] == 'Infectado') & (cases[location_col].isin(['Hospital UCI', 'Hospital'])),'num_infected_in_hospital'] = 1
         cases.loc[(cases[current_state_col]== 'Infectado') & (~cases[location_col].isin(['Hospital UCI', 'Hospital'])),'num_infected_in_house'] = 1
 
+        # Add in ICU
+        cases.loc[(cases[current_state_col]== 'Infectado') & (cases[location_col].isin(['Hospital UCI'])),'num_infected_in_icu'] = 1
+
+
         # Removes temporary columns
         cases = cases.fillna(0).drop([current_state_col,location_col], axis = 1)
-        
+
         # Convert to numeric
         cases.lon = cases.lon.apply(lambda l: float(str(l).replace(',','.')))
         cases.lat = cases.lat.apply(lambda l: float(str(l).replace(',','.')))
-        
+
         # Groups
-        cases = cases.groupby(['date_time','geo_id','location','lon','lat']).sum().reset_index()        
+        cases = cases.groupby(['date_time','geo_id','location','lon','lat']).sum().reset_index()
 
         return(cases)
-        
-
 
     def build_polygons(self):
 
@@ -149,8 +150,28 @@ class Unifier(GenericUnifier):
             polygons['poly_lat'] = centroids.y
 
             # Adjusts geometry  to latiude and longitud
-            polygons = polygons.to_crs('epsg:4326')         
+            polygons = polygons.to_crs('epsg:4326')     
 
+        elif definition == 'upz':
+            # Polygons
+            polygons = geopandas.read_file(os.path.join(self.raw_folder, 'geo', self.get('shape_upz_file_name')))
+            
+            # Polygon Info
+            polygons = polygons[['UPlCodigo','UPlNombre','geometry']].rename(columns = {'UPlCodigo':'poly_id', 'UPlNombre':'poly_name'})
+
+            # Adjust names
+            polygons.poly_name = polygons.poly_name.apply(lambda s: " ".join([(x[0] + x[1:].lower()) for x in s.split(" ")]))    
+
+            # Adjust poly id
+            polygons.poly_id = polygons.poly_id.apply(lambda s: s.replace("UPZ","colombia_bogota_upz_"))
+
+            # Extracts the center
+            centroids = geo.get_centroids(polygons.geometry)
+            polygons['poly_lon'] = centroids.x
+            polygons['poly_lat'] = centroids.y
+
+            # Adjusts geometry  to latiude and longitud
+            polygons = polygons.to_crs('epsg:4326')        
 
 
         return(polygons)

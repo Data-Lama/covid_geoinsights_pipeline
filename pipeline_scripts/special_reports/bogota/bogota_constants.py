@@ -1,5 +1,12 @@
 # Analysis
 
+OBSERVATION_IDS = ["colombia_bogota_super_spreading_1",
+                    "colombia_bogota_super_spreading_2",
+                    "colombia_bogota_super_spreading_2",
+                    "colombia_bogota_super_spreading_4",
+                    "colombia_bogota_super_spreading_6",
+                    "colombia_bogota_super_spreading_8"]
+
 # Window to calculate "last week"
 WINDOW = 6
 
@@ -7,8 +14,8 @@ WINDOW = 6
 BASELINE_DATE = "2020-04-20"
 
 # Values correspond to pandas.Weekday() -> 0: Monday, 6: Sunday
-WEEKDAY_LIST = [0, 1, 2, 3, 4]
-WEEKEND_LIST = [5, 6]
+WEEKDAY_LIST = [0, 1, 2, 3]
+WEEKEND_LIST = [4, 5, 6]
 
 # Layout and design
 COLORS = {'colombia_bogota_localidad_barrios_unidos': "#2D864A",
@@ -42,19 +49,25 @@ TRANSLATE = {'colombia_bogota_localidad_barrios_unidos': "Barrios Unidos",
              'colombia_bogota_localidad_bosa': "Bosa",
              'colombia_bogota_localidad_chapinero': "Chapinero",
              'colombia_bogota_localidad_ciudad_bolivar': "Ciudad Bolivar",
-             'colombia_bogota_localidad_engativa': "Engativa",
-             'colombia_bogota_localidad_fontibon': "Fontibon",
+             'colombia_bogota_localidad_engativa': "Engativá",
+             'colombia_bogota_localidad_fontibon': "Fontibón",
              'colombia_bogota_localidad_kennedy': "Kennedy",
-             'colombia_bogota_localidad_los_martires': "Los Martires",
+             'colombia_bogota_localidad_los_martires': "Los Mártires",
              'colombia_bogota_localidad_puente_aranda': "Puente Aranda",
              'colombia_bogota_localidad_rafael_uribe_uribe': "Rafael Uribe Uribe",
              'colombia_bogota_localidad_san_cristobal': "San Cristobal",
-             'colombia_bogota_localidad_santa_fe': "Santa Fe",
+             'colombia_bogota_localidad_santa_fe': "Santa Fé",
              'colombia_bogota_localidad_suba': "Suba",
              'colombia_bogota_localidad_teusaquillo': "Teusaquillo",
              'colombia_bogota_localidad_tunjuelito': "Tunjuelito",
-             'colombia_bogota_localidad_usaquen': "Usaquen",
+             'colombia_bogota_localidad_usaquen': "Usaquén",
              'colombia_bogota_localidad_usme': "Usme",
              'colombia_bogota_localidad_antonio_narino': "Antonio Nariño",
-             'colombia_bogota_localidad_candelaria': "La Candelaria"}
-
+             'colombia_bogota_localidad_candelaria': "La Candelaria",
+             'colombia_bogota': 'Bogotá',
+             'colombia_bogota_super_spreading_1': 'Teusaquillo - Clinica Palermo',
+             'colombia_bogota_super_spreading_2':'Engativa - Vivienda mixta',
+             'colombia_bogota_super_spreading_4': 'Suba - Parqueadero mulas',
+             'colombia_bogota_super_spreading_6': 'Kennedy Central - Plaza mercado',
+             'colombia_bogota_super_spreading_8': 'Los Cedros - Colegios privados'
+             }
