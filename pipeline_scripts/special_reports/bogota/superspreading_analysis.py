@@ -1,5 +1,9 @@
 # Script for detecting superspreading locations in Bogotá
 
+import os
+# Set credentials explicitly for jupyter
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/andreaparra/Dropbox/4_Work/DataLamaCovid/gcp/andrea-grafos-bogota-key.json"
+
 # Loads the different libraries
 import numpy as np
 import pandas as pd
@@ -60,7 +64,7 @@ def main(location_graph_id,
         location_name,
         max_date = None, # max date to start analysis (goes backwards) If None, graps latest in DB (can be string or pandas.datetime)
         days_go_back = 14, # two weeks (number of days to go back in analysis)
-        other_geopandas_to_draw = []):
+        other_geopandas_to_draw = [], save=True):
     '''
 
     other_geopandas_to_draw : Array of diccionaries:
@@ -334,7 +338,10 @@ def main(location_graph_id,
     geo_locations['type'] = 'Contacts Top'
 
     df_final = pd.concat((geo_pagerank, geo_locations, geo_pagerank_trace), ignore_index = True)
-    df_final.to_file(os.path.join(export_folder_location,shapefile_folder,shapefile_name))
+    if save:
+        df_final.to_file(os.path.join(export_folder_location,shapefile_folder,shapefile_name))
+    else:
+        return df_final
 
 
 # Runs the script

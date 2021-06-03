@@ -1,5 +1,12 @@
 # Analysis
 
+OBSERVATION_IDS = ["colombia_bogota_super_spreading_1",
+                    "colombia_bogota_super_spreading_2",
+                    "colombia_bogota_super_spreading_2",
+                    "colombia_bogota_super_spreading_4",
+                    "colombia_bogota_super_spreading_6",
+                    "colombia_bogota_super_spreading_8"]
+
 # Window to calculate "last week"
 WINDOW = 6
 
@@ -64,4 +71,3 @@ TRANSLATE = {'colombia_bogota_localidad_barrios_unidos': "Barrios Unidos",
              'colombia_bogota_super_spreading_6': 'Kennedy Central - Plaza mercado',
              'colombia_bogota_super_spreading_8': 'Los Cedros - Colegios privados'
              }
-
