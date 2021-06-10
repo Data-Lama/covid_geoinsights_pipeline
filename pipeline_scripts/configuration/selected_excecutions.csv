@@ -1,12 +1,12 @@
 location_name,locations_folder,stage,folder_location,position,excecute,script_name,script_type,script_parameters
-All,,PRE,PRE,1,NO,download_facebook,python,
+All,,PRE,PRE,1,YES,download_facebook,python,
 ALL,,PRE,extractors,1,NO,johns_hopkins_extractor,python,
 USA,usa,PRE,extractors,2,NO,usa_extractor,python,
 Bogota,bogota,extract,extractors,1,NO,bogota_extractor,python,
 Bogota,bogota,unify,unifiers,1,NO,universal_generic_unifier,python,Bogota bogota
 Bogota,bogota,agglomerate,agglomerators,2,NO,universal_geometry_agglomerate,python,Bogota bogota
 Bogota,bogota,analyse,special_reports/bogota,1,NO,superspreading_analysis,python,
-Bogota,bogota,analyse,special_reports/bogota,1,YES,ppr_gini,python,
+Bogota,bogota,analyse,special_reports/bogota,1,NO,ppr_gini,python,
 Peru,peru,extract,extractors,1,NO,single_file_download_extractor,python,Peru peru
 Peru,peru,unify,unifiers,1,NO,universal_generic_unifier,python,Peru peru
 Peru,peru,agglomerate,agglomerators,1,NO,universal_radius_agglomerate,python,Peru peru 10

@@ -21,8 +21,16 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException 
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.firefox.options import Options
+
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as expect
+
+
 
 import geo_functions as geo
 
@@ -44,6 +52,16 @@ MOVEMENT_COLS = set(['geometry', 'date_time', 'start_polygon_id', 'start_polygon
 					 'n_difference','percent_change', 'is_statistically_significant', 'z_score','start_lat', 
 					 'start_lon', 'end_lat', 'end_lon', 'start_quadkey','end_quadkey'])
 
+PLACEHOLDER_SEARCH = "Search for a dataset by name"
+
+MAX_DAYS_CRAWLING = 30
+
+# Interval Types
+DEFAULT = "DEFAULT"
+PRE_DETERMINED = "PRE_DETERMINED"
+CUSTOM = "CUSTOM"
+
+
 
 def get_driver(download_dir):
 	'''
@@ -59,7 +77,7 @@ def get_driver(download_dir):
 		fp.set_preference("browser.download.folderList", 2)
 		fp.set_preference("browser.download.manager.showWhenStarting", False)
 		fp.set_preference("browser.download.dir", download_dir)
-		fp.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv")
+		fp.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/zip")
 		driver = webdriver.Firefox(firefox_profile=fp)
 
 	else:
@@ -68,7 +86,7 @@ def get_driver(download_dir):
 		fp.set_preference("browser.download.folderList", 2)
 		fp.set_preference("browser.download.manager.showWhenStarting", False)
 		fp.set_preference("browser.download.dir", download_dir)
-		fp.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv")
+		fp.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/zip")
 
 		cap = DesiredCapabilities().FIREFOX
 		cap["marionette"] = False
@@ -128,9 +146,218 @@ def login_driver(driver):
 
 	time.sleep(np.random.randint(3,5))
 
+	driver.get("https://partners.facebook.com/data_for_good/data/")
+
+	time.sleep(np.random.randint(3,5))
+
 	return(driver)
 
 
+def download_zip_movement_interval(driver, download_dir, database_name, database_id, days = 7, ident = '               '):
+	'''
+	Downloads a zip file from the new GeoInsights portal
+	'''
+
+	# Does not have built-in option to check if download has finished
+	# Loops over the existing files
+	zip_files = set()
+	for file in os.listdir(download_dir):
+		if file.endswith('.zip') or file.endswith['.zip.part'] in file:
+			zip_files.add(file)
+
+
+	# Assigns the target interval 
+
+	if days <= 0:
+		raise ValueError(f"Days has to be a positive number: {days}")
+	
+	elif days <= 7:
+		interval_type = DEFAULT
+	elif days <= 14:
+		interval_type = PRE_DETERMINED
+		target_interval = "Últimos 14 días"
+	elif days <= MAX_DAYS_CRAWLING:
+		interval_type = CUSTOM
+	else:
+		raise ValueError(f"No support for days larger than 30: {days}, please download manually")	
+
+	# Filters the database
+	elem = WebDriverWait(driver, 10, 1).until(expect.visibility_of_element_located(
+			(By.XPATH, f"//input[@placeholder='{PLACEHOLDER_SEARCH}']")))
+
+	elem.clear()
+	elem.send_keys(database_name)        
+
+	# Sleeps
+	time.sleep(np.random.randint(3,5))
+
+	# Extracts the location of the movement between tiles (position)
+
+	candidates = driver.find_elements_by_xpath("//div[@role='listitem']")
+	valid_names = ["Facebook Population (Administrative Region)",
+					"Movement between Administrative Regions",
+					"Facebook Population (Tile Level)",
+					"Movement between tiles",
+					"Colocation | Data from"]
+
+	order = []
+	for c in candidates:
+		divs = c.find_elements_by_tag_name("div")
+		for div in divs:
+			inner_divs = div.find_elements_by_tag_name("div")
+			inner_html = div.get_attribute('innerHTML')
+			if len(inner_divs) == 0 and np.sum([v in inner_html for v in valid_names]) > 0:
+				order.append(inner_html)
+		
+
+	pos = np.where(["Movement between tiles" in k for k in order])[0][0]
+
+
+	button = driver.find_elements_by_xpath("//*[text()[contains(., 'Descargar')]]")[pos]
+	button.click()
+
+	time.sleep(np.random.randint(3,5))
+
+	if interval_type != DEFAULT:
+		
+
+		# Open personalized interval
+		candidates = driver.find_elements_by_xpath("//div[@tabindex='0']")
+		for c in candidates:
+			divs = c.find_elements_by_tag_name("div")
+			for div in divs:
+				inner = div.get_attribute('innerHTML')
+				if "Últimos 7 días" in inner:
+					div.click()
+					break
+		
+		time.sleep(np.random.randint(2,4))
+
+		# Predetermined
+		if interval_type == PRE_DETERMINED:
+			# Selects the desired predetermined interval
+			try:
+				candidates = driver.find_elements_by_xpath("//div[@tabindex='-1']")
+				for c in candidates:
+					divs = c.find_elements_by_tag_name("div")
+					for div in divs:
+						inner_divs = div.find_elements_by_tag_name("div")
+						inner_html = div.get_attribute('innerHTML')
+						if len(inner_divs) == 0 and target_interval in inner_html:
+							div.click()
+							break
+
+			except StaleElementReferenceException:
+				pass
+		
+		# Custom
+		elif interval_type == CUSTOM:
+			
+			# Moves to previous month
+			candidates = driver.find_elements_by_xpath("//div[@tabindex='0' and @role='button']")
+			for c in candidates:
+				divs = c.find_elements_by_tag_name("div")
+				for div in divs:
+					inner = div.get_attribute('innerHTML')
+					if "Mes anterior" == inner:
+						div.find_element_by_xpath('..').click()
+						break
+
+
+			# Extracts max date button
+			max_date_button = driver.find_elements_by_xpath("//div[@aria-disabled='false' and @tabindex='-1' and @role='button']")[-1]
+			min_date_button = None
+
+			# Saves the date
+			target_inner_html = max_date_button.get_attribute('innerHTML')
+
+			# Checks 30th
+			if target_inner_html == "31":
+				target_inner_html = "30"
+
+			# Extracts the one from the previous month
+			candidates = driver.find_elements_by_xpath("//div[@aria-disabled='false' and @tabindex='-1' and @role='button']")
+			for div in candidates:
+				inner = div.get_attribute('innerHTML')
+				
+				if inner == target_inner_html:
+					min_date_button = div
+					break
+
+			#Clicks both dates
+			min_date_button.click()
+			time.sleep(np.random.randint(1,2))
+			max_date_button.click()
+			time.sleep(np.random.randint(1,2))
+
+
+			# Updates the interval
+			try:
+				candidates = driver.find_elements_by_xpath("//div[@tabindex='0' and @role='button']")
+				for c in candidates:
+					divs = c.find_elements_by_tag_name("div")
+					for div in divs:
+						inner = div.get_attribute('innerHTML')
+						if "Actualizar" == inner:
+							div.click()
+							break
+						
+			except StaleElementReferenceException:
+				pass 
+
+
+		else:
+			raise ValueError(f"No support for Interval Type: {interval_type}")    
+
+
+	time.sleep(np.random.randint(2,3))
+	# Clicks the download button
+	try:
+		candidates = driver.find_elements_by_xpath("//div[@tabindex='0' and @role='button']")
+		for c in candidates:
+			divs = c.find_elements_by_tag_name("div")
+			for div in divs:
+				inner = div.get_attribute('innerHTML')
+				if "Download Files" in inner:
+					div.click()
+					break
+				
+	except StaleElementReferenceException:
+		pass
+
+
+	time.sleep(np.random.randint(10,15))
+
+	num_tries = 10
+	sleep_time = 10
+	file_name = None
+
+	# Waits for download to start
+	for j in range(num_tries):
+		for file in os.listdir(download_dir):
+
+			if database_id in file and file.endswith('.zip') and file not in zip_files:
+				file_name = file
+				break
+		
+		if file_name is None:
+			print(ident + '   Waiting for to start downloading')
+			time.sleep(sleep_time)
+		else:
+			break
+		
+	print(ident + "File started Downloading")
+	# Waits for download to finish
+	for j in range(num_tries):
+		if os.path.exists(os.path.join(download_dir, file_name + '.part')):
+			print(ident + '   Waiting for file to finish downloading')
+			time.sleep(sleep_time)
+		else:
+			break
+	
+	print(ident + "File Downloaded")
+
+	return file_name
 
 def download_fb_file(driver, type_data, dataset_id, date, extra_param = None, timeout = 20):
 	'''
@@ -156,7 +383,7 @@ def download_fb_file(driver, type_data, dataset_id, date, extra_param = None, ti
 
 
 
-def check_movement_integrity(folder_name, fb_location_name, type_data, start_date, end_date):
+def check_movement_integrity(folder_name, dataset_id, type_data, start_date, end_date):
 	'''
 	Checks the integrity of the movement files
 	'''
@@ -169,8 +396,7 @@ def check_movement_integrity(folder_name, fb_location_name, type_data, start_dat
 
 	if type_data == 'movement':
 
-		name_string = '{}'.format(fb_location_name)
-		type_data_string = 'Movement between Tiles'
+		name_string = '{}'.format(dataset_id)
 		
 		# Wtong files
 		wrong_files = []
@@ -187,23 +413,30 @@ def check_movement_integrity(folder_name, fb_location_name, type_data, start_dat
 		# Iterates over the files in folder
 		for file in os.listdir(directory):
 			if file.endswith('.csv'):
-				if name_string not in file or type_data_string not in file:
+				
+				if name_string not in file:
 					wrong_files.append(file)
 				elif os.stat(os.path.join(directory, file)).st_size > 0:
 
-					date_string = file.split('_')[-1]
-					date_string = date_string.split('.')[0]
-					d = pd.to_datetime(date_string)
+					date_string = file.split('_')[1]
+					hour_string = file.split('_')[-1].replace('.csv','')
+					hour_string = hour_string[0:2] + ':' + hour_string[2:]
+					final_date_string = date_string + ' ' + hour_string
+					
+					d = pd.to_datetime(final_date_string)
 					if d in dates:
 						dates.remove(d)
-				
-		
-		return(wrong_files, list(dates))
+
+
+		return(wrong_files, np.sort(list(dates)))
 
 
 	elif type_data == 'movement_range':
 
-		name_string = '{}'.format(fb_location_name)
+		# NOTE 
+		# OUTDATED CODE. NEW FB PLATFORM DOES NOT HAVE MOVEMENT RANGE
+
+		name_string = '{}'.format(dataset_id)
 		type_data_string = 'Movement Range_'
 		
 		# Wtong files

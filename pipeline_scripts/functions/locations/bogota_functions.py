@@ -139,6 +139,7 @@ class Unifier(GenericUnifier):
             polygons = geopandas.read_file(os.path.join(self.raw_folder, 'geo', self.get('shape_locality_file_name')))
             
             polygons.geometry = polygons.geometry.set_crs("EPSG:4326")
+            
             # Polygon Info
             polygons = polygons[['location_i','label','geometry']].rename(columns = {'location_i':'poly_id', 'label':'poly_name'})
                         
