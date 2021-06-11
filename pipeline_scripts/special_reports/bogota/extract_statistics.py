@@ -6,6 +6,7 @@ import matplotlib.dates as mdates
 from google.cloud import bigquery
 import os, sys
 import pandas as pd
+import numpy as np
 from datetime import datetime, timedelta
 
 import bigquery_functions as bqf
@@ -34,6 +35,16 @@ def main():
     Extracts the different statistics directly for the bogota weekly report
     '''
 
+    print(ident + f"Extracts statistics for {location_graph_id}")
+
+    # Export folder
+    export_folder_location = os.path.join(analysis_dir, 
+                                            location_folder_name, 
+                                            result_folder_name)
+
+    if not os.path.exists(export_folder_location):
+        os.makedirs(export_folder_location)        
+
     # Number of cases previous seven days
 
     start_date = (datetime.today() - timedelta(days = 10)).strftime("%Y-%m-%d")
@@ -50,7 +61,7 @@ def main():
             )
     """
 
-    average_cases = str(int(np.round(bqf.run_simple_query(client, sql).average_cases[0])))
+    average_cases = str(int(np.round(bqf.run_simple_query(client, sql_extract).average_cases[0])))
 
 
     # Top Localities
@@ -68,7 +79,7 @@ def main():
             ORDER BY attribute_value DESC
     """
 
-    df_res =  bqf.run_simple_query(client, sql)
+    df_res =  bqf.run_simple_query(client, sql_extract)
     df_res['name'] = df_res['name'].apply(lambda s: s.replace("Bogotá Localidad ","")) 
     names = df_res['name'].values
 
@@ -76,8 +87,12 @@ def main():
 
 
     # Creates CSV
-    df = pd.dataFrame({'name', top_localities })
+    df = pd.DataFrame([{'parameter_name':"top_localities", "parameter_value":top_localities},
+                       {'parameter_name':"average_cases", "parameter_value":average_cases}])
 
+    df.to_csv(os.path.join(export_folder_location, 'statistics.csv'), index = False, sep = ";")
+
+    print(ident + "Done!")
 
     
 
