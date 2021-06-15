@@ -103,7 +103,10 @@ cases_cols = [col for col in cases.columns if 'num_' in col]
 print(ident + '      Agglomerates Cases')
 # Creates the agglomerated cases
 agg_cases = geopandas.sjoin(cases, polygons, how = 'inner', op = 'within')
-agg_cases = agg_cases[['date_time','location','poly_id'] + cases_cols]
+agg_cases = agg_cases[['date_time','poly_name','poly_id'] + cases_cols].rename(columns = {'poly_name':'location'})
+
+# Groups
+agg_cases = agg_cases.groupby(['date_time','location','poly_id']).sum().reset_index()
 
 
 print(ident + '      Agglomerates Polygons')

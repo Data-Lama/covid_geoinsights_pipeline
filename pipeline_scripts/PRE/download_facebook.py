@@ -1,5 +1,6 @@
 # Script that doelioads the facebook movement data and moves it to the corresponding folders
 # Imports all the necesary functions
+ 
 import fb_functions as fb
 # Other imports
 import os, sys
@@ -9,6 +10,7 @@ import numpy as np
 import pandas as pd
 import time
 import shutil
+import zipfile
 
 #Directories
 from global_config import config
@@ -31,7 +33,7 @@ if not os.path.exists(temp_folder):
 	os.makedirs(temp_folder)
 
 # Reads the selected locations
-selected_locations_all = pd.read_csv(os.path.join(configuration_folder, 'facebook_extraction.csv'), parse_dates = ['start_date'])
+selected_locations_all = pd.read_csv(os.path.join(configuration_folder, 'facebook_extraction.csv'),dtype={'database_id': object}, parse_dates = ['start_date'])
 selected_locations = selected_locations_all[selected_locations_all.excecute == 'YES'].copy()
 
 
@@ -47,7 +49,7 @@ else:
 
 
 	# Boolean that checks if carwling is necesarry
-	carwling_necesary = False
+	crawling_necesary = False
 
 	# Results dicitonaries
 	missing = []
@@ -56,7 +58,7 @@ else:
 	# Iterates over the locations
 	for ind, row in selected_locations.iterrows():
 
-		_, m = fb.check_movement_integrity(row.location_folder, row.fb_location_name, row.type_data, row.start_date, end_date)
+		_, m = fb.check_movement_integrity(row.location_folder, row.database_id, row.type_data, row.start_date, end_date)
 		print(ident + '   {} ({}): {} missing'.format(row.location_name, row.type_data, len(m)))
 
 		if len(m) > 0:
@@ -73,72 +75,77 @@ else:
 			d['destination_folder'] = destination_folder
 			missing.append(d)
 
-			carwling_necesary = True
+			crawling_necesary = True
 
 
 	print('')
 
 	print(ident + 'Downloads Missing Data')	
 	
-	driver = fb.get_driver(temp_folder)
+	driver = None
 
-
-
-	if carwling_necesary:
+	if crawling_necesary:
+		driver = fb.get_driver(temp_folder)
 		driver = fb.login_driver(driver)
 
-	for row in missing:
+		for row in missing:
 
-		loc = row['location_name']
+			loc = row['location_name']
 
-		print(ident + '   {} ({}): {}'.format(row['location_name'], row['type_data'], len(row['dates'])))
+		
+			# Constructs dates batches
+			all_dates = np.sort(np.unique([pd.to_datetime(d.strftime("%Y-%m-%d")) for d in row['dates']]))
+			max_date = row['dates'][-1]
+			days_back = np.array([ (max_date - d).days for d in row['dates']])
+			days_back = days_back[days_back < fb.MAX_DAYS_CRAWLING]
+			days = np.max(days_back)
+					
+			print(ident + '   {} ({}): {} days back'.format(row['location_name'], row['type_data'], days))
+			
+			
+			# Dowloads the zip file
+			downloaded_file_name = fb.download_zip_movement_interval(driver, temp_folder, row['database_name'], row['database_id'], days = days)
 
-		i = 0
-		for d in row['dates']:
-
-			i += 1
-			string_date = d.strftime("%Y-%m-%d+%H%M")
-			print(ident + '      Downloading: {} ({} of {})'.format(string_date, i, len(row['dates'])))
-			fb.download_fb_file(driver, row['type_data'], row['dataset_id'], d, extra_param = row['extra_param'])
-
-
-		print(ident + '   Finished Downloading')
-		print(ident + '   Moves the Downloaded Files')
-
-
-		for file in os.listdir(temp_folder):
-			if file.endswith('.csv') and row['fb_location_name'] in file:
-
-				src_file = os.path.join(temp_folder, file)
-				dst_path = os.path.join(row['destination_folder'], file)
-
-				shutil.move(src_file, dst_path)
-
-				
-
-		print(ident + '   Finished.')
-		print()
+			if downloaded_file_name is None:
+				raise ValueError("There was an error downloading the file. Check the scrapper")
 
 
-	print(ident + 'Finished Downloading')
+			print(ident + '   Finished Downloading')
+			print(ident + '   Moves the Downloaded Files')
 
-	driver.close()
+			
+			with zipfile.ZipFile(os.path.join(temp_folder,downloaded_file_name), 'r') as zip_ref:
+				zip_ref.extractall(row['destination_folder'])
 
+			# Removes file
+			os.remove(os.path.join(temp_folder,downloaded_file_name) )
+			
+			print(ident + '   Finished.')
+			print()
+
+
+		print(ident + 'Finished Downloading')
+
+
+		driver.close()
+
+	else:
+		print(ident + '   No missing data found')
 
 # Removes Temporal Folder
 
 print()
-print(ident + 'Removes Temproal Folder')
-if os.listdir(temp_folder) == 0:
+print(ident + 'Removes Temporal Folder')
+if len(os.listdir(temp_folder)) == 0:
 	shutil.rmtree(temp_folder)
 else:
 	print(ident + '   Folder still contains files, will not remove.')
 
 # Prints the final results
 print()
-print(ident + 'Final Status (all locations)')
+print(ident + 'Final Status (Only selected locations)')
 # Iterates over the locations
-for ind, row in selected_locations_all.iterrows():
+for ind, row in selected_locations.iterrows():
 
 	print(ident + '   {}:'.format(row.location_name))
 	destination_folder =  os.path.join(data_dir, 'data_stages/',row.location_folder, 'raw/', fb.get_folder_name_by_type(row.type_data))
@@ -148,7 +155,7 @@ for ind, row in selected_locations_all.iterrows():
 		print()
 		continue
 
-	w, m = fb.check_movement_integrity(row.location_folder, row.fb_location_name, row.type_data, row.start_date, end_date)
+	w, m = fb.check_movement_integrity(row.location_folder, row.database_id, row.type_data, row.start_date, end_date)
 
 	# Missing
 	print(ident + '      Missing: {}'.format(len(m)))

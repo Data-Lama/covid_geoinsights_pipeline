@@ -9,18 +9,37 @@ from pathlib import Path
 import pandas as pd
 from shapely import wkt
 import geopandas as geopandas
+import general_functions as gf
+import movement_range_functions as mov_fun
+
+import geo_functions as geo
+
+# Direcotries
+from global_config import config
+data_dir = config.get_property('data_dir')
+analysis_dir = config.get_property('analysis_dir')
+key_string = config.get_property('key_string') 
+
+
 
 # Method Name
 method_name = 'geometry'
 
 # Reads the parameters from excecution
 location_name  = sys.argv[1] # location namme
-location_folder_name  = sys.argv[2] # location folder namme
+location_folder_name  = sys.argv[2] # location folder name
+
+if len(sys.argv) > 3:
+	calculate_intersections = sys.argv[3].upper() == 'TRUE'
+else:
+	calculate_intersections = True
+
+# Checks if its encrypted
+encrypted = gf.is_encrypted(location_folder_name)
 
 
 # Sets the location
-data_dir = Path(os.path.realpath(__file__)).parent.parent.parent
-location_folder = os.path.join(data_dir, 'data/data_stages', location_folder_name)
+location_folder = os.path.join(data_dir, 'data_stages', location_folder_name)
 
 
 # Creates the folders if the don't exist
@@ -30,8 +49,8 @@ if not os.path.exists(agglomeration_folder):
 	os.makedirs(agglomeration_folder)
 
 
-
 ident = '         '
+
 
 print(ident + 'Agglomerates for {}'.format(location_name))
 print()
@@ -46,7 +65,11 @@ print(ident + '      Polygons')
 polygons = pd.read_csv(os.path.join(location_folder, 'unified/polygons.csv'))
 
 print(ident + '      Cases')
-cases = pd.read_csv(os.path.join(location_folder, 'unified/cases.csv'))
+
+if not encrypted:
+	cases = pd.read_csv(os.path.join(location_folder, 'unified/cases.csv'))
+else:
+	cases = gf.decrypt_df(os.path.join(location_folder, 'unified/cases.csv'), key_string)
 
 print(ident + '      Movement')
 movement = pd.read_csv(os.path.join(location_folder,  'unified/movement.csv'))
@@ -62,12 +85,15 @@ print(ident + '      Checks Data Structure')
 if 'geometry' not in polygons.columns or 'POLYGON' not in polygons.geometry.values[0].upper():
 	raise ValueError('To agglomerate by geometry, polygons must have a geometry column populated with POLYGON geometry')
 
+
+
 print(ident + '      Converts to GeoPandas')
 
 # Converts the datasets into geometry
 # Polygons
 polygons['geometry'] = polygons['geometry'].apply(wkt.loads)
 polygons = geopandas.GeoDataFrame(polygons, geometry = 'geometry')
+
 
 # Cases
 cases = geopandas.GeoDataFrame(cases, geometry= geopandas.points_from_xy(cases.lon, cases.lat))
@@ -77,7 +103,10 @@ cases_cols = [col for col in cases.columns if 'num_' in col]
 print(ident + '      Agglomerates Cases')
 # Creates the agglomerated cases
 agg_cases = geopandas.sjoin(cases, polygons, how = 'inner', op = 'within')
-agg_cases = agg_cases[['date_time','location','poly_id'] + cases_cols]
+agg_cases = agg_cases[['date_time','poly_name','poly_id'] + cases_cols].rename(columns = {'poly_name':'location'})
+
+# Groups
+agg_cases = agg_cases.groupby(['date_time','location','poly_id']).sum().reset_index()
 
 
 print(ident + '      Agglomerates Polygons')
@@ -85,6 +114,8 @@ print(ident + '      Agglomerates Polygons')
 # Creates the agglomerated polygons
 agg_polygons = polygons.merge(agg_cases[['poly_id'] + cases_cols].groupby('poly_id').sum().reset_index(), on = 'poly_id')
 agg_polygons.sort_values('num_cases', ascending = False)
+
+
 
 
 print(ident + '      Agglomerates Movement')
@@ -114,10 +145,27 @@ agg_movement = agg_movement.groupby(['date_time','start_poly_id','end_poly_id'])
 # TODO: fix population
 agg_population = pd.DataFrame(columns = ['date_time','poly_id','population'])
 
+
+# If location has movement range
+mov_range_file = os.path.join(location_folder,  'unified/movement_range.csv')
+agg_movement_range = None
+if os.path.exists(mov_range_file):
+
+	print(ident + '      Movement Range')
+	df_movement_range_unified = pd.read_csv(mov_range_file)
+
+	# Computes the movement range by polygon
+	gadm_polygons = geo.get_gadm_polygons(location_folder_name)
+	gadm_polygons.rename(columns = {f'poly_id':'external_polygon_id'}, inplace = True)
+
+	agg_movement_range = mov_fun.construct_movement_range_by_polygon(df_movement_range_unified, agg_polygons,  gadm_polygons, \
+		location_folder_name, calculate_intersections)
+
 print()
 print(ident + '   Saves Data:')
 
 print(ident + '      Cases')
+
 cases_date_max = agg_cases.date_time.max()
 cases_date_min = agg_cases.date_time.min()
 agg_cases.to_csv(os.path.join(agglomeration_folder, 'cases.csv'), index = False)
@@ -136,7 +184,12 @@ agg_polygons.to_csv(os.path.join(agglomeration_folder, 'polygons.csv'), index = 
 
 print(ident + '      Population')
 agg_population.to_csv(os.path.join(agglomeration_folder, 'population.csv'), index = False)
-agg_population
+
+
+
+if agg_movement_range is not None:
+	print(ident + '      Movement Range')
+	agg_movement_range.to_csv(os.path.join(agglomeration_folder, 'movement_range.csv'), index = False)
 
 print(ident + '   Saves Statistics:')
 
