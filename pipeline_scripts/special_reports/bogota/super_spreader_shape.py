@@ -1,5 +1,4 @@
 import os
-import sys
 import numpy as np
 import pandas as pd
 import geopandas as gpd
@@ -7,6 +6,7 @@ import matplotlib.pyplot as plt
 from shapely.geometry import Point
 
 # Local imports 
+import special_functions.utils as butils
 import special_functions.geo_functions as gfun
 import superspreading_analysis as ss_analysis
 
@@ -15,6 +15,7 @@ from global_config import config
 data_dir = config.get_property('data_dir')
 analysis_dir = config.get_property('analysis_dir')
 
+sources = []
 indent = '   '
 RADIUS = 200    # Agglomeration radius
 
@@ -262,26 +263,38 @@ out_file = os.path.join(export_folder_location, out_shapefile_name)
 gdf_super_spreading_aggl_caracterized[columns_to_save].to_file(out_file, index=False)
 
 # Heatmap
-variables = ["COM-IND-TURI", "FUN-PUB", "SALUD", "TRANS", "EDUC", "TRANSMI"]
-variables_traducidas = ["Comercio, industria y turismo", "Función Pública", "Salúd", "Transporte", "Educación", "Transmilenio"]
+variables = ["COM-IND-TURI", "FUN-PUB", "SALUD", "EDUC", "TRANSMI"]
+variables_traducidas = ["Centros comerciales", "Mercados públicos", "Centros de salúd", "Centros educativos", "Red de Transmilenio"]
+
+localidades = gdf_super_spreading_aggl_caracterized["localidad"].values
+upz = gdf_super_spreading_aggl_caracterized["UPZ_name"].values
+x_labels = []
+for idx, i in enumerate(localidades):
+    label = f"{idx + 1}. {upz[idx]} - ({i})"
+    x_labels.append(label)
+
 df_heatmap = gdf_super_spreading_aggl_caracterized[variables].copy()
 df_heatmap = df_heatmap.fillna(0)
 for col in df_heatmap.columns:
     df_heatmap[col] = df_heatmap.apply(lambda x: 0 if x[col] == 0 else 1, axis=1)
 
-df_heatmap = df_heatmap.transpose()
+# df_heatmap = df_heatmap.transpose()
 
 
 fig, ax = plt.subplots(1,1, figsize=(5,5))
 ax.imshow(df_heatmap, cmap='GnBu')
-ax.set_xticks(np.arange(0, df_heatmap.shape[1]))
-ax.set_xticklabels([str(i) for i in range(1, (df_heatmap.shape[1] + 1))])
-ax.xaxis.label.set_color('w')
-ax.set_yticks(np.arange(0, len(variables)))
+ax.set_yticks(np.arange(0, df_heatmap.shape[0]))
+# ax.set_xticklabels([str(i) for i in range(1, (df_heatmap.shape[1] + 1))])
+ax.set_yticklabels(x_labels)
 ax.yaxis.label.set_color('w')
-ax.set_yticklabels(variables_traducidas)
+ax.set_xticks(np.arange(0, len(variables)))
+ax.xaxis.label.set_color('w')
+ax.set_xticklabels(variables_traducidas, rotation=90)
 out_file = os.path.join(os.path.join(export_folder_location, "superspreading_detalles.png"))
 fig.savefig(out_file, bbox_inches='tight')
+
+# Add for export
+sources.append(out_file)
 
 # --------------- HISTORIC ---------------- #
 result_folder_name = "edgelist_detection"
@@ -346,3 +359,9 @@ for d in pd.date_range(start_date, pd.to_datetime('today'), freq=frequency):
 # saves
 gdf_historic["date_time"] = gdf_historic.apply(lambda x: x["date_time"].strftime('%Y-%m-%d'), axis=1)
 gdf_historic.to_file(file_name)
+
+# Adds to export
+sources.append(file_name)
+
+# add export file info
+butils.add_export_info(os.path.basename(__file__), sources)

@@ -1,5 +1,6 @@
-# Analysis
+import os 
 
+# Analysis
 OBSERVATION_IDS = ["colombia_bogota_super_spreading_1",
                     "colombia_bogota_super_spreading_2",
                     "colombia_bogota_super_spreading_2",
@@ -65,9 +66,13 @@ TRANSLATE = {'colombia_bogota_localidad_barrios_unidos': "Barrios Unidos",
              'colombia_bogota_localidad_antonio_narino': "Antonio Nariño",
              'colombia_bogota_localidad_candelaria': "La Candelaria",
              'colombia_bogota': 'Bogotá',
-             'colombia_bogota_super_spreading_1': 'Teusaquillo - Clinica Palermo',
-             'colombia_bogota_super_spreading_2':'Engativa - Vivienda mixta',
-             'colombia_bogota_super_spreading_4': 'Suba - Parqueadero mulas',
-             'colombia_bogota_super_spreading_6': 'Kennedy Central - Plaza mercado',
-             'colombia_bogota_super_spreading_8': 'Los Cedros - Colegios privados'
+             'colombia_bogota_super_spreading_1': 'Teusaquillo - Clinica Palermo (2)',
+             'colombia_bogota_super_spreading_2':'Engativa - Vivienda mixta (1)',
+             'colombia_bogota_super_spreading_4': 'Suba - Parqueadero mulas (9)',
+             'colombia_bogota_super_spreading_6': 'Kennedy Central - Plaza mercado (4)',
+             'colombia_bogota_super_spreading_8': 'Los Cedros - Colegios privados (8)'
              }
+
+
+bogota_scripts_path = "/".join(os.path.realpath(__file__).split("/")[:-1])
+export_file = os.path.join(bogota_scripts_path, "export_locations.csv")

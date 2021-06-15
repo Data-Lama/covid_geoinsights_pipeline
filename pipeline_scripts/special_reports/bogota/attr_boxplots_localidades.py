@@ -3,13 +3,13 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
 from google.cloud import bigquery
 from google.api_core.exceptions import BadRequest
 from google.cloud.exceptions import NotFound
 
 # local imports
 import bogota_constants as cons
+import special_functions.utils as butils
 
 # Global Directories
 from global_config import config
@@ -20,6 +20,7 @@ analysis_dir = config.get_property('analysis_dir')
 
 attributes = ["pagerank_gini_index"]
 
+sources = []
 indent = '    '
 window = pd.Timedelta(15, unit="d")
 
@@ -48,35 +49,34 @@ def get_window(window_start_date, date):
 
 
 # -------------------------------------- #
-fig_1 = ['colombia_bogota_localidad_barrios_unidos',
+localities = ['colombia_bogota_localidad_barrios_unidos',
         'colombia_bogota_localidad_bosa',
         'colombia_bogota_localidad_chapinero',
         'colombia_bogota_localidad_ciudad_bolivar',
         'colombia_bogota_localidad_engativa',
         'colombia_bogota_localidad_fontibon',
-        'colombia_bogota_localidad_kennedy']
-
-fig_2 = ['colombia_bogota_localidad_los_martires',
+        'colombia_bogota_localidad_kennedy', 
+        'colombia_bogota_localidad_los_martires',
         'colombia_bogota_localidad_puente_aranda',
         'colombia_bogota_localidad_rafael_uribe_uribe',
         'colombia_bogota_localidad_san_cristobal',
         'colombia_bogota_localidad_santa_fe',
-        'colombia_bogota_localidad_suba']     
-
-fig_3 = ['colombia_bogota_localidad_teusaquillo',
+        'colombia_bogota_localidad_suba',
+        'colombia_bogota_localidad_teusaquillo',
         'colombia_bogota_localidad_tunjuelito',
         'colombia_bogota_localidad_usaquen',
         'colombia_bogota_localidad_usme',
         'colombia_bogota_localidad_antonio_narino',
         'colombia_bogota_localidad_candelaria']
 
+
 # Get args
 location_folder_name = "bogota"                 # sys.argv[1]
 start_time = "2020-01-01"                       # sys.argv[2]
-location_ids = fig_1 + fig_2 + fig_3            # sys.argv[3:]
+location_ids = localities                       # sys.argv[3:]
 
 # Declares the export location
-export_folder_location = os.path.join(analysis_dir, location_folder_name, "pagerank")
+export_folder_location = os.path.join(analysis_dir, location_folder_name, "attr_boxplots")
 
 if not os.path.exists(export_folder_location):
     os.makedirs(export_folder_location)    
@@ -104,8 +104,19 @@ query_job = client.query(query, job_config=job_config)
 
 # Return the results as a pandas DataFrame
 df = query_job.to_dataframe()
-print(df.head())
 df["date"] = df.apply(lambda x: pd.Timestamp(x["date"]), axis=1)
+
+# sort
+df_sort = df[["location_id", "attribute_name", "attribute_value"]].copy()
+df_sort = df_sort[df_sort["attribute_name"] == "personalized_pagerank_gini_index"]
+df_sort = df_sort.groupby("location_id")["attribute_value"].max()
+order = df_sort.sort_values(ascending=False).reset_index()["location_id"].values
+
+localities = order
+
+fig_1 = localities[0:7]
+fig_2 = localities[7:13]     
+fig_3 = localities[13:]
 
 # Generate windows of desired length
 prev_date = df.date.min()
@@ -148,7 +159,8 @@ for idx, loc in enumerate(fig_1):
         
 
     # Create the boxplot
-    bp = ax.boxplot(data_to_plot)
+    medianprops = dict(linewidth=1.5, color='royalblue')
+    bp = ax.boxplot(data_to_plot, showfliers=False, medianprops=medianprops)
     if idx != (len(axes) - 1):
         ax.set_xticklabels([])
     else:
@@ -156,8 +168,12 @@ for idx, loc in enumerate(fig_1):
         
 
     ax.set_title(cons.TRANSLATE[loc])
-    
-fig.savefig(os.path.join(export_folder_location,f"pr_gini_localities_1.png"), bbox_inches='tight')    
+
+file_name = os.path.join(export_folder_location,f"pr_gini_localities_1.png")
+fig.savefig(file_name, bbox_inches='tight')  
+
+# Adds to export
+sources.append(file_name)
 
 # Figure 2
 # Create a figure instance
@@ -177,7 +193,8 @@ for idx, loc in enumerate(fig_2):
         
 
     # Create the boxplot
-    bp = ax.boxplot(data_to_plot)
+    medianprops = dict(linewidth=1.5, color='royalblue')
+    bp = ax.boxplot(data_to_plot, showfliers=False, medianprops=medianprops)
     if idx != (len(axes) - 1):
         ax.set_xticklabels([])
     else:
@@ -186,7 +203,12 @@ for idx, loc in enumerate(fig_2):
 
     ax.set_title(cons.TRANSLATE[loc])
     
-fig.savefig(os.path.join(export_folder_location,f"pr_gini_localities_2.png"), bbox_inches='tight')  
+
+file_name = os.path.join(export_folder_location,f"pr_gini_localities_2.png")
+fig.savefig(file_name, bbox_inches='tight')  
+
+# Adds to export
+sources.append(file_name)
 
 # Figure 3
 # Create a figure instance
@@ -206,7 +228,8 @@ for idx, loc in enumerate(fig_3):
         
 
     # Create the boxplot
-    bp = ax.boxplot(data_to_plot)
+    medianprops = dict(linewidth=1.5, color='royalblue')
+    bp = ax.boxplot(data_to_plot, showfliers=False, medianprops=medianprops)
     if idx != (len(axes) - 1):
         ax.set_xticklabels([])
     else:
@@ -215,11 +238,13 @@ for idx, loc in enumerate(fig_3):
 
     ax.set_title(cons.TRANSLATE[loc])
 print(f"{indent}Saves")   
-fig.savefig(os.path.join(export_folder_location,f"pr_gini_localities_3.png"), bbox_inches='tight')  
 
-# # General
-# fig, ax = plt.subplots(1, 1, figsize=(20, 10))
-# fig.subplots_adjust(bottom=0.5)  
 
-# df_graph_avg = df_graph.groupby(["location_id", "window"]).mean()
-# df_graph_avg.plot()
+file_name = os.path.join(export_folder_location,f"pr_gini_localities_3.png")
+fig.savefig(file_name, bbox_inches='tight')  
+
+# Adds to export
+sources.append(file_name)
+
+# add export file info
+butils.add_export_info(os.path.basename(__file__), sources)

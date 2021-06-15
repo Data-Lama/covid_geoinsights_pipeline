@@ -3,13 +3,13 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
 from google.cloud import bigquery
 from google.api_core.exceptions import BadRequest
 from google.cloud.exceptions import NotFound
 
 # local imports
 import bogota_constants as cons
+import special_functions.utils as butils
 
 # Global Directories
 from global_config import config
@@ -20,6 +20,7 @@ analysis_dir = config.get_property('analysis_dir')
 
 attributes = ["number_of_contacts", "pagerank_gini_index", "personalized_pagerank_gini_index"]
 
+sources = []
 indent = '    '
 window = pd.Timedelta(15, unit="d")
 
@@ -56,12 +57,10 @@ start_time = "2021-01-01"                   # sys.argv[2]
 location_ids = cons.OBSERVATION_IDS         # sys.argv[3:]
 
 # Declares the export location
-export_folder_location = os.path.join(analysis_dir, location_folder_name, "pagerank")
+export_folder_location = os.path.join(analysis_dir, location_folder_name, "attr_boxplots")
 
 if not os.path.exists(export_folder_location):
     os.makedirs(export_folder_location)    
-
-export_folder_location = os.path.join("/", "Users", "andreaparra", "Desktop", "attr_boxplots")
 
 print(f"{indent}Plotting attributes per location id.")
 
@@ -88,6 +87,14 @@ query_job = client.query(query, job_config=job_config)
 df = query_job.to_dataframe()
 df["date"] = df.apply(lambda x: pd.Timestamp(x["date"]), axis=1)
 
+# sort
+df_sort = df[["location_id", "attribute_name", "attribute_value"]].copy()
+df_sort = df_sort[df_sort["attribute_name"] == "personalized_pagerank_gini_index"]
+df_sort = df_sort.groupby("location_id")["attribute_value"].max()
+order = df_sort.sort_values(ascending=False).reset_index()["location_id"].values
+
+
+
 # Generate windows of desired length
 prev_date = df.date.min()
 window_start_date = []
@@ -109,7 +116,7 @@ for attr in attributes:
     columns.append(attr)
 
 df_graph = df_graph[columns].copy()
-for location in df_graph.location_id.unique():
+for location in order:
     print(f"{indent}{indent}{location}")
 
     df_tmp = df_graph[df_graph["location_id"] == location].copy()
@@ -132,7 +139,8 @@ for location in df_graph.location_id.unique():
             
 
         # Create the boxplot
-        bp = ax.boxplot(data_to_plot)
+        medianprops = dict(linewidth=1.5, color='royalblue')
+        bp = ax.boxplot(data_to_plot, showfliers=False, medianprops=medianprops)
         if idx != (len(axes) - 1):
             ax.set_xticklabels([])
         else:
@@ -142,7 +150,13 @@ for location in df_graph.location_id.unique():
         ax.set_title(ATTR_TRANSLATE[attr])
         
     plt.suptitle(cons.TRANSLATE[location], fontsize=18)
-    fig.savefig(os.path.join(export_folder_location,f"{location}_boxplot.png"), bbox_inches='tight')    
+    
+    file_name = os.path.join(export_folder_location,f"{location}_boxplot.png")
+    fig.savefig(file_name, bbox_inches='tight')
+    
+    # Adds to export
+    sources.append(file_name)    
 
-
+    # add export file info
+    butils.add_export_info(os.path.basename(__file__), sources)
     
