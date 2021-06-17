@@ -17,7 +17,7 @@ analysis_dir = config.get_property('analysis_dir')
 
 sources = []
 indent = '   '
-RADIUS = 200    # Agglomeration radius
+RADIUS = 200    # Agglomeration radius in meters
 
 # Constants for bogota
 location_folder_name = "bogota"
