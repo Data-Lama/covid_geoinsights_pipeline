@@ -8,6 +8,7 @@ import os, sys
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
+import special_functions.utils as butils
 
 import bigquery_functions as bqf
 import graph_functions as grf
@@ -91,8 +92,11 @@ def main():
 
     df.to_csv(os.path.join(export_folder_location, 'statistics.csv'), index = False, sep = ";")
 
+    butils.add_export_info(os.path.basename(__file__), [os.path.join(export_folder_location, 'statistics.csv')])
+
     print(ident + "Done!")
 
+    
     
 
 # Runs the script

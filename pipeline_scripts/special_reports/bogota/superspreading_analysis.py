@@ -109,6 +109,10 @@ def main(location_graph_id,
     # Extracts
     print(ident + "   Extracts the Distance to Infected")
     df_dist_infected = bqf.get_distance_to_infected(client, location_graph_id, min_date, max_date)
+
+    if df_dist_infected.shape[0] == 0:
+        raise ValueError(f"No cases found between the dates {min_date} and {max_date}, the cases table is probably out of date")
+
     df_dist_infected.date = pd.to_datetime(df_dist_infected.date)
     dist_infected_dates = df_dist_infected.date.unique() 
 
@@ -352,7 +356,12 @@ if __name__ == "__main__":
     location_folder_name = "bogota" #sys.argv[3]
     location_name = "Bogotá" #sys.argv[4]
 
+    #max_date = pd.to_datetime("2021-06-08")
     max_date = None
+    
+    if not pd.isna(max_date):
+        print("DEBUG!!!")
+        print("DATE IS FIXED")
 
 
     # Adds the health poligons

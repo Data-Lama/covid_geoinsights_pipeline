@@ -22,8 +22,9 @@ scripts = [ "extract_statistics.py",
             "attr_boxplots.py",
             "housing_super_spreaders.py"]
 
+scripts = [ "extract_statistics.py"]
 
-export_location = {"extract_statistics.py":None,
+export_location = {"extract_statistics.py":"archivos",
                     "superspreading_analysis.py": None, 
                     "super_spreader_shape.py": "shapefiles",
                     "attr_boxplots_localidades.py": "graficas",
@@ -50,6 +51,7 @@ if not os.path.exists(export_folder_location):
 print("Exporting files")
 for script in scripts:
     files = butils.get_script_sources(script)
+
     if files == None:
         continue
     if export_location[script]:
@@ -69,6 +71,7 @@ for script in scripts:
                 butils.copytree(shp_folder_path, dest_folder)
 
             else:
+                
                 if not os.path.exists(dest_location):
                     os.makedirs(dest_location) 
                 try:
