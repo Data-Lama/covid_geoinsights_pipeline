@@ -22,7 +22,6 @@ scripts = [ "extract_statistics.py",
             "attr_boxplots.py",
             "housing_super_spreaders.py"]
 
-scripts = [ "extract_statistics.py"]
 
 export_location = {"extract_statistics.py":"archivos",
                     "superspreading_analysis.py": None, 
