@@ -330,6 +330,9 @@ location_folder_name = "bogota"
 location_name = "Bogotá"
 
 
+# REMOVE
+
+
 for d in pd.date_range(start_date, pd.to_datetime('today'), freq=frequency):
     if gdf_historic["date_time"].max() >= pd.to_datetime('today') - pd.Timedelta(days=1):
         print(indent + f"Data is up to date.")

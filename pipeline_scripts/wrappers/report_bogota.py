@@ -15,7 +15,8 @@ report_dir = config.get_property('report_dir')
 indent = '   '
 
 # scripts
-scripts = [ "extract_statistics.py",
+scripts = [ "ppr_gini.py",
+            "extract_statistics.py",
             "superspreading_analysis.py",
             "super_spreader_shape.py",
             "attr_boxplots_localidades.py",
@@ -23,7 +24,8 @@ scripts = [ "extract_statistics.py",
             "housing_super_spreaders.py"]
 
 
-export_location = {"extract_statistics.py":"archivos",
+export_location = {"ppr_gini.py":"graficas",
+                    "extract_statistics.py":"archivos",
                     "superspreading_analysis.py": None, 
                     "super_spreader_shape.py": "shapefiles",
                     "attr_boxplots_localidades.py": "graficas",
@@ -36,7 +38,7 @@ script_location = os.path.join("pipeline_scripts", "special_reports", "bogota")
 
 # Excecutes
 for script in scripts:
-    print(f"Excecuting {script}")
+    print(ident + f"Excecuting {script}")
     resp = ef.excecute_script(script_location, script, "python", "", progress_file = con.progress_file)
     resp = "O.K" if resp == 0 else f"with error {resp}"
     print(f"{script} excecuted: {resp}")
@@ -47,7 +49,7 @@ export_folder_location = os.path.join(report_dir, "reporte_bogota")
 if not os.path.exists(export_folder_location):
     os.makedirs(export_folder_location)   
 
-print("Exporting files")
+print(ident + "Exporting files")
 for script in scripts:
     files = butils.get_script_sources(script)
 

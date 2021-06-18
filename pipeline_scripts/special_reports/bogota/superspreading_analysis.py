@@ -356,8 +356,8 @@ if __name__ == "__main__":
     location_folder_name = "bogota" #sys.argv[3]
     location_name = "Bogotá" #sys.argv[4]
 
-    max_date = pd.to_datetime("2021-06-08")
-    #max_date = None
+    #max_date = pd.to_datetime("2021-06-08")
+    max_date = None
 
     if not pd.isna(max_date):
         print("DEBUG!!!")
