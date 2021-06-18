@@ -2,7 +2,7 @@
 
 import os
 # Set credentials explicitly for jupyter
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/andreaparra/Dropbox/4_Work/DataLamaCovid/gcp/andrea-grafos-bogota-key.json"
+#os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/andreaparra/Dropbox/4_Work/DataLamaCovid/gcp/andrea-grafos-bogota-key.json"
 
 # Loads the different libraries
 import numpy as np
@@ -352,6 +352,8 @@ if __name__ == "__main__":
     location_folder_name = "bogota" #sys.argv[3]
     location_name = "Bogotá" #sys.argv[4]
 
+    max_date = None
+
 
     # Adds the health poligons
     other_geopandas_to_draw = []
@@ -361,4 +363,4 @@ if __name__ == "__main__":
                                     'display_name' : 'Cuadrantes de Salud'})
     
 
-    main(location_graph_id, dataset_id, location_folder_name, location_name, other_geopandas_to_draw = other_geopandas_to_draw)
+    main(location_graph_id, dataset_id, location_folder_name, location_name, max_date, other_geopandas_to_draw = other_geopandas_to_draw)

@@ -15,14 +15,16 @@ report_dir = config.get_property('report_dir')
 indent = '   '
 
 # scripts
-scripts = [ "superspreading_analysis.py",
+scripts = [ "extract_statistics.py",
+            "superspreading_analysis.py",
             "super_spreader_shape.py",
             "attr_boxplots_localidades.py",
             "attr_boxplots.py",
             "housing_super_spreaders.py"]
 
 
-export_location = {"superspreading_analysis.py": None, 
+export_location = {"extract_statistics.py":None,
+                    "superspreading_analysis.py": None, 
                     "super_spreader_shape.py": "shapefiles",
                     "attr_boxplots_localidades.py": "graficas",
                     "attr_boxplots.py": "graficas/observacion", 

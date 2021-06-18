@@ -47,7 +47,7 @@ def main():
 
     # Number of cases previous seven days
 
-    start_date = (datetime.today() - timedelta(days = 10)).strftime("%Y-%m-%d")
+    start_date = (datetime.today() - timedelta(days = 18)).strftime("%Y-%m-%d")
     sql_extract = f"""
 
             SELECT AVG(total_cases) as average_cases
@@ -57,10 +57,9 @@ def main():
                 FROM `servinf-unacast-prod.AlcaldiaBogota.positivos_agg_fecha`
                 WHERE fechadiagn >= "{start_date}"
                 GROUP BY fechadiagn
-                ORDER BY fecha
+                ORDER BY fechadiagn
             )
     """
-
     average_cases = str(int(np.round(bqf.run_simple_query(client, sql_extract).average_cases[0])))
 
 
