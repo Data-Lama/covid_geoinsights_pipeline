@@ -2,7 +2,7 @@ script	source
 ppr_gini.py	/home/minigonche/Dropbox/Projects/covid_fb_pipeline/data_repo/analysis/bogota/superspreading/ppr_gini.png
 extract_statistics.py	/home/minigonche/Dropbox/Projects/covid_fb_pipeline/data_repo/analysis/bogota/statistics/statistics.csv
 superspreading_analysis.py	
-super_spreader_shape.py	
-attr_boxplots_localidades.py	
-attr_boxplots.py	
-housing_super_spreaders.py	
+super_spreader_shape.py	/home/minigonche/Dropbox/Projects/covid_fb_pipeline/data_repo/analysis/bogota/edgelist_detection/shapefile_report/superspreading_detalles.png,/home/minigonche/Dropbox/Projects/covid_fb_pipeline/data_repo/analysis/bogota/edgelist_detection/shapefile_colombia_bogota_historic/superspreader_colombia_bogota_historic.shp
+attr_boxplots_localidades.py	/home/minigonche/Dropbox/Projects/covid_fb_pipeline/data_repo/analysis/bogota/attr_boxplots/pr_gini_localities_1.png,/home/minigonche/Dropbox/Projects/covid_fb_pipeline/data_repo/analysis/bogota/attr_boxplots/pr_gini_localities_2.png,/home/minigonche/Dropbox/Projects/covid_fb_pipeline/data_repo/analysis/bogota/attr_boxplots/pr_gini_localities_3.png
+attr_boxplots.py	/home/minigonche/Dropbox/Projects/covid_fb_pipeline/data_repo/analysis/bogota/attr_boxplots/colombia_bogota_super_spreading_1_boxplot.png,/home/minigonche/Dropbox/Projects/covid_fb_pipeline/data_repo/analysis/bogota/attr_boxplots/colombia_bogota_super_spreading_2_boxplot.png,/home/minigonche/Dropbox/Projects/covid_fb_pipeline/data_repo/analysis/bogota/attr_boxplots/colombia_bogota_super_spreading_8_boxplot.png
+housing_super_spreaders.py	/home/minigonche/Dropbox/Projects/covid_fb_pipeline/data_repo/analysis/bogota/housing_shapefile/housing_super_spreading.shp

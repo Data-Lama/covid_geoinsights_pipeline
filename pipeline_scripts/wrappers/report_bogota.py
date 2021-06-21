@@ -38,7 +38,7 @@ script_location = os.path.join("pipeline_scripts", "special_reports", "bogota")
 
 # Excecutes
 for script in scripts:
-    print(ident + f"Excecuting {script}")
+    print(indent + f"Excecuting {script}")
     resp = ef.excecute_script(script_location, script, "python", "", progress_file = con.progress_file)
     resp = "O.K" if resp == 0 else f"with error {resp}"
     print(f"{script} excecuted: {resp}")
@@ -49,7 +49,7 @@ export_folder_location = os.path.join(report_dir, "reporte_bogota")
 if not os.path.exists(export_folder_location):
     os.makedirs(export_folder_location)   
 
-print(ident + "Exporting files")
+print(indent + "Exporting files")
 for script in scripts:
     files = butils.get_script_sources(script)
 
