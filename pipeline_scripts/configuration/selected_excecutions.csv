@@ -3,7 +3,7 @@ All,,PRE,PRE,1,NO,download_facebook,python,
 Bogota,bogota,extract,extractors,1,NO,bogota_extractor,python,
 Bogota,bogota,unify,unifiers,1,NO,universal_generic_unifier,python,Bogota bogota
 Bogota,bogota,agglomerate,agglomerators,2,NO,universal_geometry_agglomerate,python,Bogota bogota
-Bogota,bogota,analyse,special_reports/bogota,2,NO,super_spreader_shape,python,
+Bogota,bogota,analyse,special_reports/bogota,2,NO,super_spreading_shape_historic_and_new,python,
 Bogota,bogota,analyse,special_reports/bogota,1,NO,extract_statistics,python,
 Bogota,bogota,analyse,special_reports/bogota,1,NO,ppr_gini,python,
 Bogota,Bogota,POS,wrappers,1,YES,report_bogota,python,

@@ -17,7 +17,7 @@ indent = '   '
 # scripts
 scripts = [ "ppr_gini.py",
             "extract_statistics.py",
-            "superspreading_analysis.py",
+            "super_spreading_shape_historic_and_new.py",
             "super_spreader_shape.py",
             "attr_boxplots_localidades.py",
             "attr_boxplots.py",
@@ -26,7 +26,7 @@ scripts = [ "ppr_gini.py",
 
 export_location = {"ppr_gini.py":"graficas",
                     "extract_statistics.py":"archivos",
-                    "superspreading_analysis.py": None, 
+                    "super_spreading_shape_historic_and_new.py": "shapefiles", 
                     "super_spreader_shape.py": "shapefiles",
                     "attr_boxplots_localidades.py": "graficas",
                     "attr_boxplots.py": "graficas/observacion", 

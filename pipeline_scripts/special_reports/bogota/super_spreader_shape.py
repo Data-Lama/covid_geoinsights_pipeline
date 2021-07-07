@@ -262,6 +262,9 @@ print(f"{indent}Saving")
 out_file = os.path.join(export_folder_location, out_shapefile_name)
 gdf_super_spreading_aggl_caracterized[columns_to_save].to_file(out_file, index=False)
 
+# Adds to export
+sources.append(out_file)
+
 # Heatmap
 variables = ["COM-IND-TURI", "FUN-PUB", "SALUD", "EDUC", "TRANSMI"]
 variables_traducidas = ["Centros comerciales", "Mercados públicos", "Centros de salúd", "Centros educativos", "Red de Transmilenio"]
