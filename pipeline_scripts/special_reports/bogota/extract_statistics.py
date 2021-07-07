@@ -8,6 +8,7 @@ import os, sys
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
+import special_functions.utils as butils
 
 import bigquery_functions as bqf
 import graph_functions as grf
@@ -47,7 +48,7 @@ def main():
 
     # Number of cases previous seven days
 
-    start_date = (datetime.today() - timedelta(days = 10)).strftime("%Y-%m-%d")
+    start_date = (datetime.today() - timedelta(days = 18)).strftime("%Y-%m-%d")
     sql_extract = f"""
 
             SELECT AVG(total_cases) as average_cases
@@ -57,10 +58,9 @@ def main():
                 FROM `servinf-unacast-prod.AlcaldiaBogota.positivos_agg_fecha`
                 WHERE fechadiagn >= "{start_date}"
                 GROUP BY fechadiagn
-                ORDER BY fecha
+                ORDER BY fechadiagn
             )
     """
-
     average_cases = str(int(np.round(bqf.run_simple_query(client, sql_extract).average_cases[0])))
 
 
@@ -92,8 +92,11 @@ def main():
 
     df.to_csv(os.path.join(export_folder_location, 'statistics.csv'), index = False, sep = ";")
 
+    butils.add_export_info(os.path.basename(__file__), [os.path.join(export_folder_location, 'statistics.csv')])
+
     print(ident + "Done!")
 
+    
     
 
 # Runs the script

@@ -262,6 +262,9 @@ print(f"{indent}Saving")
 out_file = os.path.join(export_folder_location, out_shapefile_name)
 gdf_super_spreading_aggl_caracterized[columns_to_save].to_file(out_file, index=False)
 
+# Adds to export
+sources.append(out_file)
+
 # Heatmap
 variables = ["COM-IND-TURI", "FUN-PUB", "SALUD", "EDUC", "TRANSMI"]
 variables_traducidas = ["Centros comerciales", "Mercados públicos", "Centros de salúd", "Centros educativos", "Red de Transmilenio"]
@@ -328,6 +331,10 @@ location_graph_id = "colombia_bogota"
 dataset_id = "edgelists_cities" 
 location_folder_name = "bogota"
 location_name = "Bogotá"
+
+
+# REMOVE
+
 
 for d in pd.date_range(start_date, pd.to_datetime('today'), freq=frequency):
     if gdf_historic["date_time"].max() >= pd.to_datetime('today') - pd.Timedelta(days=1):
