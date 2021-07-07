@@ -5,8 +5,6 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 from shapely.geometry import Point
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/andreaparra/Dropbox/4_Work/DataLamaCovid/gcp/andrea-grafos-bogota-key.json"
-
 # Local imports
 import bogota_constants as cons
 import special_functions.utils as butils
