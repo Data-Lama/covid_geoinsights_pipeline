@@ -1,12 +1,16 @@
 import os 
 
 # Analysis
-OBSERVATION_IDS = ["colombia_bogota_super_spreading_1",
-                    "colombia_bogota_super_spreading_2",
-                    "colombia_bogota_super_spreading_2",
-                    "colombia_bogota_super_spreading_4",
-                    "colombia_bogota_super_spreading_6",
-                    "colombia_bogota_super_spreading_8"]
+# OBSERVATION_IDS = ["colombia_bogota_super_spreading_1",
+#                     "colombia_bogota_super_spreading_2",
+#                     "colombia_bogota_super_spreading_2",
+#                     "colombia_bogota_super_spreading_4",
+#                     "colombia_bogota_super_spreading_6",
+#                     "colombia_bogota_super_spreading_8"]
+
+OBSERVATION_IDS = ["intervencion_alcaldia_bogota_1", 
+                   "intervencion_alcaldia_bogota_2",
+                   "intervencion_alcaldia_bogota_3"]
 
 # Window to calculate "last week"
 WINDOW = 6
