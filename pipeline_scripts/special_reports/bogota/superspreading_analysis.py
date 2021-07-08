@@ -46,7 +46,7 @@ MAX_RESOLUTION = 5
 MAX_DISTANCE = 3
 MAX_TIME = 2
 
-ident = '   '
+ident = '         '
 
 result_folder_name = "edgelist_detection"
 
@@ -392,7 +392,7 @@ def main(location_graph_id,
 
 
     # Saves the geofiles
-    print(ident + "   Constructs Geo File")
+    print(ident + "Constructs Geo File")
     geo_pagerank_trace['type'] = 'Pagerank Trace'
     geo_pagerank['type'] = 'Pagerank Top'
     geo_locations['type'] = 'Contacts Top'

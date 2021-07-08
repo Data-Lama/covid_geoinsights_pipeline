@@ -18,7 +18,7 @@ indent = '   '
 scripts = [ "ppr_gini.py",
             "extract_statistics.py",
             "super_spreading_shape_historic_and_new.py",
-            "super_spreader_shape.py",
+            #"super_spreader_shape.py",
             "attr_boxplots_localidades.py",
             "attr_boxplots.py",
             "housing_super_spreaders.py"]
@@ -27,7 +27,7 @@ scripts = [ "ppr_gini.py",
 export_location = {"ppr_gini.py":"graficas",
                     "extract_statistics.py":"archivos",
                     "super_spreading_shape_historic_and_new.py": "shapefiles", 
-                    "super_spreader_shape.py": "shapefiles",
+                    #"super_spreader_shape.py": "shapefiles",
                     "attr_boxplots_localidades.py": "graficas",
                     "attr_boxplots.py": "graficas/observacion", 
                     "housing_super_spreaders.py": "shapefiles"}
@@ -38,10 +38,10 @@ script_location = os.path.join("pipeline_scripts", "special_reports", "bogota")
 
 # Excecutes
 for script in scripts:
-    print(indent + f"Excecuting {script}")
+    print(indent + f"   Excecuting {script}")
     resp = ef.excecute_script(script_location, script, "python", "", progress_file = con.progress_file)
     resp = "O.K" if resp == 0 else f"with error {resp}"
-    print(f"{script} excecuted: {resp}")
+    print(indent + f"   {script} excecuted: {resp}")
 
 # Exports 
 export_folder_location = os.path.join(report_dir, "reporte_bogota")
