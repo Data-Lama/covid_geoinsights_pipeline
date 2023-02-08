@@ -9,7 +9,7 @@ selenium==3.141.0
 GitPython==3.1.14
 requests==2.25.1
 Unidecode==1.2.0
-cryptography==3.4.7
+cryptography==39.0.1
 matplotlib==3.4.1
 rtree==0.9.7
 pymc3==3.11.2
