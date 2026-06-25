@@ -30,7 +30,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support import expected_conditions as expect
 
-
+import fileinput
 
 import geo_functions as geo
 
@@ -512,7 +512,14 @@ def clean_folder(directory):
 			new_name = file.split('_')[-1]
 			os.rename(os.path.join(directory, file) , os.path.join(directory, new_name)  )
 
+def clean_file(file_name):
+	'''
+	Method that cleans file
+	'''
 
+	with fileinput.FileInput(file_name, inplace=True) as file:
+		for line in file:
+			print(line.replace("Bogotá, ", "Bogotá "), end='')
 
 def read_single_file(file_name, dropna = False, parse_dates = False):
 	'''
@@ -520,11 +527,18 @@ def read_single_file(file_name, dropna = False, parse_dates = False):
 	This method is designed for te facebook files
 	'''
 
+
+
+	print(file_name.split('/')[-1])
+
+	#cleans file
+	clean_file(file_name)
+
 	try:
 		if parse_dates:
-			df = pd.read_csv(file_name, parse_dates=["date_time"], date_parser=lambda x: pd.to_datetime(x, format="%Y-%m-%d %H%M"), na_values = ['\\N'])
+			df = pd.read_csv(file_name, parse_dates=["date_time"], date_parser=lambda x: pd.to_datetime(x, format="%Y-%m-%d %H%M"))
 		else: 
-			df = pd.read_csv(file_name, na_values = ['\\N'])
+			df = pd.read_csv(file_name)
 
 		if dropna:
 			df.dropna(inplace = True)
@@ -533,6 +547,10 @@ def read_single_file(file_name, dropna = False, parse_dates = False):
 
 	except pd.errors.EmptyDataError:
 		raise ValueError(f'File {file_name} is empty, please download it again.')
+	
+	except pd.errors.ParserError:
+		#print(f"File: {file_name} is corrupt, please download again")
+		return None
 
 
 
@@ -599,9 +617,9 @@ def export_movement_batch(final_file_location, location_folder_name, stage = 'ra
 			df = read_single_file(file_name, dropna = dropna, parse_dates = True)
 
 			# Adds geometry
-			if set(df.columns) != MOVEMENT_COLS:
+			if df is None or set(df.columns) != MOVEMENT_COLS:
 				print(ident + f"File {file} is corrupted\n"  + ident + "   Will remove.")
-				os.remove(file_name)
+				#os.remove(file_name)
 				continue
 
 

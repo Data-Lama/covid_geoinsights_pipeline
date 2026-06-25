@@ -78,7 +78,12 @@ df_aggl_scheme.to_csv(os.path.join(unified_dir, 'aggl_scheme.csv'), index = Fals
 # ---- Cases -----
 # ----------------
 print(ident + '   Cases')
-df_cases = unifier.build_cases_geo()
+
+print("DEBUG!!!")
+#df_cases = unifier.build_cases_geo()
+df_cases = pd.DataFrame({'date_time':[pd.to_datetime("2020-01-20")]})
+
+
 
 # Checks if max date is given
 if max_date is not None:
