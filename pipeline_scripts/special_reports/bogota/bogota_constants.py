@@ -1,12 +1,16 @@
 import os 
 
 # Analysis
-OBSERVATION_IDS = ["colombia_bogota_super_spreading_1",
-                    "colombia_bogota_super_spreading_2",
-                    "colombia_bogota_super_spreading_2",
-                    "colombia_bogota_super_spreading_4",
-                    "colombia_bogota_super_spreading_6",
-                    "colombia_bogota_super_spreading_8"]
+# OBSERVATION_IDS = ["colombia_bogota_super_spreading_1",
+#                     "colombia_bogota_super_spreading_2",
+#                     "colombia_bogota_super_spreading_2",
+#                     "colombia_bogota_super_spreading_4",
+#                     "colombia_bogota_super_spreading_6",
+#                     "colombia_bogota_super_spreading_8"]
+
+OBSERVATION_IDS = ["intervencion_alcaldia_bogota_1", 
+                   "intervencion_alcaldia_bogota_2",
+                   "intervencion_alcaldia_bogota_3"]
 
 # Window to calculate "last week"
 WINDOW = 6
@@ -70,7 +74,10 @@ TRANSLATE = {'colombia_bogota_localidad_barrios_unidos': "Barrios Unidos",
              'colombia_bogota_super_spreading_2':'Engativa - Vivienda mixta (1)',
              'colombia_bogota_super_spreading_4': 'Suba - Parqueadero mulas (9)',
              'colombia_bogota_super_spreading_6': 'Kennedy Central - Plaza mercado (4)',
-             'colombia_bogota_super_spreading_8': 'Los Cedros - Colegios privados (8)'
+             'colombia_bogota_super_spreading_8': 'Los Cedros - Colegios privados (8)',
+             'intervencion_alcaldia_bogota_1': 'Teusaquillo',
+             'intervencion_alcaldia_bogota_2': 'Engativa',
+             'intervencion_alcaldia_bogota_3': 'Las Ferias'
              }
 
 

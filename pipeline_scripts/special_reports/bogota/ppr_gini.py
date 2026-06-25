@@ -6,6 +6,8 @@ import matplotlib.dates as mdates
 from google.cloud import bigquery
 import os, sys
 import pandas as pd
+import special_functions.utils as butils
+
 
 import bigquery_functions as bqf
 import graph_functions as grf
@@ -68,7 +70,12 @@ def main():
         
     ax.figure.savefig(os.path.join(export_folder_location, 'ppr_gini.png'), dpi = 150)
 
+    butils.add_export_info(os.path.basename(__file__), [os.path.join(export_folder_location, 'ppr_gini.png')])
+
+
     print(ident + "Done!")
+
+
 
 # Runs the script
 if __name__ == "__main__":

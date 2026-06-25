@@ -5,6 +5,9 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 from shapely.geometry import Point
 
+# Bigquery
+from google.cloud import bigquery
+
 # Local imports 
 import special_functions.utils as butils
 import special_functions.geo_functions as gfun
@@ -33,6 +36,21 @@ shapefile_name = "superspreader_colombia_bogota.shp"
 
 # Get super_spreaders
 gdf_super_spreading = gpd.read_file(os.path.join(input_folder_location, shapefile_folder, shapefile_name))
+
+# Get max date
+client = bigquery.Client(location="US")
+job_config = bigquery.QueryJobConfig(allow_large_results = True)
+
+
+query = f"""
+SELECT MAX(attr.date)
+FROM `grafos-alcaldia-bogota.graph_attributes.graph_attributes` attr
+WHERE attr.attribute_name = "personalized_pagerank_gini_index"
+"""
+
+query_job = client.query(query, job_config=job_config)
+df = query_job.to_dataframe()
+max_date = df.values[0]
 
 # Get manzanas shapefile
 manzanas_path = os.path.join(data_dir,
@@ -262,6 +280,9 @@ print(f"{indent}Saving")
 out_file = os.path.join(export_folder_location, out_shapefile_name)
 gdf_super_spreading_aggl_caracterized[columns_to_save].to_file(out_file, index=False)
 
+# Adds to export
+sources.append(out_file)
+
 # Heatmap
 variables = ["COM-IND-TURI", "FUN-PUB", "SALUD", "EDUC", "TRANSMI"]
 variables_traducidas = ["Centros comerciales", "Mercados públicos", "Centros de salúd", "Centros educativos", "Red de Transmilenio"]
@@ -329,8 +350,10 @@ dataset_id = "edgelists_cities"
 location_folder_name = "bogota"
 location_name = "Bogotá"
 
-for d in pd.date_range(start_date, pd.to_datetime('today'), freq=frequency):
-    if gdf_historic["date_time"].max() >= pd.to_datetime('today') - pd.Timedelta(days=1):
+
+# REMOVE
+for d in pd.date_range(start_date, max_date, freq=frequency):
+    if gdf_historic["date_time"].max() >= max_date - pd.Timedelta(days=1):
         print(indent + f"Data is up to date.")
         break
     

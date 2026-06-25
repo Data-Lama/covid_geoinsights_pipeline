@@ -34,7 +34,7 @@ PALETTE = ["#75D1BA", "#B0813B", "#A85238", "#18493F", "#32955E",
           "#BB3E94", "#2F8E31", "#CED175", "#85D686", "#A39FDF"]
 
 ATTR_TRANSLATE = {"pagerank_gini_index": "Indice Pagerank GINI",
-                "personalized_pagerank_gini_index": "Indice Pagerank GINI (ponderado)"}
+                "personalized_pagerank_gini_index": "Indice Personalized Pagerank GINI (ponderado)"}
 
 box_plots = True
 

@@ -26,7 +26,7 @@ min_date = (pd.to_datetime('today') - pd.Timedelta(days=15)).strftime('%Y-%m-%d'
 location_ids = cons.OBSERVATION_IDS                                                  # sys.argv[3]
 
 # Declares the export location
-export_folder_location = os.path.join(analysis_dir, location_folder_name, "housing_shapefile")
+export_folder_location = os.path.join(analysis_dir, location_folder_name, "housing_shapefile_salud")
 
 if not os.path.exists(export_folder_location):
     os.makedirs(export_folder_location)    
